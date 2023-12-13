@@ -5,10 +5,8 @@ services:
         build:
             context: ../
             dockerfile: env/Dockerfile
-            args:
-              USER_ID: ${USER_ID}
+        environment:
+            - SSH_AUTH_SOCK=/ssh-agent
         volumes:
             - ../:/app
             - ${SSH_AUTH_SOCK}:/ssh-agent
-        environment:
-            - SSH_AUTH_SOCK=/ssh-agent
