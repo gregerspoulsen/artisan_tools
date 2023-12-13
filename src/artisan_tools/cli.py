@@ -1,5 +1,6 @@
 import typer
 from artisan_tools.version import bump_version_file
+import artisan_tools.vcs
 
 app = typer.Typer()
 
@@ -25,8 +26,20 @@ def bump(
 
 
 @app.command()
-def hello(name: str):
-    typer.echo(f"Hello {name}")
+def check_tag(
+    tag: str = typer.Argument(  # noqa: B008
+        ..., help="The tag to check in the remote repository."
+    )
+):
+    """
+    Check if a specific tag exists in the remote Git repository.
+    """
+    if artisan_tools.vcs.check_tag(tag):
+        print(f"Tag '{tag}' exists in the remote repository.")
+        typer.Exit(code=0)
+    else:
+        print(f"Tag '{tag}' does not exist in the remote repository.")
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":
