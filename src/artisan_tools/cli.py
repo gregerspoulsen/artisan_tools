@@ -42,5 +42,22 @@ def check_tag(
         raise typer.Exit(code=1)
 
 
+@app.command()
+def check_branch(
+    expected_branch: str = typer.Argument(  # noqa: B008
+        ..., help="The branch name to check."
+    )
+):
+    """
+    Check if the current Git branch is the specified branch.
+    """
+    if artisan_tools.vcs.check_current_branch(expected_branch):
+        print(f"Current branch is '{expected_branch}'.")
+        raise typer.Exit(code=0)
+    else:
+        print(f"Current branch is not '{expected_branch}'.")
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

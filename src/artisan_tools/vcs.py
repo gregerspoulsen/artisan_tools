@@ -41,3 +41,24 @@ def check_tag(tag):
     """
     remote_tags = get_remote_tags()
     return tag in remote_tags
+
+
+def get_current_branch():
+    """
+    Returns the name of the currently checked-out Git branch.
+    """
+    return run_git_command("git branch --show-current")
+
+
+def check_current_branch(expected_branch):
+    """
+    Check if the current Git branch is the expected branch.
+
+    Args:
+    expected_branch (str): The name of the branch to check against.
+
+    Returns:
+    bool: True if the current branch matches the expected branch, False otherwise.
+    """
+    current_branch = get_current_branch()
+    return current_branch == expected_branch
