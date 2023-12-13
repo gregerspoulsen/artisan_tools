@@ -3,6 +3,8 @@ name = "artisan-tools"
 version = "0.1.0"
 dependencies = [
   "semver",
+  "typer",
+  "rich", # pretty output for typer
 ]
 requires-python = ">=3.7"
 authors = [
@@ -15,3 +17,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
+
+
+[project.scripts]
+at = "artisan_tools.cli:app"

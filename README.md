@@ -14,3 +14,8 @@ To force a re-build of the container (e.g. for dependency changes):
 ```shell
 task build
 ```
+
+To run a command in the development environment (in this case `bash`):
+```
+task run -- bash
+```

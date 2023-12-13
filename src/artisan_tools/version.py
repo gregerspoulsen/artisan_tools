@@ -19,14 +19,18 @@ def bump_version(version, part):
     Raises:
     ValueError: If the part is not 'major', 'minor', or 'patch'.
     """
+    parsed_version = semver.Version.parse(version)
+
     if part == "major":
-        return semver.bump_major(version)
+        new_version = parsed_version.bump_major()
     elif part == "minor":
-        return semver.bump_minor(version)
+        new_version = parsed_version.bump_minor()
     elif part == "patch":
-        return semver.bump_patch(version)
+        new_version = parsed_version.bump_patch()
     else:
         raise ValueError("Invalid part to bump: must be 'major', 'minor', or 'patch'")
+
+    return str(new_version)
 
 
 def bump_version_file(file_path, part):
