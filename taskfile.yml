@@ -10,7 +10,8 @@ tasks:
   build:
     dir: env/
     cmds:
-      - docker compose build
+      - echo $(id -u)
+      - USER_ID=$(id -u) docker compose build
 
   format:
     - task: run
