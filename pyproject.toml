@@ -1,0 +1,17 @@
+[project]
+name = "artisan-tools"
+version = "0.1.0"
+dependencies = [
+  "semver",
+]
+requires-python = ">=3.7"
+authors = [
+  {name = "Gregers Poulsen", email = "gp@skytem.com"},
+]
+description = "Tools to make software artisanship a breeze"
+readme = "README.rst"
+keywords = ["ci", "build tools", "sausage", "tomatoes", "Lobster Thermidor"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]

@@ -1,0 +1,19 @@
+version: '3'
+
+tasks:
+  test:
+    cmds:
+      - task: run
+        vars:
+          CLI_ARGS: pytest
+
+  build:
+    dir: env/
+    cmds:
+      - docker compose build
+
+
+  run: # Run a command in the development environment
+    dir: env/
+    cmds:
+      - docker compose run --rm test {{.CLI_ARGS}}
