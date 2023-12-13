@@ -13,7 +13,12 @@ tasks:
       - docker compose build
 
 
+  format:
+    dir: env/
+    cmds:
+      - docker compose run --rm dev black .
+
   run: # Run a command in the development environment
     dir: env/
     cmds:
-      - docker compose run --rm test {{.CLI_ARGS}}
+      - docker compose run --rm dev {{.CLI_ARGS}}

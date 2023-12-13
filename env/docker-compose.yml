@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-    test:
+    dev:
         build:
             context: ../
             dockerfile: env/Dockerfile
