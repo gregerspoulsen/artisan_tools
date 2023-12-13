@@ -9,8 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Prepare environment
-      run: ./ci_bootstrap.sh
-
     - name: Run tests
-      run: task ci
+      run: |
+        ./ci_bootstrap.sh
+        task ci
