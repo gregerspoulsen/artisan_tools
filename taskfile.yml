@@ -12,13 +12,21 @@ tasks:
     cmds:
       - docker compose build
 
-
   format:
-    dir: env/
-    cmds:
-      - docker compose run --rm dev black .
+    - task: run
+      vars:
+        CLI_ARGS: black .
+
+  lint:
+    - task: run
+      vars:
+        CLI_ARGS: flake8
 
   run: # Run a command in the development environment
     dir: env/
     cmds:
       - docker compose run --rm dev {{.CLI_ARGS}}
+
+  ci:
+    - task: lint
+    - task: test
