@@ -30,3 +30,9 @@ tasks:
   ci:
     - task: lint
     - task: test
+
+
+  check_release:
+    - task: run
+      vars:
+        CLI_ARGS: at verify-version --file VERSION

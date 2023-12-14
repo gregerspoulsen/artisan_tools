@@ -95,7 +95,7 @@ def verify_version(
     version: str = typer.Option(  # noqa: B008
         None, help="The semver version string to check."
     ),
-    file_path: str = typer.Option(  # noqa: B008
+    file: str = typer.Option(  # noqa: B008
         None, help="The path to the file containing the version string."
     ),
 ):
@@ -107,8 +107,8 @@ def verify_version(
     """
     if version:
         result = artisan_tools.release.check_version(version)
-    elif file_path:
-        result = artisan_tools.release.check_version_file(file_path)
+    elif file:
+        result = artisan_tools.release.check_version_file(file)
     else:
         typer.echo("Please provide either a version string or a file path.")
         raise typer.Exit(code=1)
