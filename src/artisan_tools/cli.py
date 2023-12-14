@@ -1,6 +1,7 @@
 import typer
 from artisan_tools.version import bump_version_file
 import artisan_tools.vcs
+import artisan_tools.release
 from typing import Optional
 
 app = typer.Typer()
@@ -87,6 +88,36 @@ def add_tag(
     typer.echo(
         f"Tag '{tag_name}' has been successfully added and pushed to remote '{remote}'."
     )
+
+
+@app.command()
+def verify_version(
+    version: str = typer.Option(  # noqa: B008
+        None, help="The semver version string to check."
+    ),
+    file_path: str = typer.Option(  # noqa: B008
+        None, help="The path to the file containing the version string."
+    ),
+):
+    """
+    Verify if a given version or version in a file is a proper semver release version.
+
+    :param version: The semver version string to check.
+    :param file_path: The path to the file containing the version string.
+    """
+    if version:
+        result = artisan_tools.release.check_version(version)
+    elif file_path:
+        result = artisan_tools.release.check_version_file(file_path)
+    else:
+        typer.echo("Please provide either a version string or a file path.")
+        raise typer.Exit(code=1)
+
+    if result:
+        typer.echo("Version is a proper semver release version.")
+    else:
+        typer.echo("Invalid semver version.")
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from typer.testing import CliRunner
 from artisan_tools.cli import (
     app,
-)  # Replace 'your_cli_script' with the name of your script
+)
 
 from artisan_tools.vcs import run_git_command
 
