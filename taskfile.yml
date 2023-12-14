@@ -5,7 +5,7 @@ tasks:
     cmds:
       - task: run
         vars:
-          CLI_ARGS: pytest
+          CLI_ARGS: pytest {{.CLI_ARGS}}
 
   build:
     dir: env/
