@@ -1,6 +1,7 @@
 import typer
 from artisan_tools.version import bump_version_file
 import artisan_tools.vcs
+from typing import Optional
 
 app = typer.Typer()
 
@@ -57,6 +58,35 @@ def check_branch(
     else:
         print(f"Current branch is not '{expected_branch}'.")
         raise typer.Exit(code=1)
+
+
+@app.command()
+def add_tag(
+    tag_name: str = typer.Argument(..., help="The tag name to be added"),  # noqa: B008
+    message: str = typer.Argument(..., help="The message for the tag"),  # noqa: B008
+    remote: Optional[str] = typer.Option(  # noqa: B008
+        "origin", help="The remote name, defaults to 'origin'"
+    ),
+    git_user_name: Optional[str] = typer.Option(  # noqa: B008
+        None, help="Git user name for commit"
+    ),
+    git_user_email: Optional[str] = typer.Option(  # noqa: B008
+        None, help="Git user email for commit"
+    ),
+):
+    """
+    Add a tag to the current commit and push it to a remote Git repository.
+    """
+    git_config = {}
+    if git_user_name:
+        git_config["user.name"] = git_user_name
+    if git_user_email:
+        git_config["user.email"] = git_user_email
+
+    artisan_tools.vcs.add_and_push_tag(tag_name, message, remote, git_config=git_config)
+    typer.echo(
+        f"Tag '{tag_name}' has been successfully added and pushed to remote '{remote}'."
+    )
 
 
 if __name__ == "__main__":

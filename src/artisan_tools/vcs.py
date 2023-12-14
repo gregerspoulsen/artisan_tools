@@ -1,19 +1,21 @@
 import subprocess
 
 
-def run_git_command(command):
+def run_git_command(command, cwd=None):
     """
     Execute a git command and return its output as a string.
 
     Args:
     command (str): The git command to run.
+    cwd (str): The path to the directory in which to run the command. Optional.
+
 
     Returns:
-    str: The output of the git command, or None if an error occurred.
+    str: The output of the git command
     """
 
     result = subprocess.check_output(
-        command, stderr=subprocess.STDOUT, shell=True, encoding="utf-8"
+        command, stderr=subprocess.STDOUT, shell=True, encoding="utf-8", cwd=cwd
     )
     return result.strip()
 
@@ -62,3 +64,26 @@ def check_current_branch(expected_branch):
     """
     current_branch = get_current_branch()
     return current_branch == expected_branch
+
+
+def add_and_push_tag(tag_name, message, remote="origin", git_config=None):
+    """
+    Add a tag to the current commit and push it to a remote repository.
+
+    Args:
+    tag_name (str): The name of the tag to be added.
+    message (str): The message associated with the tag.
+    remote (str): The name of the remote repository. Defaults to 'origin'.
+    git_config (dict): A dictionary of git configuration options. This can be useful
+        when running the command in a CI environment where the user's name and email
+        are not configured. Defaults to None. E.g.:
+        {'user.name': 'Test Bot', 'user.email': 'bot@none.com'}
+
+    """
+    config_str = " ".join([f"-c '{key}={value}'" for key, value in git_config.items()])
+
+    # Add the tag
+    run_git_command(f"git {config_str} tag -a {tag_name} -m '{message}'")
+
+    # Push the tag to the remote repository
+    run_git_command(f"git push {remote} {tag_name}")
