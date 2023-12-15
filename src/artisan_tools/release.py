@@ -12,8 +12,8 @@ def check_version(version: str) -> None:
 
     """
     try:
-        parsed_version = semver.parse(version)
-        return parsed_version["prerelease"] is None and parsed_version["build"] is None
+        parsed_version = semver.Version.parse(version)
+        return parsed_version.prerelease is None and parsed_version.build is None
     except ValueError:
         return False
 

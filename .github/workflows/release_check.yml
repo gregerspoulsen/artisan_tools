@@ -16,4 +16,4 @@ jobs:
     - name: Check version
       run: |
         ./ci_bootstrap.sh
-        task check_release
+        task check-release
