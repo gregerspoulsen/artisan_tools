@@ -1,0 +1,19 @@
+name: Check release requirements
+
+on:
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check version
+      run: |
+        ./ci_bootstrap.sh
+        task check_release
