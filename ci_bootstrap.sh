@@ -8,4 +8,4 @@ set -e
 sudo snap install task --classic
 
 # Install artisan-tools
-pip install git+https://github.com/gregerspoulsen/artisan-tools.git@version_check
+#pip install git+https://github.com/gregerspoulsen/artisan_tools.git@version_check
