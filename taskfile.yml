@@ -33,6 +33,5 @@ tasks:
 
 
   check_release:
-    - task: run
-      vars:
-        CLI_ARGS: at verify-version --file VERSION
+    cmds:
+      - at verify-version --file VERSION
