@@ -98,12 +98,16 @@ def verify_version(
     file: str = typer.Option(  # noqa: B008
         None, help="The path to the file containing the version string."
     ),
+    check_tag: bool = typer.Option(  # noqa: B008
+        False, help="Check that current versions isn't already a tag"
+    ),
 ):
     """
     Verify if a given version or version in a file is a proper semver release version.
 
     :param version: The semver version string to check.
     :param file_path: The path to the file containing the version string.
+    :param check_tag: Check that current versions isn't already a tag
     """
     if version:
         result = artisan_tools.release.check_version(version)
@@ -118,6 +122,15 @@ def verify_version(
     else:
         typer.echo("Invalid semver version.")
         raise typer.Exit(code=1)
+
+    if check_tag:
+        with open(file, "r") as file:
+            version = file.read().strip()
+        if artisan_tools.vcs.check_tag(version):
+            typer.echo(f"Tag '{version}' already exists.")
+            raise typer.Exit(code=2)
+        else:
+            typer.echo(f"Tag '{version}' does not exist.")
 
 
 if __name__ == "__main__":
