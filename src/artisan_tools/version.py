@@ -53,7 +53,7 @@ def bump_version_file(file_path, part):
     return new_version
 
 
-def read_version_file(file_path = 'VERSION'):
+def read_version_file(file_path="VERSION"):
     """
     Read a version from a file.
 

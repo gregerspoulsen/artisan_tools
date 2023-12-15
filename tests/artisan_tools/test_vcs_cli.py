@@ -1,9 +1,8 @@
+import subprocess
 from typer.testing import CliRunner
 from artisan_tools.cli import (
     app,
 )
-
-from artisan_tools.vcs import run_git_command
 
 runner = CliRunner()
 
@@ -11,18 +10,14 @@ runner = CliRunner()
 
 
 def test_check_tag_exists(setup_git_repos):
-    result = runner.invoke(app, ["check-tag", "v1.0.1"])
-    assert result.exit_code == 0
-    assert "Tag 'v1.0.1' exists in the remote repository." in result.stdout
+    result = runner.invoke(app, ["check-no-tag", "v1.0.1"])
+    assert result.exit_code == 1
+    assert "Tag 'v1.0.1' already exists in the remote repository." in result.stdout
 
 
 def test_check_tag_does_not_exist(setup_git_repos):
-    result = runner.invoke(app, ["check-tag", "nonexistent-tag"])
-    assert result.exit_code == 1
-    assert (
-        "Tag 'nonexistent-tag' does not exist in the remote repository."
-        in result.stdout
-    )
+    result = runner.invoke(app, ["check-no-tag", "nonexistent-tag"])
+    assert result.exit_code == 0
 
 
 def test_check_branch(setup_git_repos):
@@ -32,23 +27,31 @@ def test_check_branch(setup_git_repos):
     assert "Current branch is 'master'." in result.stdout
 
 
-def test_add_tag(setup_git_repos):
-    repo1, repo2 = setup_git_repos
+def test_add_release_tag(setup_git_repos):
+    # Write a VERSION file in the test repository
+    version_file = setup_git_repos[1] / "VERSION"
+    with version_file.open("w") as f:
+        f.write("1.0.0")
+
+    # Run the Typer command
     result = runner.invoke(
         app,
         [
-            "add-tag",
-            "v1.0.2",
-            "Test tag",
-            "--git-user-name",
-            "Test Bot",
-            "--git-user-email",
-            "bot@none.com",
+            "add-release-tag",
+            str(version_file),
+            "--git-options=-c user.name=CI -c user.email=N/A",
         ],
     )
+
+    print(result.stdout)
     assert result.exit_code == 0
     assert (
-        "Tag 'v1.0.2' has been successfully added and pushed to remote" in result.stdout
+        "Tagged current changeset as 'v1.0.0' and pushed to remote repository."
+        in result.stdout
     )
-    tags = run_git_command("git tag", cwd=repo1).splitlines()
-    assert "v1.0.2" in tags
+
+    # Check if the tag was actually created in the repository
+    tags = subprocess.run(
+        ["git", "tag"], cwd=setup_git_repos[0], capture_output=True, text=True
+    )
+    assert "v1.0.0" in tags.stdout

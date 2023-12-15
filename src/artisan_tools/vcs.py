@@ -81,7 +81,8 @@ def add_and_push_tag(tag_name, message, remote="origin", git_options=None):
 
     """
     # Add the tag
-    run_git_command(f"git {'' if git_options is None else git_options} tag -a {tag_name} -m '{message}'")
+    git_options = "" if git_options is None else git_options
+    run_git_command(f"git {git_options} tag -a {tag_name} -m '{message}'")
 
     # Push the tag to the remote repository
     run_git_command(f"git push {remote} {tag_name}")
