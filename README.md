@@ -5,7 +5,13 @@ Tools to help the software artisan make his craft a breeze.
 ## Development
 Ordinary tasks can be used using go-task configured in taskfile.yaml.
 
-To test:
+Before committing and pushing you should run:
+
+```shell
+task pre-commit
+```
+This will run code formatting linting and tests. To run a specific step like
+testing use:
 ```shell
 task test
 ```
@@ -19,7 +25,6 @@ To run a command in the development environment (in this case `bash`):
 ```shell
 task run -- bash
 ```
-
 
 ## Releasing
 

@@ -2,6 +2,13 @@ version: '3'
 
 tasks:
 # --- Development Tasks ---
+
+  pre-commit: # Run pre-commit hooks
+    cmds:
+      - task: test
+      - task: format
+      - task: lint
+
   test: # Run the test suite
     cmds:
       - task: run
@@ -35,7 +42,7 @@ tasks:
         vars:
           CLI_ARGS: at bump {{.CLI_ARGS}} VERSION
 
-  check_release:
+  check-release:
     cmds:
       - task: run
         vars:
