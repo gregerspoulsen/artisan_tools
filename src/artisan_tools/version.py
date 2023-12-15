@@ -41,13 +41,7 @@ def bump_version_file(file_path, part):
     file_path (str): Path to the file containing the version string.
     part (str): The part of the version to bump ('major', 'minor', or 'patch').
     """
-    # Check the file exists:
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File not found: {file_path}")
-
-    # Read the version from the file
-    with open(file_path, "r") as file:
-        current_version = file.read().strip()
+    current_version = read_version_file(file_path)
 
     # Bump the version using the bump_version function
     new_version = bump_version(current_version, part)
@@ -57,6 +51,24 @@ def bump_version_file(file_path, part):
         file.write(new_version)
 
     return new_version
+
+
+def read_version_file(file_path="VERSION"):
+    """
+    Read a version from a file.
+
+    Parameters:
+    file_path (str): Path to the file containing the version string.
+    """
+    # Check the file exists:
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    # Read the version from the file
+    with open(file_path, "r") as file:
+        current_version = file.read().strip()
+
+    return current_version
 
 
 # Example usage

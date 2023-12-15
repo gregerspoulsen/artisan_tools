@@ -1,6 +1,7 @@
 import typer
 from artisan_tools.version import bump_version_file
 import artisan_tools.vcs
+import artisan_tools.release
 from typing import Optional
 
 app = typer.Typer()
@@ -27,7 +28,7 @@ def bump(
 
 
 @app.command()
-def check_tag(
+def check_no_tag(
     tag: str = typer.Argument(  # noqa: B008
         ..., help="The tag to check in the remote repository."
     )
@@ -36,10 +37,11 @@ def check_tag(
     Check if a specific tag exists in the remote Git repository.
     """
     if artisan_tools.vcs.check_tag(tag):
-        print(f"Tag '{tag}' exists in the remote repository.")
-        typer.Exit(code=0)
-    else:
-        print(f"Tag '{tag}' does not exist in the remote repository.")
+        typer.secho(
+            f"Tag '{tag}' already exists in the remote repository.",
+            fg=typer.colors.RED,
+            bold=True,
+        )
         raise typer.Exit(code=1)
 
 
@@ -61,32 +63,72 @@ def check_branch(
 
 
 @app.command()
-def add_tag(
-    tag_name: str = typer.Argument(..., help="The tag name to be added"),  # noqa: B008
-    message: str = typer.Argument(..., help="The message for the tag"),  # noqa: B008
-    remote: Optional[str] = typer.Option(  # noqa: B008
-        "origin", help="The remote name, defaults to 'origin'"
+def add_release_tag(
+    file: str = typer.Argument(  # noqa: B008
+        "VERSION",
+        help="Path to the file containing the version string. Defaults to 'VERSION'.",
     ),
-    git_user_name: Optional[str] = typer.Option(  # noqa: B008
-        None, help="Git user name for commit"
-    ),
-    git_user_email: Optional[str] = typer.Option(  # noqa: B008
-        None, help="Git user email for commit"
+    git_options: Optional[str] = typer.Option(  # noqa: B008
+        None, help="Git options to pass on, e.g. '-c user.name=John -c user.email=None'"
     ),
 ):
     """
     Add a tag to the current commit and push it to a remote Git repository.
     """
-    git_config = {}
-    if git_user_name:
-        git_config["user.name"] = git_user_name
-    if git_user_email:
-        git_config["user.email"] = git_user_email
+    version = artisan_tools.version.read_version_file(file)
+    tag = "v" + version
+    check_no_tag(tag)
 
-    artisan_tools.vcs.add_and_push_tag(tag_name, message, remote, git_config=git_config)
-    typer.echo(
-        f"Tag '{tag_name}' has been successfully added and pushed to remote '{remote}'."
+    artisan_tools.vcs.add_and_push_tag(
+        tag_name=tag, message=f"Tag Release v{version}", git_options=git_options
     )
+    typer.echo(f"Tagged current changeset as '{tag}' and pushed to remote repository.")
+
+
+@app.command()
+def verify_version(
+    version: str = typer.Option(  # noqa: B008
+        None, help="The semver version string to check."
+    ),
+    file: str = typer.Option(  # noqa: B008
+        None, help="The path to the file containing the version string."
+    ),
+    check_tag: bool = typer.Option(  # noqa: B008
+        False, help="Check that current versions isn't already a tag"
+    ),
+):
+    """
+    Verify if a given version or version in a file is a proper semver release version.
+
+    :param version: The semver version string to check.
+    :param file_path: The path to the file containing the version string.
+    :param check_tag: Check that current versions isn't already a tag
+    """
+    typer.echo("xzzz" + str(version) + str(file))
+    if version:
+        result = artisan_tools.release.check_version(version)
+    elif file:
+        result = artisan_tools.release.check_version_file(file)
+    else:
+        typer.echo("Please provide either a version string or a file path.")
+        raise typer.Exit(code=1)
+
+    if result:
+        typer.secho(
+            "Version is a proper semver release version.", fg=typer.colors.GREEN
+        )
+    else:
+        typer.secho("Invalid semver version.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    if check_tag:
+        with open(file, "r") as file:
+            version = file.read().strip()
+        if artisan_tools.vcs.check_tag(version):
+            typer.echo(f"Tag '{version}' already exists.")
+            raise typer.Exit(code=2)
+        else:
+            typer.echo(f"Tag '{version}' does not exist.")
 
 
 if __name__ == "__main__":

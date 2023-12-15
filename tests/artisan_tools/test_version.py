@@ -19,6 +19,12 @@ def test_bump_version_invalid_part():
         bump_version("1.2.3", "invalid_part")
 
 
+def test_read_version_file(tmpdir):
+    temp_file = tmpdir.join("version.txt")
+    temp_file.write("1.2.3")
+    assert bump_version_file(str(temp_file), "minor") == "1.3.0"
+
+
 def test_bump_version_file(tmpdir):
     temp_file = tmpdir.join("version.txt")
     temp_file.write("1.2.3")

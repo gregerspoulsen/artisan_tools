@@ -16,6 +16,17 @@ task build
 ```
 
 To run a command in the development environment (in this case `bash`):
-```
+```shell
 task run -- bash
 ```
+
+
+## Releasing
+
+The pipeline automatically checks pull requests for unique and proper semver
+version. To update the version when preparing a pull-request use
+```shell
+task bump -- major|minor|patch
+```
+When the pull-request is merged to master the release will automatically be
+tagged with the version in the file VERSION.

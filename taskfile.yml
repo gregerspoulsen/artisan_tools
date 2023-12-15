@@ -1,32 +1,54 @@
 version: '3'
 
 tasks:
-  test:
+# --- Development Tasks ---
+  test: # Run the test suite
     cmds:
       - task: run
         vars:
           CLI_ARGS: pytest {{.CLI_ARGS}}
 
-  build:
+  build: # Build the development environment, relevant when dependencies change
     dir: env/
     cmds:
       - docker compose build
 
-  format:
+  format: # Run code formatter
     - task: run
       vars:
         CLI_ARGS: black .
 
-  lint:
+  lint: # Lint code
     - task: run
       vars:
         CLI_ARGS: flake8
 
+  ci:
+    - task: lint
+    - task: test
+
+# --- Release Tasks ---
+
+  bump: # Bump the version. Usage: task bump -- major|minor|patch
+    cmds:
+      - task: run
+        vars:
+          CLI_ARGS: at bump {{.CLI_ARGS}} VERSION
+
+  check_release:
+    cmds:
+      - task: run
+        vars:
+          CLI_ARGS: at verify-version --file VERSION --check-tag
+
+  release: # Create a release
+    cmds:
+      - task: run
+        vars:
+          CLI_ARGS: at add-release-tag --git-options="-c user.name='CI' -c user.email='N/A'"
+
+# --- Utilities ---
   run: # Run a command in the development environment
     dir: env/
     cmds:
       - docker compose run --rm dev {{.CLI_ARGS}}
-
-  ci:
-    - task: lint
-    - task: test
