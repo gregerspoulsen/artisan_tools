@@ -104,7 +104,6 @@ def verify_version(
     :param file_path: The path to the file containing the version string.
     :param check_tag: Check that current versions isn't already a tag
     """
-    typer.echo("xzzz" + str(version) + str(file))
     if version:
         result = artisan_tools.release.check_version(version)
     elif file:
@@ -123,7 +122,7 @@ def verify_version(
 
     if check_tag:
         with open(file, "r") as file:
-            version = file.read().strip()
+            version = "v" + file.read().strip()
         if artisan_tools.vcs.check_tag(version):
             typer.echo(f"Tag '{version}' already exists.")
             raise typer.Exit(code=2)
