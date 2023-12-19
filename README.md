@@ -35,3 +35,12 @@ task bump -- major|minor|patch
 ```
 When the pull-request is merged to master the release will automatically be
 tagged with the version in the file VERSION.
+
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
