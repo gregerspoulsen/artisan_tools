@@ -1,6 +1,16 @@
 # Artisan Tools
 Tools to help the software artisan make his craft a breeze.
 
+## Installation
+
+Artisan Tools can be installed from source using pip:
+```shell
+pip install git+https://github.com/gregerspoulsen/artisan_tools.git
+```
+
+| :zap:        CLI only works if installed with pip>23.0   |
+|----------------------------------------------------------|
+
 
 ## Development
 Ordinary tasks can be performed using just configured in justfile.
