@@ -14,6 +14,6 @@ jobs:
     - name: Run tests
       run: |
         ./ci_bootstrap.sh
-        task ci
-        task check-release
-        task release
+        just ci
+        just check-release
+        just release

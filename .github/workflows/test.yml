@@ -12,4 +12,4 @@ jobs:
     - name: Run tests
       run: |
         ./ci_bootstrap.sh
-        task ci
+        just ci
