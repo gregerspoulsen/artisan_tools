@@ -19,11 +19,11 @@ build:
 
 # Run code formatter
 format:
-  just run "black ."
+  just run black .
 
 # Lint code
 lint:
-  just run "flake8"
+  just run flake8
 
 # Run CI pipeline tasks
 ci:
@@ -34,17 +34,17 @@ ci:
 
 # Bump the version. Usage: just bump major|minor|patch
 bump args: 
-  just run "at bump {{args}} VERSION"
+  just run at bump {{args}} VERSION
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:
-  just run "at verify-version --file VERSION --check-tag"
+  just run at verify-version --file VERSION --check-tag
 
 # Create a release
 release: 
-  just run "at add-release-tag --git-options="-c user.name='CI' -c user.email='N/A'""
+  just run at add-release-tag --git-options="\"-c user.name='CI' -c user.email='N/A'\""
 
 # --- Utilities ---
 # Run command in development environment
-run ARGS: # Run a command in the development environment
-  cd env/ && docker compose run --rm dev {{ARGS}}
+run *ARGS: # Run a command in the development environment
+  docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}

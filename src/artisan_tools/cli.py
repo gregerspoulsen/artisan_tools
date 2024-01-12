@@ -124,10 +124,11 @@ def verify_version(
         with open(file, "r") as file:
             version = "v" + file.read().strip()
         if artisan_tools.vcs.check_tag(version):
-            typer.echo(f"Tag '{version}' already exists.")
+            typer.secho(f"Tag '{version}' already exists.", fg=typer.colors.RED)
             raise typer.Exit(code=2)
         else:
-            typer.echo(f"Tag '{version}' does not exist.")
+            typer.secho(f"Tag '{version}' does not exist.", fg=typer.colors.GREEN)
+    typer.secho("All checks passed.", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
