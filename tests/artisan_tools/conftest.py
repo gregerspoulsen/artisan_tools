@@ -1,8 +1,16 @@
 import pytest
+import logging
+
+from artisan_tools.log import setup_root_handler
 
 from artisan_tools.vcs import (
     run_git_command,
 )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def start_log():
+    setup_root_handler()
 
 
 @pytest.fixture

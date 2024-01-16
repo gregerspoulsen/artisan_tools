@@ -1,8 +1,11 @@
 import typer
-from artisan_tools.version import bump_version_file
+from typing import Optional
+
 import artisan_tools.vcs
 import artisan_tools.release
-from typing import Optional
+import artisan_tools.config
+
+config = artisan_tools.config.load_config()
 
 app = typer.Typer()
 

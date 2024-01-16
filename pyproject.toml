@@ -5,6 +5,8 @@ dependencies = [
   "semver",
   "typer",
   "rich", # pretty output for typer
+  "pyyaml",
+  "structlog",
 ]
 requires-python = ">=3.7"
 authors = [
