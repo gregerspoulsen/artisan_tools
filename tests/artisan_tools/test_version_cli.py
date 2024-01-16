@@ -12,11 +12,11 @@ def test_cli_with_default_file(tmpdir):
     # Change the current working directory to tmpdir
     with tmpdir.as_cwd():
         # Run the CLI command without specifying the file path
-        result = runner.invoke(app, ["bump", "minor"])
+        result = runner.invoke(app, ["version", "bump", "minor"])
 
         # Check if the command was successful and output is correct
         assert result.exit_code == 0
-        assert "Version bumped to 1.3.0 in VERSION" in result.stdout
+        assert "Version bumped to 1.3.0 in ./VERSION" in result.stdout
         assert version_file.read() == "1.3.0"
 
 
@@ -26,7 +26,7 @@ def test_cli_with_specified_file(tmpdir):
     custom_version_file.write("2.4.6")
 
     # Run the CLI command specifying the custom file path
-    result = runner.invoke(app, ["bump", "patch", str(custom_version_file)])
+    result = runner.invoke(app, ["version", "bump", "patch", str(custom_version_file)])
 
     # Check if the command was successful and output is correct
     assert result.exit_code == 0
@@ -36,7 +36,7 @@ def test_cli_with_specified_file(tmpdir):
 
 def test_cli_nonexistent_file(tmpdir):
     # Run the CLI command with a non-existent file
-    result = runner.invoke(app, ["bump", "minor", str("nonexistent_file")])
+    result = runner.invoke(app, ["version", "bump", "minor", str("nonexistent_file")])
 
     # Check if the correct error message is displayed
     assert result.exit_code != 0
@@ -44,7 +44,7 @@ def test_cli_nonexistent_file(tmpdir):
 
 def test_bad_part(tmpdir):
     # Run the CLI command with a bad part
-    result = runner.invoke(app, ["bump", "bad_part"])
+    result = runner.invoke(app, ["version", "bump", "bad_part"])
 
     # Check if the correct error message is displayed
     assert result.exit_code != 0

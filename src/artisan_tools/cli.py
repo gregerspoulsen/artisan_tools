@@ -3,32 +3,11 @@ from typing import Optional
 
 import artisan_tools.vcs
 import artisan_tools.release
-import artisan_tools.config
-
-config = artisan_tools.config.load_config()
+import artisan_tools.version_cli
 
 app = typer.Typer()
 
-
-@app.command()
-def bump(
-    part: str = typer.Argument(  # noqa: B008
-        ..., help="The part of the version to bump ('major', 'minor', or 'patch')."
-    ),
-    file_path: str = typer.Argument(  # noqa: B008
-        "VERSION",
-        help="Path to the file containing the version string. Defaults to 'VERSION'.",
-    ),
-):
-    """
-    Bump the version in the specified file.
-    """
-    try:
-        new_version = bump_version_file(file_path, part)
-        typer.echo(f"Version bumped to {new_version} in {file_path}")
-    except FileNotFoundError:
-        raise typer.BadParameter(f"File not found: {file_path}")
-
+app.add_typer(artisan_tools.version_cli.app)
 
 @app.command()
 def check_no_tag(
