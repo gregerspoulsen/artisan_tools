@@ -1,14 +1,18 @@
 import typer
 
-import artisan_tools.vcs_cli
+from artisan_tools import get_config, get_module
+from artisan_tools.modules import get_modules
+
+import artisan_tools.vcs.vcs_cli
 import artisan_tools.release
-import artisan_tools.version_cli
 
 app = typer.Typer()
 
-app.add_typer(artisan_tools.version_cli.app)
+_config = get_config()
 
-app.add_typer(artisan_tools.vcs_cli.app)
+for module_name in get_modules():
+    module = get_module(module_name)
+    app.add_typer(module.get_typer_app())
 
 
 @app.command()

@@ -1,7 +1,7 @@
 import pytest
 
 from artisan_tools.log import setup_root_handler
-from artisan_tools.vcs import run_git_command
+from artisan_tools.vcs.vcs import run_git_command
 
 
 @pytest.fixture(scope="session", autouse=True)

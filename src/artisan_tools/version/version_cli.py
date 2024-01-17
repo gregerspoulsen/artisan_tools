@@ -1,6 +1,6 @@
 import typer
 
-from artisan_tools.version import bump_version_file
+from .version import bump_version_file
 from artisan_tools import get_config
 
 app = typer.Typer(

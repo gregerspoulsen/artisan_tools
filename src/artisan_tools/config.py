@@ -41,7 +41,6 @@ def load_config(config_dir=None):
     logger.info(f"Loading local config from {local_config_file}")
     local_config = read_yaml(local_config_file)
 
-    print(base_config, local_config)
     # Merge configs:
     config = recursive_merge(base_config, local_config)
     return config

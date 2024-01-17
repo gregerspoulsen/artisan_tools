@@ -1,4 +1,4 @@
-from artisan_tools.vcs import (
+from artisan_tools.vcs.vcs import (
     run_git_command,
     check_tag,
     check_current_branch,

@@ -1,6 +1,6 @@
 import typer
 
-import artisan_tools.vcs
+import artisan_tools.vcs.vcs
 
 import artisan_tools
 
@@ -19,7 +19,7 @@ def check_no_tag(
     """
     Check if a specific tag exists in the remote Git repository.
     """
-    if artisan_tools.vcs.check_tag(tag):
+    if artisan_tools.vcs.vcs.check_tag(tag):
         typer.secho(
             f"Tag '{tag}' already exists in the remote repository.",
             fg=typer.colors.RED,
@@ -37,7 +37,7 @@ def check_branch(
     """
     Check if the current Git branch is the specified branch.
     """
-    if artisan_tools.vcs.check_current_branch(expected_branch):
+    if artisan_tools.vcs.vcs.check_current_branch(expected_branch):
         print(f"Current branch is '{expected_branch}'.")
         raise typer.Exit(code=0)
     else:
@@ -54,5 +54,7 @@ def add_release_tag():
     tag = "v" + version
     check_no_tag(tag)
 
-    artisan_tools.vcs.add_and_push_tag(tag_name=tag, message=f"Tag Release v{version}")
+    artisan_tools.vcs.vcs.add_and_push_tag(
+        tag_name=tag, message=f"Tag Release v{version}"
+    )
     typer.echo(f"Tagged current changeset as '{tag}' and pushed to remote repository.")

@@ -1,5 +1,5 @@
 import pytest
-from artisan_tools.version import bump_version, bump_version_file
+from artisan_tools.version.version import bump_version, bump_version_file
 
 
 def test_bump_version_major():
