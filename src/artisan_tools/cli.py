@@ -1,7 +1,6 @@
 import typer
-from typing import Optional
 
-import artisan_tools.vcs
+import artisan_tools.vcs_cli
 import artisan_tools.release
 import artisan_tools.version_cli
 
@@ -9,62 +8,7 @@ app = typer.Typer()
 
 app.add_typer(artisan_tools.version_cli.app)
 
-@app.command()
-def check_no_tag(
-    tag: str = typer.Argument(  # noqa: B008
-        ..., help="The tag to check in the remote repository."
-    )
-):
-    """
-    Check if a specific tag exists in the remote Git repository.
-    """
-    if artisan_tools.vcs.check_tag(tag):
-        typer.secho(
-            f"Tag '{tag}' already exists in the remote repository.",
-            fg=typer.colors.RED,
-            bold=True,
-        )
-        raise typer.Exit(code=1)
-
-
-@app.command()
-def check_branch(
-    expected_branch: str = typer.Argument(  # noqa: B008
-        ..., help="The branch name to check."
-    )
-):
-    """
-    Check if the current Git branch is the specified branch.
-    """
-    if artisan_tools.vcs.check_current_branch(expected_branch):
-        print(f"Current branch is '{expected_branch}'.")
-        raise typer.Exit(code=0)
-    else:
-        print(f"Current branch is not '{expected_branch}'.")
-        raise typer.Exit(code=1)
-
-
-@app.command()
-def add_release_tag(
-    file: str = typer.Argument(  # noqa: B008
-        "VERSION",
-        help="Path to the file containing the version string. Defaults to 'VERSION'.",
-    ),
-    git_options: Optional[str] = typer.Option(  # noqa: B008
-        None, help="Git options to pass on, e.g. '-c user.name=John -c user.email=None'"
-    ),
-):
-    """
-    Add a tag to the current commit and push it to a remote Git repository.
-    """
-    version = artisan_tools.version.read_version_file(file)
-    tag = "v" + version
-    check_no_tag(tag)
-
-    artisan_tools.vcs.add_and_push_tag(
-        tag_name=tag, message=f"Tag Release v{version}", git_options=git_options
-    )
-    typer.echo(f"Tagged current changeset as '{tag}' and pushed to remote repository.")
+app.add_typer(artisan_tools.vcs_cli.app)
 
 
 @app.command()

@@ -62,13 +62,11 @@ def test_load_config_merged_correctly(tmp_path):
     local_config_file = tmp_path / "artisan.yaml"
     create_temp_yaml(local_config_file, local_config_content)
 
-    # Run the test
-    expected_config = {
-        "version": {"file": "./VERSION"},
-        "setting2": "local",
-        "setting3": "local",
-    }
-    assert load_config(config_dir=tmp_path) == expected_config
+    config = load_config(config_dir=tmp_path)
+
+    assert config["version"] == {"file": "./VERSION"}
+    assert config["setting2"] == "local"
+    assert config["setting3"] == "local"
 
 
 def test_load_config_raises_error_when_local_config_missing(tmp_path):
@@ -88,33 +86,27 @@ def test_load_config_raises_error_when_local_config_missing(tmp_path):
         load_config()
 
 
-def create_temp_yaml(file, content):
-    """
-    Helper function to create a temporary YAML file.
-    """
-    with open(file, 'w') as f:
-        yaml.dump(content, f)
-
 def test_read_yaml_with_valid_content(tmpdir):
     """
     Test read_yaml function with valid YAML content.
     """
     # Create a temporary YAML file with content
-    sample_content = {'key1': 'value1', 'key2': 'value2'}
-    temp_yaml = tmpdir.join('sample.yaml')
+    sample_content = {"key1": "value1", "key2": "value2"}
+    temp_yaml = tmpdir.join("sample.yaml")
     create_temp_yaml(temp_yaml, sample_content)
 
     # Read the YAML file
     result = read_yaml(str(temp_yaml))
     assert result == sample_content
 
+
 def test_read_yaml_with_empty_file(tmpdir):
     """
     Test read_yaml function with an empty YAML file.
     """
     # Create an empty temporary YAML file
-    empty_yaml = tmpdir.join('empty.yaml')
-    with open(empty_yaml, 'w')  as f:
+    empty_yaml = tmpdir.join("empty.yaml")
+    with open(empty_yaml, "w"):
         pass
 
     # Read the YAML file

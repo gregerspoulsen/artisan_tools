@@ -1,7 +1,2 @@
-import artisan_tools.config
-
-def get_config():
-    """
-    Get the configuration dictionary.
-    """
-    return artisan_tools.config.load_config()
+from artisan_tools.config import get_config  # noqa F401
+from artisan_tools.modules import get_module  # noqa F401

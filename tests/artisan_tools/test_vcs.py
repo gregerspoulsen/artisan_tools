@@ -18,9 +18,7 @@ def test_check_tag_does_not_exist(setup_git_repos):
 
 def test_add_and_push_tag(setup_git_repos):
     # Add a new tag in repo2 and check if it exists
-    add_and_push_tag(
-        "v1.0.2", "Another tag", git_options="-c 'user.name=Bot' -c 'user.email=N/A'"
-    )
+    add_and_push_tag("v1.0.2", "Another tag")
     assert "v1.0.2" in run_git_command("git tag")
 
 

@@ -5,6 +5,16 @@ import os
 import semver
 
 
+def get_version():
+    """
+    Get the version of the package.
+
+    Returns:
+    str: The version of the package.
+    """
+    return read_version_file()
+
+
 def bump_version(version, part):
     """
     Bump the specified part (major, minor, or patch) of a semantic version string.

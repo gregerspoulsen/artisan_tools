@@ -1,2 +1,7 @@
 version:
   file: ./VERSION
+vcs:
+  username: "Artisan Tools"
+  email: "artisan@tools.com"
+modules:
+  - 'artisan_tools.version'

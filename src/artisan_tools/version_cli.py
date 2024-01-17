@@ -3,11 +3,12 @@ import typer
 from artisan_tools.version import bump_version_file
 from artisan_tools import get_config
 
-app = typer.Typer(name="version",
-                  help=("Commands for retrieving and settings version"
-                  "information."))
+app = typer.Typer(
+    name="version", help=("Commands for retrieving and settings version" "information.")
+)
 
 config = get_config()
+
 
 @app.command()
 def bump(
@@ -23,7 +24,7 @@ def bump(
     Bump the version in the specified file.
     """
     if file_path is None:
-        file_path = config['version']['file']
+        file_path = config["version"]["file"]
     try:
         new_version = bump_version_file(file_path, part)
         typer.echo(f"Version bumped to {new_version} in {file_path}")

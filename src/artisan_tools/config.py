@@ -31,7 +31,10 @@ def load_config(config_dir=None):
     # Check local config exists:
     if not os.path.exists(local_config_file):
         raise FileNotFoundError(
-            f"{local_config_file} not found. Please create this file in the root of your project."
+            (
+                f"{local_config_file} not found. Please create this file in the "
+                "root of your project."
+            )
         )
 
     # Load local config:
@@ -98,3 +101,13 @@ def write_yaml(data, file_path):
     """
     with open(file_path, "w") as file:
         yaml.dump(data, file, default_flow_style=False)
+
+
+_config = load_config()
+
+
+def get_config():
+    """
+    Get the configuration dictionary.
+    """
+    return copy.deepcopy(_config)

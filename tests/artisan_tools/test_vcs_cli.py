@@ -10,19 +10,19 @@ runner = CliRunner()
 
 
 def test_check_tag_exists(setup_git_repos):
-    result = runner.invoke(app, ["check-no-tag", "v1.0.1"])
+    result = runner.invoke(app, ["vcs", "check-no-tag", "v1.0.1"])
     assert result.exit_code == 1
     assert "Tag 'v1.0.1' already exists in the remote repository." in result.stdout
 
 
 def test_check_tag_does_not_exist(setup_git_repos):
-    result = runner.invoke(app, ["check-no-tag", "nonexistent-tag"])
+    result = runner.invoke(app, ["vcs", "check-no-tag", "nonexistent-tag"])
     assert result.exit_code == 0
 
 
 def test_check_branch(setup_git_repos):
     # Assuming the default branch is 'master'
-    result = runner.invoke(app, ["check-branch", "master"])
+    result = runner.invoke(app, ["vcs", "check-branch", "master"])
     assert result.exit_code == 0
     assert "Current branch is 'master'." in result.stdout
 
@@ -37,9 +37,8 @@ def test_add_release_tag(setup_git_repos):
     result = runner.invoke(
         app,
         [
+            "vcs",
             "add-release-tag",
-            str(version_file),
-            "--git-options=-c user.name=CI -c user.email=N/A",
         ],
     )
 
