@@ -1,5 +1,6 @@
 from artisan_tools.version.api import get_version
 
+
 # --- get_version ---------------------------------------------------------- ###
 def test_get_version(tmpdir, app):
     # Create a custom version file in the tmpdir

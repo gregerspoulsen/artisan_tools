@@ -4,12 +4,11 @@ import artisan_tools.vcs.main
 
 import artisan_tools
 
-def factory(app):
 
+def factory(app):
     cli = typer.Typer(
         name="vcs", help=("Commands for retrieving and settings version" "information.")
     )
-
 
     @cli.command()
     def check_no_tag(
@@ -28,7 +27,6 @@ def factory(app):
             )
             raise typer.Exit(code=1)
 
-
     @cli.command()
     def check_branch(
         expected_branch: str = typer.Argument(  # noqa: B008
@@ -45,19 +43,20 @@ def factory(app):
             print(f"Current branch is not '{expected_branch}'.")
             raise typer.Exit(code=1)
 
-
     @cli.command()
     def add_release_tag():
         """
         Add a tag to the current commit and push it to a remote Git repository.
         """
-        version = app.get_extension('version').get_version(app)
+        version = app.get_extension("version").get_version(app)
         tag = "v" + version
         check_no_tag(tag)
 
-        artisan_tools.vcs.main.add_and_push_tag(app.config['vcs'],
-            tag_name=tag, message=f"Tag Release v{version}"
+        artisan_tools.vcs.main.add_and_push_tag(
+            app.config["vcs"], tag_name=tag, message=f"Tag Release v{version}"
         )
-        typer.echo(f"Tagged current changeset as '{tag}' and pushed to remote repository.")
+        typer.echo(
+            f"Tagged current changeset as '{tag}' and pushed to remote repository."
+        )
 
     return cli

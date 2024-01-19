@@ -9,7 +9,8 @@ _std_extensions = [
     "artisan_tools.version",
 ]
 
-class App():
+
+class App:
     def __init__(self):
         self.cli = typer.Typer()
         self.extensions = {}
@@ -21,11 +22,9 @@ class App():
         """
         Load standard extensions and extensions specified in the config.
         """
-        for extension in (_std_extensions + self.config["extensions"]):
+        for extension in _std_extensions + self.config["extensions"]:
             ext = importlib.import_module(extension)
             ext.setup(self)
-            
-
 
     def add_cli(self, cli: typer.Typer):
         """
@@ -47,7 +46,7 @@ class App():
         """
         if isinstance(extension, dict):
             extension = types.SimpleNamespace(**extension)
-        self.extensions[name] = (extension)
+        self.extensions[name] = extension
         self.logger.debug(f"Registered extension: {name}: {extension}")
 
     def get_extension(self, name: str) -> object:
@@ -61,5 +60,7 @@ class App():
         object: The extension
         """
         if name not in self.extensions:
-            raise ValueError(f"Extension not found: {name}, available extensions: {self.extensions}")
+            raise ValueError(
+                f"Extension not found: {name}, available extensions: {self.extensions}"
+            )
         return self.extensions[name]

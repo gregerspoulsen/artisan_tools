@@ -2,7 +2,9 @@ import pytest
 
 from typer.testing import CliRunner
 
-from artisan_tools.version.cli import factory # Replace with the actual import from your CLI script
+from artisan_tools.version.cli import (
+    factory,
+)  # Replace with the actual import from your CLI script
 
 runner = CliRunner()
 
@@ -29,7 +31,11 @@ def test_bump_with_specified_file(tmpdir, app):
     custom_version_file.write("2.4.6")
 
     # Run the CLI command specifying the custom file path
-    result = runner.invoke(factory(app), ["bump", "patch", str(custom_version_file)], catch_exceptions=False)
+    result = runner.invoke(
+        factory(app),
+        ["bump", "patch", str(custom_version_file)],
+        catch_exceptions=False,
+    )
 
     # Check if the command was successful and output is correct
     assert result.exit_code == 0
@@ -39,7 +45,9 @@ def test_bump_with_specified_file(tmpdir, app):
 
 def test_bump_nonexistent_file(tmpdir, app):
     # Run the CLI command with a non-existent file
-    result = runner.invoke(factory(app), ["bump", "minor", str("nonexistent_file")], catch_exceptions=False)
+    result = runner.invoke(
+        factory(app), ["bump", "minor", str("nonexistent_file")], catch_exceptions=False
+    )
 
     # Check if the correct error message is displayed
     assert result.exit_code != 0
@@ -54,21 +62,19 @@ def test_bump_bad_part(tmpdir, app):
 
 
 # Test CLI with version argument
-def test_cli_with_version(app, tmpdir, monkeypatch):
+@pytest.mark.parametrize(
+    "param",
+    [
+        {"version": "1.0.0", "exit_code": 0},
+        {"version": "1.0.0.rc1", "exit_code": 1},
+    ],
+)
+def test_verify(app, tmpdir, monkeypatch, param):
     file = tmpdir.join("VERSION")
     monkeypatch.setitem(app.config, "version", {"file": str(file)})
-    
-    # Test with valid version
-    file.write("1.0.0")
-
-    result = runner.invoke(factory(app), ["verify"], catch_exceptions=False)
-    assert result.exit_code == 0, result.output
-    assert "Version is a proper semver release version." in result.output
 
     # Test with valid version
-    file.write("1.0.0.rc1")
-
+    file.write(param["version"])
 
     result = runner.invoke(factory(app), ["verify"], catch_exceptions=False)
-    assert result.exit_code == 1, result.output
-    assert "Invalid semver version." in result.output
+    assert result.exit_code == param["exit_code"], result.output

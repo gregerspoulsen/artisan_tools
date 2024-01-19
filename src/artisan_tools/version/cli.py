@@ -5,9 +5,9 @@ from artisan_tools.version.api import get_version
 
 
 def factory(app):
-
     cli = typer.Typer(
-        name="version", help=("Commands for retrieving and settings version" "information.")
+        name="version",
+        help=("Commands for retrieving and settings version" "information."),
     )
 
     @cli.command()
@@ -17,7 +17,7 @@ def factory(app):
         ),
         file_path: str = typer.Argument(  # noqa: B008
             None,
-            help="Path to the file containing the version string. Defaults to 'VERSION'.",
+            help="Path to file containing the version string. Defaults to 'VERSION'.",
         ),
     ):
         """
@@ -42,8 +42,9 @@ def factory(app):
 
         :param check_tag: Check that current versions isn't already a tag
         """
-        result = check_version(get_version(app))
-            
+        version = get_version(app)
+        result = check_version(version)
+
         if result:
             typer.secho(
                 "Version is a proper semver release version.", fg=typer.colors.GREEN
@@ -53,13 +54,15 @@ def factory(app):
             raise typer.Exit(code=1)
 
         if check_tag:
-            with open(file, "r") as file:
-                version = "v" + file.read().strip()
-            if vcs.check_tag(version):
-                typer.secho(f"Tag '{version}' already exists.", fg=typer.colors.RED)
+            vcs_version = "v" + version
+            vcs = app.get_extension("vcs")
+            if vcs.check_tag(vcs_version):
+                typer.secho(f"Tag '{vcs_version}' already exists.", fg=typer.colors.RED)
                 raise typer.Exit(code=2)
             else:
-                typer.secho(f"Tag '{version}' does not exist.", fg=typer.colors.GREEN)
+                typer.secho(
+                    f"Tag '{vcs_version}' does not exist.", fg=typer.colors.GREEN
+                )
         typer.secho("All checks passed.", fg=typer.colors.GREEN)
 
     return cli

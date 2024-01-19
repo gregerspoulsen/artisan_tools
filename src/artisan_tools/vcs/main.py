@@ -1,5 +1,6 @@
 import subprocess
 
+
 def run_git_command(command, cwd=None):
     """
     Execute a git command and return its output as a string.

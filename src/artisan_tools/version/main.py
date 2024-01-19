@@ -4,6 +4,7 @@ Tools to support release of a package.
 import os
 import semver
 
+
 def check_version(version: str) -> None:
     """
     Check that the version is a proper semver release version.

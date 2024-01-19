@@ -40,6 +40,7 @@ def setup_git_repos(tmp_path, monkeypatch):
 
     return repo1, repo2
 
+
 @pytest.fixture
 def app():
     """
@@ -50,6 +51,6 @@ def app():
     # Create empty artisan.yaml file:
     with open("artisan.yaml", "w"):
         pass
-    
+
     app = App()
     return app

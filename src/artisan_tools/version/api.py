@@ -1,5 +1,5 @@
-
 from artisan_tools.version.main import read_version_file
+
 
 def get_version(app):
     """
@@ -10,6 +10,6 @@ def get_version(app):
     Returns:
     str: The version of the package.
     """
-    file_path = app.config['version']['file']
+    file_path = app.config["version"]["file"]
 
     return read_version_file(file_path)

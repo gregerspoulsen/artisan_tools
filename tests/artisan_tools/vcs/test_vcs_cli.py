@@ -9,19 +9,25 @@ runner = CliRunner()
 
 
 def test_check_tag_exists(setup_git_repos, app):
-    result = runner.invoke(factory(app), ["check-no-tag", "v1.0.1"], catch_exceptions=False)
+    result = runner.invoke(
+        factory(app), ["check-no-tag", "v1.0.1"], catch_exceptions=False
+    )
     assert result.exit_code == 1, result.stdout
     assert "Tag 'v1.0.1' already exists in the remote repository." in result.stdout
 
 
 def test_check_tag_does_not_exist(setup_git_repos, app):
-    result = runner.invoke(factory(app), ["check-no-tag", "nonexistent-tag"], catch_exceptions=False)
+    result = runner.invoke(
+        factory(app), ["check-no-tag", "nonexistent-tag"], catch_exceptions=False
+    )
     assert result.exit_code == 0, result.stdout
 
 
 def test_check_branch(setup_git_repos, app):
     # Assuming the default branch is 'master'
-    result = runner.invoke(factory(app), ["check-branch", "master"], catch_exceptions=False)
+    result = runner.invoke(
+        factory(app), ["check-branch", "master"], catch_exceptions=False
+    )
     assert result.exit_code == 0, result.stdout
     assert "Current branch is 'master'." in result.stdout
 
@@ -37,7 +43,8 @@ def test_add_release_tag(setup_git_repos, app):
         factory(app),
         [
             "add-release-tag",
-        ], catch_exceptions=False,
+        ],
+        catch_exceptions=False,
     )
 
     print(result.stdout)

@@ -2,7 +2,8 @@ import pytest
 import unittest
 from artisan_tools.version.main import bump_version, bump_version_file, check_version
 
-### --- bump_version ------------------------------------------------------- ###
+
+# --- bump_version -------------------------------------------------------------
 def test_bump_version_major():
     assert bump_version("1.2.3", "major") == "2.0.0"
 
@@ -19,7 +20,8 @@ def test_bump_version_invalid_part():
     with pytest.raises(ValueError):
         bump_version("1.2.3", "invalid_part")
 
-# --- bump_version_file ---------------------------------------------------- ###
+
+# --- bump_version_file --------------------------------------------------------
 def test_read_version_file(tmpdir):
     temp_file = tmpdir.join("version.txt")
     temp_file.write("1.2.3")
@@ -39,7 +41,8 @@ def test_bump_version_file_nonexistent(tmpdir):
     with pytest.raises(FileNotFoundError):
         bump_version_file(str(nonexistent_file), "minor")
 
-# --- check_version -------------------------------------------------------- ###
+
+# --- check_version ------------------------------------------------------------
 class TestVersionCheck(unittest.TestCase):
     def test_proper_release(self):
         # Test with a proper release version
