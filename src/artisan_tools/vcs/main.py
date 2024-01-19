@@ -1,10 +1,5 @@
 import subprocess
 
-from artisan_tools import get_config
-
-config = get_config()["vcs"]
-
-
 def run_git_command(command, cwd=None):
     """
     Execute a git command and return its output as a string.
@@ -70,7 +65,7 @@ def check_current_branch(expected_branch):
     return current_branch == expected_branch
 
 
-def add_and_push_tag(tag_name, message, remote="origin"):
+def add_and_push_tag(config, tag_name, message, remote="origin"):
     """
     Add a tag to the current commit and push it to a remote repository.
 

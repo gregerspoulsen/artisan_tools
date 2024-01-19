@@ -1,4 +1,10 @@
-def get_typer_app():
-    from .vcs_cli import app
+from . import api
+from . import cli
 
-    return app
+def setup(app):
+    """
+    Setup the version module.
+    """
+    app.register_extension("vcs", api)
+
+    app.add_cli(cli.factory(app))

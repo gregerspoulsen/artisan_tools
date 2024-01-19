@@ -1,9 +1,10 @@
-from .version import (  # noqa: F401
-    get_version,
-)
+from . import api
+from . import cli
 
+def setup(app):
+    """
+    Setup the version module.
+    """
+    app.register_extension("version", api)
 
-def get_typer_app():
-    from .version_cli import app
-
-    return app
+    app.add_cli(cli.factory(app))

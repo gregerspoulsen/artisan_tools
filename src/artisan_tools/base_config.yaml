@@ -3,6 +3,4 @@ version:
 vcs:
   username: "Artisan Tools"
   email: "artisan@tools.com"
-modules:
-  - 'artisan_tools.version'
-  - 'artisan_tools.vcs'
+extensions: []
