@@ -1,5 +1,9 @@
 from artisan_tools.app import App
 
-if __name__ == "__main__":
+
+def run():
+    """
+    Run the CLI
+    """
     app = App()
-    app.cli()
+    return app.cli()

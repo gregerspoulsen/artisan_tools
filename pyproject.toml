@@ -22,4 +22,4 @@ classifiers = [
 
 
 [project.scripts]
-at = "artisan_tools.cli:app"
+at = "artisan_tools.cli:run"
