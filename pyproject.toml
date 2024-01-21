@@ -5,6 +5,8 @@ dependencies = [
   "semver",
   "typer",
   "rich", # pretty output for typer
+  "pyyaml",
+  "structlog",
 ]
 requires-python = ">=3.7"
 authors = [
@@ -20,4 +22,4 @@ classifiers = [
 
 
 [project.scripts]
-at = "artisan_tools.cli:app"
+at = "artisan_tools.cli:run"

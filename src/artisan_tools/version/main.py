@@ -5,6 +5,20 @@ import os
 import semver
 
 
+def check_version(version: str) -> None:
+    """
+    Check that the version is a proper semver release version.
+
+    :param version: The version to check
+
+    """
+    try:
+        parsed_version = semver.Version.parse(version)
+        return parsed_version.prerelease is None and parsed_version.build is None
+    except ValueError:
+        return False
+
+
 def bump_version(version, part):
     """
     Bump the specified part (major, minor, or patch) of a semantic version string.
@@ -69,10 +83,3 @@ def read_version_file(file_path="VERSION"):
         current_version = file.read().strip()
 
     return current_version
-
-
-# Example usage
-# file_path = 'path/to/your/version.txt'  # Replace with your file path
-# part_to_bump = 'minor'  # Choose 'major', 'minor', or 'patch'
-# new_version = bump_version_in_file(file_path, part_to_bump)
-# print(f"Version bumped to {new_version}")

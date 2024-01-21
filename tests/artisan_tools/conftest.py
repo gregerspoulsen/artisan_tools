@@ -1,8 +1,12 @@
 import pytest
 
-from artisan_tools.vcs import (
-    run_git_command,
-)
+from artisan_tools.log import setup_root_handler
+from artisan_tools.vcs.main import run_git_command
+
+
+@pytest.fixture(scope="session", autouse=True)
+def start_log():
+    setup_root_handler(level="debug")
 
 
 @pytest.fixture
@@ -15,7 +19,9 @@ def setup_git_repos(tmp_path, monkeypatch):
     repo1.mkdir()
     run_git_command("git init", cwd=repo1)
     (repo1 / "file.txt").write_text("Test file")
+    (repo1 / "artisan.yaml").write_text("")
     run_git_command("git add file.txt", cwd=repo1)
+    run_git_command("git add artisan.yaml", cwd=repo1)
     run_git_command(
         (
             "git -c 'user.name=Test Bot' -c 'user.email=bot@none.com' "
@@ -33,3 +39,18 @@ def setup_git_repos(tmp_path, monkeypatch):
     monkeypatch.chdir(repo2)
 
     return repo1, repo2
+
+
+@pytest.fixture
+def app():
+    """
+    Fixture for creating a Artisan Tool app for testing
+    """
+    from artisan_tools.app import App
+
+    # Create empty artisan.yaml file:
+    with open("artisan.yaml", "w"):
+        pass
+
+    app = App()
+    return app

@@ -66,7 +66,7 @@ def check_current_branch(expected_branch):
     return current_branch == expected_branch
 
 
-def add_and_push_tag(tag_name, message, remote="origin", git_options=None):
+def add_and_push_tag(config, tag_name, message, remote="origin"):
     """
     Add a tag to the current commit and push it to a remote repository.
 
@@ -81,7 +81,9 @@ def add_and_push_tag(tag_name, message, remote="origin", git_options=None):
 
     """
     # Add the tag
-    git_options = "" if git_options is None else git_options
+    git_options = (
+        f"-c user.name=\"{config['username']}\" -c user.email=\"{config['email']}\""
+    )
     run_git_command(f"git {git_options} tag -a {tag_name} -m '{message}'")
 
     # Push the tag to the remote repository

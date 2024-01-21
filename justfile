@@ -34,15 +34,15 @@ ci:
 
 # Bump the version. Usage: just bump major|minor|patch
 bump args: 
-  just run at bump {{args}} VERSION
+  just run at version bump {{args}} VERSION
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:
-  just run at verify-version --file VERSION --check-tag
+  just run at version verify --check-tag
 
 # Create a release
 release: 
-  just run at add-release-tag --git-options="\"-c user.name='CI' -c user.email='N/A'\""
+  just run at vcs add-release-tag
 
 # --- Utilities ---
 # Run command in development environment

@@ -12,6 +12,20 @@ pip install git+https://github.com/gregerspoulsen/artisan_tools.git
 |----------------------------------------------------------|
 
 
+## Usage
+
+To use artisan tools in your project create a structure like:
+```
+project/
+  + artisan.yaml
+  + VERSION
+```
+`artisan.yaml` can in most cases be left empty when default settings are
+sufficient. `VERSION` should contain the current version of the project
+(e.g. 1.3.5). For now you can seek inspiration in the `justfile` in this project
+on how to use artisan-tools - documentation of the CLI will follow soon.
+
+
 ## Development
 Ordinary tasks can be performed using just configured in justfile.
 
@@ -36,7 +50,7 @@ To run a command in the development environment (in this case `bash`):
 just run bash
 ```
 
-## Releasing
+### Releasing
 
 The pipeline automatically checks pull requests for unique and proper semver
 version. To update the version when preparing a pull-request use
