@@ -14,7 +14,6 @@ authors = [
 ]
 description = "Tools to make software artisanship a breeze"
 readme = "README.rst"
-keywords = ["ci", "build tools", "sausage", "tomatoes", "Lobster Thermidor"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
