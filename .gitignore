@@ -1,2 +1,3 @@
 *.pyc
 src/artisan_tools.egg-info/*
+doc/build/*

@@ -30,6 +30,9 @@ ci:
   just lint
   just test
 
+doc:
+  just run sphinx-build -b html doc/source doc/build
+
 # --- Release Tasks ---
 
 # Bump the version. Usage: just bump major|minor|patch
