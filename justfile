@@ -13,6 +13,12 @@ pre-commit:
 test target="":
   just run pytest {{target}}
 
+# Run tox tests:
+tox *args:
+  just run tox {{args}}
+  # Remove .egg-info it seems to make MANIFEST changes unreliable:
+  just run "rm -rf src/artisan_tools.egg-info/"
+
 # Build the development environment, relevant when dependencies change
 build:
   cd env/ && docker compose build
@@ -28,7 +34,7 @@ lint:
 # Run CI pipeline tasks
 ci:
   just lint
-  just test
+  just tox
   just doc
 
 doc:
