@@ -29,14 +29,15 @@ lint:
 ci:
   just lint
   just test
+  just doc
 
 doc:
-  just run sphinx-build -b html doc/source doc/build
+  docker compose -f env/docker-compose.yml run --rm -u $(id -u) dev sphinx-build -b html doc/source doc/build
 
 # --- Release Tasks ---
 
 # Bump the version. Usage: just bump major|minor|patch
-bump args: 
+bump *args: 
   just run at version bump {{args}} VERSION
 
 # Check VERSION contains a valid semver and the tag does not exist

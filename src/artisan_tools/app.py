@@ -16,15 +16,13 @@ class App:
         self.extensions = {}
         self.logger = get_logger("App")
         self.config = load_config()
-        self._load_extensions()
 
-    def _load_extensions(self):
+    def load_extensions(self):
         """
-        Load standard extensions and extensions specified in the config.
+        Load extensions (standard and config specified)
         """
         for extension in _std_extensions + self.config["extensions"]:
-            ext = importlib.import_module(extension)
-            ext.setup(self)
+            self._load_extension(extension)
 
     def add_cli(self, cli: typer.Typer):
         """
@@ -64,3 +62,19 @@ class App:
                 f"Extension not found: {name}, available extensions: {self.extensions}"
             )
         return self.extensions[name]
+
+    def _load_extension(self, extension: str):
+        """
+        Load an extension by name.
+
+        Parameters:
+        extension (str): The name of the extension to load.
+        """
+        # if extension[0] == '@': # Load from path
+        #     extension = extension[1:]
+        #     spec = importlib.util.spec_from_file_location(module_name, file_path)
+        #     module = importlib.util.module_from_spec(spec)
+        #     sys.modules[module_name] = module
+        #     spec.loader.exec_module(module)
+        ext = importlib.import_module(extension)
+        ext.setup(self)

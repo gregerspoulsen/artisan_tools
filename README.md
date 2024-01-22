@@ -50,6 +50,12 @@ To run a command in the development environment (in this case `bash`):
 just run bash
 ```
 
+### Documentation
+To build the documentation:
+```shell
+just doc
+```
+
 ### Releasing
 
 The pipeline automatically checks pull requests for unique and proper semver

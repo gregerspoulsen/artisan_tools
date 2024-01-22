@@ -25,3 +25,20 @@ def test_get_extension_not_found():
     with pytest.raises(ValueError) as excinfo:
         app.get_extension("non_existent")
     assert "Extension not found" in str(excinfo.value)
+
+
+def test_load_extension_module():
+    app = App()
+    app._load_extension("artisan_tools.version")
+
+    # Test API call:
+    app.get_extension("version").get_version(app)
+
+
+def test_load_extension_local(tmp_path):
+    app = App()
+    app._load_extension("fake_extension")
+
+    # Test API call:
+    out = app.get_extension("test_ext").test_function("x")
+    assert out == (("x",), {})
