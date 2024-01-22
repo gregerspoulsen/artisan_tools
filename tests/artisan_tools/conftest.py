@@ -53,4 +53,5 @@ def app():
         pass
 
     app = App()
+    app.load_extensions()
     return app
