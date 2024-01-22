@@ -1,8 +1,13 @@
 import typer
 import types
 import importlib
+import sys
+import os
 from .log import get_logger
 from .config import load_config
+
+# Add CWD to path to allow import of local extensions
+sys.path.append(os.getcwd())
 
 _std_extensions = [
     "artisan_tools.vcs",
@@ -70,11 +75,5 @@ class App:
         Parameters:
         extension (str): The name of the extension to load.
         """
-        # if extension[0] == '@': # Load from path
-        #     extension = extension[1:]
-        #     spec = importlib.util.spec_from_file_location(module_name, file_path)
-        #     module = importlib.util.module_from_spec(spec)
-        #     sys.modules[module_name] = module
-        #     spec.loader.exec_module(module)
         ext = importlib.import_module(extension)
         ext.setup(self)
