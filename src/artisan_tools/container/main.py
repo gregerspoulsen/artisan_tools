@@ -4,35 +4,6 @@ import os
 # import typer
 
 
-def login(
-    username: str,
-    token: str,
-    registry: str = "https://index.docker.io/v1",
-    engine: str = "docker",
-):
-    """
-    Log in to a container registry using CLI.
-
-    This function checks if the user is already logged in to the specified
-    container registry by examining the specific engine configuration file.
-    If not already logged in, it uses the CLI to log in to the registry using
-    the provided username and password/token
-
-    Parameters
-    ----------
-    username : str
-        The username for the Docker registry.
-    token : str
-        The password or token for the registry.
-    registry : str, optional
-        The URL of the container registry. Default is dockerhub.
-    engine : str, optional
-        The container engine to use. Default is Docker.
-    """
-    # Check if already logged in by checking the Docker config file
-    # docker_config_path = os.path.expanduser("~/.docker/config.json")
-
-
 def check_login(registry: str, engine: str = "docker"):
     """
     Check if the user is logged in to a container registry using CLI.
@@ -80,41 +51,83 @@ def check_login(registry: str, engine: str = "docker"):
         raise ValueError(f"Unknown container engine: {engine}")
 
 
-# def x():
-#     # # Check if the CR_TOKEN is set in the environment
-#     # cr_token = os.getenv("CR_TOKEN")
-#     # if not cr_token:
-#     #     raise ValueError("Error: CR_TOKEN environment variable not set -
-# it must be set with a valid token/password for logging in to the registry.")
+def login(
+    username: str,
+    token: str,
+    registry: str = "https://index.docker.io/v1",
+    engine: str = "docker",
+    options: list = (),
+):
+    """
+    Log in to a container registry using CLI.
 
-#     # Check if already logged in by checking the Docker config file
-#     docker_config_path = os.path.expanduser("~/.docker/config.json")
-#     if os.path.isfile(docker_config_path):
-#         try:
-#             with open(docker_config_path, "r") as file:
-#                 config_contents = file.read()
+    This function checks if the user is already logged in to the specified
+    container registry by examining the specific engine configuration file.
+    If not already logged in, it uses the CLI to log in to the registry using
+    the provided username and password/token
 
-#             # Check if the registry URL is present in the Docker configuration file
-#             if registry in config_contents:
-#                 print(f"Already logged in to {registry}")
-#                 return
-#         except Exception as e:
-#             print(f"Error reading Docker config file: {e}")
-#             return
+    Parameters
+    ----------
+    username : str
+        The username for the Docker registry.
+    token : str
+        The password or token for the registry.
+    registry : str, optional
+        The URL of the container registry. Default is dockerhub.
+    engine : str, optional
+        The container engine to use. Default is Docker.
+    options : list, optional
+        Additional options to pass to the login command.
+    """
 
-#     # Log in to the Docker registry
-#     try:
-#         login_process = subprocess.run(
-#             ["docker", "login", registry, "-u", username, "--password-stdin"],
-#             input=token,
-#             text=True,
-#             capture_output=True,
-#             check=True,
-#         )
-#         print(login_process.stdout)
-#     except subprocess.CalledProcessError as e:
-#         print(f"Failed to log in to {registry}: {e.output}")
-#         raise
+    if check_login(registry, engine):
+        return
+
+    # Log in to the registry
+    try:
+        subprocess.run(
+            [engine, "login", registry, "-u", username, "--password-stdin"]
+            + list(options),
+            input=token,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to log in to {registry}: {e.output}")
+        raise
+
+
+def logout(
+    registry: str = "https://index.docker.io/v1",
+    engine: str = "docker",
+    options: list = (),
+):
+    """
+    Log out of container registry using CLI.
+
+    Parameters
+    ----------
+    username : str
+        The username for the Docker registry.
+    registry : str, optional
+        The URL of the container registry. Default is dockerhub.
+    engine : str, optional
+        The container engine to use. Default is Docker.
+    options : list, optional
+        Additional options to pass to the login command.
+    """
+    # Log out of the registry
+    try:
+        subprocess.run(
+            [engine, "logout", registry] + list(options),
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to log out of {registry}: {e.output}")
+        raise
 
 
 # def push(source: str, target: str):
