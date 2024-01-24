@@ -1,4 +1,7 @@
+import shutil
 import pytest
+import subprocess
+
 
 from artisan_tools.log import setup_root_handler
 from artisan_tools.vcs.main import run_git_command
@@ -57,17 +60,24 @@ def app():
     return app
 
 
-@pytest.fixture
-def registry():
+def find_available_executables(executable_names):
+    return [name for name in executable_names if shutil.which(name) is not None]
+
+
+engines = ["docker", "podman"]
+available_engines = find_available_executables(engines)
+
+
+@pytest.fixture(scope="session")
+def registry(request):
     """
     Fixture for running registry with podman
     """
-    import subprocess
-
+    engine = available_engines[0]  # Just use whatever is available
     # Start the registry
     subprocess.run(
         [
-            "podman",
+            engine,
             "run",
             "-d",
             "-p",
@@ -82,4 +92,4 @@ def registry():
     yield "localhost:5000"
 
     # Stop the registry
-    subprocess.run(["podman", "rm", "-f", "registry"])
+    subprocess.run([engine, "rm", "-f", "registry"])
