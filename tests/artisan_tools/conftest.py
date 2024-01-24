@@ -66,7 +66,16 @@ def registry():
 
     # Start the registry
     subprocess.run(
-        ["podman", "run", "-d", "-p", "5000:5000", "--name", "registry", "registry:latest"],
+        [
+            "podman",
+            "run",
+            "-d",
+            "-p",
+            "5000:5000",
+            "--name",
+            "registry",
+            "registry:latest",
+        ],
         check=True,
     )
 
