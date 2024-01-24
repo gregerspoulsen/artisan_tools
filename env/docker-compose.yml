@@ -10,3 +10,4 @@ services:
         volumes:
             - ../:/app
             - ${SSH_AUTH_SOCK}:/ssh-agent
+        privileged: true # Required to run podman inside container

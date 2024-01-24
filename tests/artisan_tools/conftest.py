@@ -55,3 +55,22 @@ def app():
     app = App()
     app.load_extensions()
     return app
+
+
+@pytest.fixture
+def registry():
+    """
+    Fixture for running registry with podman
+    """
+    import subprocess
+
+    # Start the registry
+    subprocess.run(
+        ["podman", "run", "-d", "-p", "5000:5000", "--name", "registry", "registry:latest"],
+        check=True,
+    )
+
+    yield "localhost:5000"
+
+    # Stop the registry
+    subprocess.run(["podman", "rm", "-f", "registry"])
