@@ -69,7 +69,7 @@ def test_load_config_merged_correctly(tmp_path):
     assert config["setting3"] == "local"
 
 
-def test_load_config_raises_error_when_local_config_missing(tmp_path):
+def test_load_config_raises_error_when_local_config_missing(tmp_path, monkeypatch):
     """
     Test that FileNotFoundError is raised when the local config is missing.
     """
@@ -79,7 +79,7 @@ def test_load_config_raises_error_when_local_config_missing(tmp_path):
     create_temp_yaml(base_config_file, base_config_content)
 
     # Set up the environment to use the temporary path
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
 
     # Run the test
     with pytest.raises(FileNotFoundError):
