@@ -1,5 +1,4 @@
 import subprocess
-import shutil
 import pytest
 
 from artisan_tools.container.main import check_login, login, logout, push
@@ -49,6 +48,7 @@ def test_login(registry, engine):
 
     # Log out
     logout(registry, engine)
+
 
 @pytest.mark.parametrize("engine", available_engines)
 def test_push(registry, engine):

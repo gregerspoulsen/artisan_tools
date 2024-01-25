@@ -1,5 +1,6 @@
 from . import api
 
+
 def setup(app):
     """
     Setup the version module.

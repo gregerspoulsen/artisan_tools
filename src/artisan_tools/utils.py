@@ -1,5 +1,6 @@
 import shutil
 
+
 def check_executables(executable_names):
     """
     Generate list of executables that are available on the system.

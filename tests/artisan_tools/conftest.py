@@ -2,7 +2,6 @@ import shutil
 import pytest
 import subprocess
 import yaml
-import os
 
 from artisan_tools.log import setup_root_handler
 from artisan_tools.vcs.main import run_git_command
@@ -95,6 +94,7 @@ def registry(request):
     # Stop the registry
     subprocess.run([engine, "rm", "-f", "registry"])
 
+
 @pytest.fixture()
 def app_with_config(tmp_path, monkeypatch):
     """
@@ -102,13 +102,14 @@ def app_with_config(tmp_path, monkeypatch):
     """
     monkeypatch.chdir(tmp_path)
 
-
-    config = {'container': {
-                'user': 'test',
-                'token_var': 'CR_TOKEN',
-                'registry': 'localhost:5000',
-                'engine': 'podman',
-                'options': ['--tls-verify=False']}
+    config = {
+        "container": {
+            "user": "test",
+            "token_var": "CR_TOKEN",
+            "registry": "localhost:5000",
+            "engine": "podman",
+            "options": ["--tls-verify=False"],
+        }
     }
     with open("artisan.yaml", "w") as f:
         yaml.dump(config, f)
@@ -116,7 +117,7 @@ def app_with_config(tmp_path, monkeypatch):
     monkeypatch.setenv("CR_TOKEN", "test_token")
 
     from artisan_tools.app import App
+
     app = App()
     app.load_extensions()
     return app
-

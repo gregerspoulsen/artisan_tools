@@ -1,5 +1,4 @@
 import pytest
-import os
 import yaml
 
 from artisan_tools.config import recursive_merge, load_config, read_yaml

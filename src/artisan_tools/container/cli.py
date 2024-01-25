@@ -1,5 +1,4 @@
 import typer
-import typing
 import os
 
 import artisan_tools.container.main as atc
@@ -12,13 +11,6 @@ def factory(app):
     config = app.config["container"]
 
     @cli.command()
-    def push_tag(source, target, tag):
-        """
-        Push the current tag to the remote repository.
-        """
-        engine.push_tag()
-
-    @cli.command()
     def login():
         """
         Log in to the container registry. Username, token variable, registry
@@ -27,7 +19,13 @@ def factory(app):
         # Read token from environment variable
         token = os.getenv(config["token_var"])
         if token is None:
-            typer.secho(f"Error, environment variable {config['token_var']} not set, it should contain token for logging in to registry.", fg=typer.colors.RED)
+            typer.secho(
+                (
+                    f"Error, environment variable {config['token_var']} not set, "
+                    "it should contain token for logging in to registry."
+                ),
+                fg=typer.colors.RED,
+            )
             raise typer.Exit(code=5)
 
         atc.login(
@@ -67,11 +65,12 @@ def factory(app):
         typer.secho(f"Successfully pushed {source} to {target}", fg=typer.colors.GREEN)
         logout()
 
-
     return cli
+
 
 if __name__ == "__main__":
     from artisan_tools.app import App
+
     app = App()
     app.load_extensions()
     cli = factory(app)

@@ -3,7 +3,7 @@ import os
 
 from artisan_tools.log import get_logger
 
-logger=get_logger('container')
+logger = get_logger("container")
 
 # import typer
 
