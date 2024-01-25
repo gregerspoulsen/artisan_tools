@@ -12,6 +12,7 @@ sys.path.append(os.getcwd())
 _std_extensions = [
     "artisan_tools.vcs",
     "artisan_tools.version",
+    "artisan_tools.parser",
 ]
 
 

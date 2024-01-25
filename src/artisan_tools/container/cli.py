@@ -63,7 +63,8 @@ def factory(app):
         target : str
             The target image to push to, must not include tags
         tags : list[str]
-            List of tags to push to the target image.
+            List of tags to push to the target image. Tags will be parsed by
+            the parser extension.
         """
 
         # Check that target doesn't contain tags, that is no colons after
@@ -73,8 +74,9 @@ def factory(app):
                 "Error, target image must not contain tags", fg=typer.colors.RED
             )
             raise typer.Exit(code=10)
-
-        targets = [target + ":" + tag for tag in tags]
+        
+        parser = app.get_extension("parser")
+        targets = [target + ":" + parser.parse(app, tag) for tag in tags]
 
         logged_in = login()
 

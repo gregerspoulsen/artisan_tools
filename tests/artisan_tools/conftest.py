@@ -102,6 +102,7 @@ def app_with_config(tmp_path, monkeypatch):
     """
     monkeypatch.chdir(tmp_path)
 
+    # Create config file:
     config = {
         "container": {
             "user": "test",
@@ -113,6 +114,10 @@ def app_with_config(tmp_path, monkeypatch):
     }
     with open("artisan.yaml", "w") as f:
         yaml.dump(config, f)
+
+    # Create VERSION file:
+    with open("VERSION", "w") as f:
+        f.write("0.99.9")
 
     monkeypatch.setenv("CR_TOKEN", "test_token")
 

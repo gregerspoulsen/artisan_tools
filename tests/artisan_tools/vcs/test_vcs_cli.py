@@ -32,7 +32,7 @@ def test_check_branch(setup_git_repos, app):
     assert "Current branch is 'master'." in result.stdout
 
 
-def test_add_release_tag(setup_git_repos, app):
+def test_add_tag(setup_git_repos, app):
     # Write a VERSION file in the test repository
     version_file = setup_git_repos[1] / "VERSION"
     with version_file.open("w") as f:
@@ -42,7 +42,8 @@ def test_add_release_tag(setup_git_repos, app):
     result = runner.invoke(
         factory(app),
         [
-            "add-release-tag",
+            "add-tag",
+            "v@version",
         ],
         catch_exceptions=False,
     )
