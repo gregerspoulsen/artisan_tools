@@ -13,6 +13,7 @@ _std_extensions = [
     "artisan_tools.vcs",
     "artisan_tools.version",
     "artisan_tools.parser",
+    "artisan_tools.container",
 ]
 
 

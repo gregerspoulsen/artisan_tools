@@ -7,7 +7,7 @@ from artisan_tools.version.api import get_version
 def factory(app):
     cli = typer.Typer(
         name="version",
-        help=("Commands for retrieving and settings version" "information."),
+        help=("Tools for managing version information."),
     )
 
     @cli.command()

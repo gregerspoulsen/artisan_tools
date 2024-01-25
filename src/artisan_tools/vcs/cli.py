@@ -9,7 +9,7 @@ import artisan_tools
 
 def factory(app):
     cli = typer.Typer(
-        name="vcs", help=("Commands for retrieving and settings version" "information.")
+        name="vcs", help=("Tools for version control system")
     )
 
     @cli.command()

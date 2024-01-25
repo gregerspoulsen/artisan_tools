@@ -6,7 +6,7 @@ import artisan_tools.container.main as atc
 
 def factory(app):
     cli = typer.Typer(
-        name="container", help=("Commands for working with container images")
+        name="container", help=("Tools for container images")
     )
     config = app.config["container"]
 
