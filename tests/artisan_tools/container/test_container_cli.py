@@ -46,12 +46,14 @@ def test_logout(runner, app_with_config):
 # Test Push
 def test_push(runner, app_with_config, registry):
     src = "alpine"
-    target = "localhost:5000/alpine:test"
+    target = "localhost:5000/alpine"
+    tags = ["test", "test2"]
+
     # Pull image with podman:
     subprocess.run(["podman", "pull", src, "--tls-verify=False"], check=True)
 
     result = runner.invoke(
-        factory(app_with_config), ["push", src, target], catch_exceptions=False
+        factory(app_with_config), ["push", src, target, *tags], catch_exceptions=False
     )
     assert result.exit_code == 0, result.stdout
     assert (
@@ -59,6 +61,18 @@ def test_push(runner, app_with_config, registry):
     )  # Adjust based on your actual success message
 
     # Check if image is present in registry
-    result = subprocess.run(
-        ["podman", "pull", target, "--tls-verify=False"], check=True
+    for tag in tags:
+        result = subprocess.run(
+            ["podman", "pull", target + ":" + tag, "--tls-verify=False"], check=True
+        )
+
+
+def test_push_tag_in_target(runner, app_with_config):
+    src = "alpine"
+    target = "localhost:5000/alpine:test"
+    tags = ["test", "latest"]
+
+    result = runner.invoke(
+        factory(app_with_config), ["push", src, target, *tags], catch_exceptions=True
     )
+    assert result.exit_code == 10, result.stdout

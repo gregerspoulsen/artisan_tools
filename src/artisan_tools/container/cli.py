@@ -28,7 +28,7 @@ def factory(app):
             )
             raise typer.Exit(code=5)
 
-        atc.login(
+        logged_in = atc.login(
             username=config["user"],
             token=token,
             registry=config["registry"],
@@ -36,6 +36,7 @@ def factory(app):
             options=config["options"],
         )
         typer.echo("Successfully logged in to {config['registry']}")
+        return logged_in
 
     @cli.command()
     def logout():
@@ -50,20 +51,45 @@ def factory(app):
         typer.echo("Successfully logged out of {config['registry']}")
 
     @cli.command()
-    def push(source: str, target: str) -> None:
+    def push(source: str, target: str, tags: list[str]) -> None:
         """
-        Push a Docker image to a container registry. Engine is read from the
-        configuration file.
+        Push a Docker image to a container registry. Logging in/out is handled
+        automatically using with details from the configuration file.
+
+        Parameters
+        ----------
+        source : str
+            The source image to push, can contain tags.
+        target : str
+            The target image to push to, must not include tags
+        tags : list[str]
+            List of tags to push to the target image.
         """
-        login()
-        atc.push(
-            source=source,
-            target=target,
-            engine=config["engine"],
-            options=config["options"],
-        )
-        typer.secho(f"Successfully pushed {source} to {target}", fg=typer.colors.GREEN)
-        logout()
+
+        # Check that target doesn't contain tags, that is no colons after
+        # the last slash:
+        if target.split("/")[-1].count(":") > 0:
+            typer.secho(
+                "Error, target image must not contain tags", fg=typer.colors.RED
+            )
+            raise typer.Exit(code=10)
+
+        targets = [target + ":" + tag for tag in tags]
+
+        logged_in = login()
+
+        for target in targets:
+            atc.push(
+                source=source,
+                target=target,
+                engine=config["engine"],
+                options=config["options"],
+            )
+            typer.secho(
+                f"Successfully pushed {source} to {target}", fg=typer.colors.GREEN
+            )
+        if logged_in:
+            logout()
 
     return cli
 

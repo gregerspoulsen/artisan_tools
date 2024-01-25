@@ -86,7 +86,7 @@ def login(
     logger.debug(f"Logging in to {registry} using {engine} and username {username}")
 
     if check_login(registry, engine):
-        return
+        return False
 
     # Log in to the registry
     try:
@@ -101,6 +101,8 @@ def login(
     except subprocess.CalledProcessError as e:
         print(f"Failed to log in to {registry}: {e.output}")
         raise
+
+    return True
 
 
 def logout(

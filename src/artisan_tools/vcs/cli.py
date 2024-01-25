@@ -44,9 +44,15 @@ def factory(app):
             raise typer.Exit(code=1)
 
     @cli.command()
-    def add_release_tag():
+    def add_tag(tag: str):
         """
-        Add a tag to the current commit and push it to a remote Git repository.
+        Add a tag to the current commit and push it to remote git repository.
+
+        Parameters
+        ----------
+        tag : str
+            The tag to add. 
+
         """
         version = app.get_extension("version").get_version(app)
         tag = "v" + version
