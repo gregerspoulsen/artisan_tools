@@ -74,7 +74,7 @@ def factory(app):
                 "Error, target image must not contain tags", fg=typer.colors.RED
             )
             raise typer.Exit(code=10)
-        
+
         parser = app.get_extension("parser")
         targets = [target + ":" + parser.parse(app, tag) for tag in tags]
 
