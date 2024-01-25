@@ -1,6 +1,10 @@
 import subprocess
 import os
 
+from artisan_tools.log import get_logger
+
+logger=get_logger('container')
+
 # import typer
 
 
@@ -79,6 +83,7 @@ def login(
     options : list, optional
         Additional options to pass to the login command.
     """
+    logger.debug(f"Logging in to {registry} using {engine} and username {username}")
 
     if check_login(registry, engine):
         return

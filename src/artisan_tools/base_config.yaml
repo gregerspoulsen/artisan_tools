@@ -1,6 +1,12 @@
 version:
   file: ./VERSION
-vcs:
-  username: "Artisan Tools"
-  email: "artisan@tools.com"
 extensions: []
+vcs:
+  username: "Artisan Tools" # User name to use for git commits
+  email: "artisan@tools.com" # Email to use for git commits
+container:
+  engine: docker # Container engine to use - [docker|podman]
+  user: null # User name used for logging into registry
+  token_var: null # Name of environment variable name to use for registry token
+  registry: null # Registry to use for container images
+  options: [] # Additional options to pass to container engine

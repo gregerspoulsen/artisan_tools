@@ -3,14 +3,9 @@ import shutil
 import pytest
 
 from artisan_tools.container.main import check_login, login, logout, push
+from artisan_tools.utils import container_engines
 
-
-def find_available_executables(executable_names):
-    return [name for name in executable_names if shutil.which(name) is not None]
-
-
-engines = ["docker", "podman"]
-available_engines = find_available_executables(engines)
+available_engines = container_engines()
 options = {"docker": [], "podman": ["--tls-verify=False"]}
 
 

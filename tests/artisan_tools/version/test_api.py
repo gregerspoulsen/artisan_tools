@@ -8,6 +8,4 @@ def test_get_version(tmpdir, app):
     custom_version_file.write("2.4.6")
 
     app.config["version"]["file"] = str(custom_version_file)
-    # Check if the version is read from the custom file
-    print(app.config)
     assert get_version(app) == "2.4.6"
