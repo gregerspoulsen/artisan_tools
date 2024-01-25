@@ -130,31 +130,30 @@ def logout(
         raise
 
 
-# def push(source: str, target: str):
-#     """
-#     Tag and push a Docker image to a container registry.
+def push(source: str, target: str, engine: str = "docker", options: list = ()) -> None:
+    """
+    Tag and push a Docker image to a container registry.
 
-#     Parameters
-#     ----------
-#     source : str
-#         The source image to push.
-#     target : str
-#         The target image to push to.
-#     """
-#     # Tag the image
-#     try:
-#         tag_process = subprocess.run(["docker", "tag", source, target], check=True)
-#     except subprocess.CalledProcessError as e:
-#         print(f"Failed to tag image: {e.output}")
-#         raise
+    Parameters
+    ----------
+    source : str
+        The source image.
+    target : str
+        Target to push to.
+    """
+    # Tag the image
+    try:
+        subprocess.run([engine, "tag", source, target], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to tag image: {e.output}")
+        raise
 
-#     # Push the image
-#     try:
-#         push_process = subprocess.run(["docker", "push", target], check=True)
-#         print(push_process.stdout)
-#     except subprocess.CalledProcessError as e:
-#         print(f"Failed to push image: {e.output}")
-#         raise
+    # Push the image
+    try:
+        subprocess.run([engine, "push", target] + list(options), check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to push image: {e.output}")
+        raise
 
 
 # def setup(app):

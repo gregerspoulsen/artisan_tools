@@ -2,7 +2,7 @@ import subprocess
 import shutil
 import pytest
 
-from artisan_tools.container.main import check_login, login, logout
+from artisan_tools.container.main import check_login, login, logout, push
 
 
 def find_available_executables(executable_names):
@@ -54,3 +54,13 @@ def test_login(registry, engine):
 
     # Log out
     logout(registry, engine)
+
+@pytest.mark.parametrize("engine", available_engines)
+def test_push(registry, engine):
+    image = "alpine"
+
+    # Make sure image is pulled:
+    subprocess.run([engine, "pull", image] + options[engine], check=True)
+
+    # Push the image
+    push(image, f"{registry}/{image}", engine, options=options[engine])
