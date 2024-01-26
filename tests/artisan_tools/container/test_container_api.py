@@ -37,6 +37,29 @@ def test_login_env(app_with_config, monkeypatch):
     logout(app)
 
 
+def test_login_env_missing_env_vars(app_with_config):
+    # If already logged in it should be allowed
+    app = app_with_config
+
+    app.config["container"]["auth"] = {
+        "method": "direct",
+        "user": "mock_username",
+        "token": "mock_token",
+    }
+
+    login(app)
+
+    app.config["container"]["auth"] = {
+        "method": "env",
+        "user_var": "USER_VAR",
+        "token_var": "TOKEN_VAR",
+    }
+
+    result = login(app)
+    assert not result
+    logout(app)
+
+
 def test_push(app_with_config, registry):
     src = "alpine"
     target = "localhost:5000/alpine"

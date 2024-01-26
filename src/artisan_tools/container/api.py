@@ -1,6 +1,8 @@
 from .main import login as login_main
 from .main import logout as logout_main
 from .main import push as push_main
+from .main import check_login as check_login_main
+
 from artisan_tools.utils import get_item, get_env_var
 
 import subprocess
@@ -19,8 +21,14 @@ def login(app):
     """
 
     config = app.config["container"]
-    auth = config["auth"]
+    registry = get_item(config, "registry", "registry")
+    engine = get_item(config, "engine", "container engine")
 
+    # Check if already logged in:
+    if check_login_main(registry, engine):
+        return False
+
+    auth = config["auth"]
     if auth["method"] == "direct":
         user = get_item(auth, "user", "username")
         token = get_item(auth, "token", "token")
@@ -43,8 +51,6 @@ def login(app):
             ),
         )
 
-    registry = get_item(config, "registry", "registry")
-    engine = get_item(config, "engine", "container engine")
     options = get_item(config, "options", "options")
 
     logged_in = login_main(
