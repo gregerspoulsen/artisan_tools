@@ -48,7 +48,6 @@ def test_add_tag(setup_git_repos, app):
         catch_exceptions=False,
     )
 
-    print(result.stdout)
     assert result.exit_code == 0, result.stdout
     assert (
         "Tagged current changeset as 'v1.0.0' and pushed to remote repository."

@@ -56,3 +56,21 @@ def test_push(runner, app_with_config, registry):
         result = subprocess.run(
             ["podman", "pull", target + ":" + tag, "--tls-verify=False"], check=True
         )
+
+
+def test_command_error(runner, app_with_config, registry):
+
+    command = "ls -j"
+    result = runner.invoke(
+        factory(app_with_config), ["command", command], catch_exceptions=True
+    )
+    assert result.exit_code == 2, result.stdout
+
+
+def test_command(runner, app_with_config, registry):
+
+    command = "ls"
+    result = runner.invoke(
+        factory(app_with_config), ["command", command], catch_exceptions=True
+    )
+    assert result.exit_code == 0, result.stdout

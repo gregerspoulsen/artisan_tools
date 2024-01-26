@@ -3,6 +3,8 @@ from .main import logout as logout_main
 from .main import push as push_main
 from artisan_tools.utils import get_item, get_env_var
 
+import subprocess
+
 
 def login(app):
     """
@@ -112,3 +114,21 @@ def push(app, source: str, target: str, tags: list[str]) -> None:
 
     if logged_in:
         logout(app)
+
+
+def run_command_with_auth(app, command: str):
+    """
+    Run shell command with access to container registry. The command will log in
+    to the registry (if not already logged in), execute the shell command
+    (and log out again).
+    """
+
+    logged_in = login(app)
+
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except Exception:
+        raise
+    finally:
+        if logged_in:
+            logout(app)

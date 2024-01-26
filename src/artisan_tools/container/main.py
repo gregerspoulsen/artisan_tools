@@ -161,11 +161,3 @@ def push(source: str, target: str, engine: str = "docker", options: list = ()) -
     except subprocess.CalledProcessError as e:
         print(f"Failed to push image: {e.output}")
         raise
-
-
-# def setup(app):
-#     app.add_cli(cli)
-
-
-if __name__ == "__main__":
-    print(check_login("localhost:5000"))

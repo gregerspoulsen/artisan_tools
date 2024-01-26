@@ -1,4 +1,5 @@
 import typer
+import subprocess
 
 from artisan_tools.container import api
 
@@ -48,6 +49,17 @@ def factory(app):
             f"Successfully pushed {source} to {target} with tags {tags}",
             fg=typer.colors.GREEN,
         )
+
+    @cli.command()
+    def command(command: str):
+        """
+        Run a command with authentication to container registry
+        """
+        try:
+            api.run_command_with_auth(app, command)
+        except subprocess.CalledProcessError as e:
+            typer.secho("Error running command", fg=typer.colors.RED)
+            raise typer.Exit(code=e.returncode)
 
     return cli
 

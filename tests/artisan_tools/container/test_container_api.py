@@ -3,7 +3,7 @@
 import pytest
 import subprocess
 
-from artisan_tools.container.api import login, logout, push
+from artisan_tools.container.api import login, logout, push, run_command_with_auth
 
 
 def test_login_direct(app_with_config, registry):
@@ -61,3 +61,11 @@ def test_push_tag_in_target(app_with_config):
 
     with pytest.raises(ValueError):
         push(app_with_config, src, target, tags)
+
+
+def test_run_command_with_auth(app_with_config, registry):
+    app = app_with_config
+    command = "ls"
+
+    # Act
+    run_command_with_auth(app, command)
