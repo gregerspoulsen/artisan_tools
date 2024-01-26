@@ -13,7 +13,7 @@ def run_git_command(command, cwd=None):
     str: The output of the git command
     """
 
-    options = "-c safe.directory=/app"
+    options = "-c safe.directory=*"
     git_command = f"git {options} {command}"
     result = subprocess.check_output(
         git_command, stderr=subprocess.STDOUT, shell=True, encoding="utf-8", cwd=cwd
