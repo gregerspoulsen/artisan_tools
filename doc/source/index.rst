@@ -12,6 +12,7 @@ Welcome to Artisan Tools's documentation!
 
    getting_started
    config
+   cli
 
 
 Indices and tables
