@@ -3,6 +3,7 @@ from .main import logout as logout_main
 from .main import push as push_main
 from artisan_tools.utils import get_item, get_env_var
 
+
 def login(app):
     """
     Login to container registry as specified in the configuration file.
@@ -22,11 +23,23 @@ def login(app):
         user = get_item(auth, "user", "username")
         token = get_item(auth, "token", "token")
 
-    if auth["method"] == 'env':
+    if auth["method"] == "env":
         user_var = get_item(auth, "user_var", "environment variable for username")
         token_var = get_item(auth, "token_var", "environment variable for token")
-        user = get_env_var(user_var, f"Error, environment variable {user_var} not set, it should contain username for logging in to registry.")
-        token = get_env_var(token_var, f"Error, environment variable {token_var} not set, it should contain token for logging in to registry.")
+        user = get_env_var(
+            user_var,
+            (
+                f"Error, environment variable {user_var} not set, it should "
+                "contain username for logging in to registry."
+            ),
+        )
+        token = get_env_var(
+            token_var,
+            (
+                f"Error, environment variable {token_var} not set, it should "
+                "contain token for logging in to registry."
+            ),
+        )
 
     registry = get_item(config, "registry", "registry")
     engine = get_item(config, "engine", "container engine")
@@ -39,8 +52,9 @@ def login(app):
         engine=engine,
         options=options,
     )
-    
+
     return logged_in
+
 
 def logout(app):
     """
@@ -55,6 +69,7 @@ def logout(app):
         registry=registry,
         engine=engine,
     )
+
 
 def push(app, source: str, target: str, tags: list[str]) -> None:
     """
@@ -80,13 +95,9 @@ def push(app, source: str, target: str, tags: list[str]) -> None:
     parser = app.get_extension("parser")
     targets = [target + ":" + parser.parse(app, tag) for tag in tags]
 
-
     config = app.config["container"]
-    registry = get_item(config, "registry", "registry")
     engine = get_item(config, "engine", "container engine")
     options = get_item(config, "options", "options")
-
-
 
     logged_in = login(app)
 

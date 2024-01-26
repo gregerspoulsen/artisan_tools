@@ -8,9 +8,7 @@ import artisan_tools
 
 
 def factory(app):
-    cli = typer.Typer(
-        name="vcs", help=("Tools for version control system")
-    )
+    cli = typer.Typer(name="vcs", help=("Tools for version control system"))
 
     @cli.command()
     def check_no_tag(

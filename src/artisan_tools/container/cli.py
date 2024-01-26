@@ -1,21 +1,18 @@
 import typer
-import os
 
-from artisan_tools.container import api 
+from artisan_tools.container import api
 
 
 def factory(app):
-    cli = typer.Typer(
-        name="container", help=("Tools for container images")
-    )
-    config = app.config["container"]
+    cli = typer.Typer(name="container", help=("Tools for container images"))
 
     @cli.command()
     def login():
         """
         Login to container registry as specified in the configuration file.
         When `auth == direct`, use the `user` and `token` directly.
-        When `auth == env`, use the environment variables specified in `user` and `token`
+        When `auth == env`, use the environment variables specified in `user`
+        and `token`
         """
         api.login(app)
         typer.echo("Successfully logged in to {config['registry']}")
@@ -47,7 +44,10 @@ def factory(app):
         """
 
         api.push(app, source, target, tags)
-        typer.secho(f"Successfully pushed {source} to {target} with tags {tags}", fg=typer.colors.GREEN)
+        typer.secho(
+            f"Successfully pushed {source} to {target} with tags {tags}",
+            fg=typer.colors.GREEN,
+        )
 
     return cli
 

@@ -106,7 +106,7 @@ def app_with_config(tmp_path, monkeypatch):
     config = {
         "container": {
             "auth": {
-                'method': 'direct',
+                "method": "direct",
                 "user": "test",
                 "token": "test",
             },
