@@ -26,14 +26,6 @@ def test_login_successful(runner, app_with_config, registry):
     )  # Adjust based on your actual success message
 
 
-# Test Missing Token Variable
-def test_login_missing_token(runner, app_with_config, registry):
-    del os.environ["CR_TOKEN"]
-    result = runner.invoke(factory(app_with_config), ["login"], catch_exceptions=False)
-    assert result.exit_code != 0, result.stdout
-    assert "Error, environment variable" in result.output
-
-
 # Test Logout
 def test_logout(runner, app_with_config):
     result = runner.invoke(factory(app_with_config), ["logout"], catch_exceptions=False)
@@ -65,14 +57,3 @@ def test_push(runner, app_with_config, registry):
         result = subprocess.run(
             ["podman", "pull", target + ":" + tag, "--tls-verify=False"], check=True
         )
-
-
-def test_push_tag_in_target(runner, app_with_config):
-    src = "alpine"
-    target = "localhost:5000/alpine:test"
-    tags = ["test", "latest"]
-
-    result = runner.invoke(
-        factory(app_with_config), ["push", src, target, *tags], catch_exceptions=True
-    )
-    assert result.exit_code == 10, result.stdout

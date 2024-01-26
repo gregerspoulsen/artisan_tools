@@ -1,7 +1,7 @@
 import typer
 import os
 
-import artisan_tools.container.main as atc
+from artisan_tools.container import api 
 
 
 def factory(app):
@@ -13,30 +13,12 @@ def factory(app):
     @cli.command()
     def login():
         """
-        Log in to the container registry. Username, token variable, registry
-        and engine are read from the configuration file.
+        Login to container registry as specified in the configuration file.
+        When `auth == direct`, use the `user` and `token` directly.
+        When `auth == env`, use the environment variables specified in `user` and `token`
         """
-        # Read token from environment variable
-        token = os.getenv(config["token_var"])
-        if token is None:
-            typer.secho(
-                (
-                    f"Error, environment variable {config['token_var']} not set, "
-                    "it should contain token for logging in to registry."
-                ),
-                fg=typer.colors.RED,
-            )
-            raise typer.Exit(code=5)
-
-        logged_in = atc.login(
-            username=config["user"],
-            token=token,
-            registry=config["registry"],
-            engine=config["engine"],
-            options=config["options"],
-        )
+        api.login(app)
         typer.echo("Successfully logged in to {config['registry']}")
-        return logged_in
 
     @cli.command()
     def logout():
@@ -44,10 +26,7 @@ def factory(app):
         Log out of the container registry. Registry and engine are read from
         the configuration file.
         """
-        atc.logout(
-            registry=config["registry"],
-            engine=config["engine"],
-        )
+        api.logout(app)
         typer.echo("Successfully logged out of {config['registry']}")
 
     @cli.command()
@@ -67,31 +46,8 @@ def factory(app):
             the parser extension.
         """
 
-        # Check that target doesn't contain tags, that is no colons after
-        # the last slash:
-        if target.split("/")[-1].count(":") > 0:
-            typer.secho(
-                "Error, target image must not contain tags", fg=typer.colors.RED
-            )
-            raise typer.Exit(code=10)
-
-        parser = app.get_extension("parser")
-        targets = [target + ":" + parser.parse(app, tag) for tag in tags]
-
-        logged_in = login()
-
-        for target in targets:
-            atc.push(
-                source=source,
-                target=target,
-                engine=config["engine"],
-                options=config["options"],
-            )
-            typer.secho(
-                f"Successfully pushed {source} to {target}", fg=typer.colors.GREEN
-            )
-        if logged_in:
-            logout()
+        api.push(app, source, target, tags)
+        typer.secho(f"Successfully pushed {source} to {target} with tags {tags}", fg=typer.colors.GREEN)
 
     return cli
 

@@ -105,8 +105,11 @@ def app_with_config(tmp_path, monkeypatch):
     # Create config file:
     config = {
         "container": {
-            "user": "test",
-            "token_var": "CR_TOKEN",
+            "auth": {
+                'method': 'direct',
+                "user": "test",
+                "token": "test",
+            },
             "registry": "localhost:5000",
             "engine": "podman",
             "options": ["--tls-verify=False"],
