@@ -48,17 +48,13 @@ bump *args:
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:
-  just gitrun "at version verify --check-tag"
+  just run at version verify --check-tag
 
 # Create a release
 release: 
-  just gitrun "at vcs add-tag"
+  just run at vcs add-tag
 
 # --- Utilities ---
 # Run command in development environment
 run *ARGS: # Run a command in the development environment
   docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}
-
-# Run command with git repo set as safe first:
-gitrun command:
-  just run sh -c "\"git config --global --add safe.directory /app && {{command}}\""

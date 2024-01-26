@@ -9,13 +9,14 @@ def run_git_command(command, cwd=None):
     command (str): The git command to run.
     cwd (str): The path to the directory in which to run the command. Optional.
 
-
     Returns:
     str: The output of the git command
     """
 
+    options = "-c safe.directory=/app"
+    git_command = f"git {options} {command}"
     result = subprocess.check_output(
-        command, stderr=subprocess.STDOUT, shell=True, encoding="utf-8", cwd=cwd
+        git_command, stderr=subprocess.STDOUT, shell=True, encoding="utf-8", cwd=cwd
     )
     return result.strip()
 
@@ -27,7 +28,7 @@ def get_remote_tags():
     Returns:
     list of str: A list of tags from the remote repository.
     """
-    remote_tags_output = run_git_command("git ls-remote --tags")
+    remote_tags_output = run_git_command("ls-remote --tags")
     return [line.split("/")[-1] for line in remote_tags_output.split("\n") if line]
 
 
@@ -49,7 +50,7 @@ def get_current_branch():
     """
     Returns the name of the currently checked-out Git branch.
     """
-    return run_git_command("git branch --show-current")
+    return run_git_command("branch --show-current")
 
 
 def check_current_branch(expected_branch):
@@ -84,7 +85,7 @@ def add_and_push_tag(config, tag_name, message, remote="origin"):
     git_options = (
         f"-c user.name=\"{config['username']}\" -c user.email=\"{config['email']}\""
     )
-    run_git_command(f"git {git_options} tag -a {tag_name} -m '{message}'")
+    run_git_command(f"{git_options} tag -a {tag_name} -m '{message}'")
 
     # Push the tag to the remote repository
-    run_git_command(f"git push {remote} {tag_name}")
+    run_git_command(f"push {remote} {tag_name}")
