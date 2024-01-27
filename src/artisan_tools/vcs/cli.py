@@ -1,4 +1,6 @@
 import typer
+from typing_extensions import Annotated
+from typing import Optional
 
 import artisan_tools.vcs.main
 
@@ -6,9 +8,7 @@ import artisan_tools
 
 
 def factory(app):
-    cli = typer.Typer(
-        name="vcs", help=("Commands for retrieving and settings version" "information.")
-    )
+    cli = typer.Typer(name="vcs", help=("Tools for version control system"))
 
     @cli.command()
     def check_no_tag(
@@ -44,16 +44,23 @@ def factory(app):
             raise typer.Exit(code=1)
 
     @cli.command()
-    def add_release_tag():
+    def add_tag(tag: Annotated[Optional[str], typer.Argument()] = "v@version"):
         """
-        Add a tag to the current commit and push it to a remote Git repository.
+        Add a tag to the current commit and push it to remote git repository.
+
+        Parameters
+        ----------
+        tag : str
+            The tag to add. The tag is parsed by the parser extension. Default
+            is 'v@version', which will render as e.g. 'v1.0.0'.
+
         """
-        version = app.get_extension("version").get_version(app)
-        tag = "v" + version
+        parser = app.get_extension("parser")
+        tag = parser.parse(app, tag)
         check_no_tag(tag)
 
         artisan_tools.vcs.main.add_and_push_tag(
-            app.config["vcs"], tag_name=tag, message=f"Tag Release v{version}"
+            app.config["vcs"], tag_name=tag, message=f"Add tag '{tag}'"
         )
         typer.echo(
             f"Tagged current changeset as '{tag}' and pushed to remote repository."

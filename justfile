@@ -52,7 +52,7 @@ check-release:
 
 # Create a release
 release: 
-  just run at vcs add-release-tag
+  just run at vcs add-tag
 
 # --- Utilities ---
 # Run command in development environment

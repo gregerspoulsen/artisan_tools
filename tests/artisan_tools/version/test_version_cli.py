@@ -55,7 +55,7 @@ def test_bump_nonexistent_file(tmpdir, app):
 
 def test_bump_bad_part(tmpdir, app):
     # Run the CLI command with a bad part
-    result = runner.invoke(factory(app), ["bump", "bad_part"], catch_exceptions=False)
+    result = runner.invoke(factory(app), ["bump", "bad_part"], catch_exceptions=True)
 
     # Check if the correct error message is displayed
     assert result.exit_code != 0

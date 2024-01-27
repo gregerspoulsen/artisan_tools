@@ -22,8 +22,11 @@ project/
 ```
 `artisan.yaml` can in most cases be left empty when default settings are
 sufficient. `VERSION` should contain the current version of the project
-(e.g. 1.3.5). For now you can seek inspiration in the `justfile` in this project
-on how to use artisan-tools - documentation of the CLI will follow soon.
+(e.g. 1.3.5).
+
+Documentation of the CLI will follow soon. Until then you can seel inspiration 
+in the justfile in this project or run `at --help` to see the available commands
+and how to use them.
 
 
 ## Development
@@ -61,7 +64,7 @@ just doc
 The pipeline automatically checks pull requests for unique and proper semver
 version. To update the version when preparing a pull-request use
 ```shell
-just bump major|minor|patch
+just bump <major|minor|patch>
 ```
 When the pull-request is merged to master the release will automatically be
 tagged with the version in the file VERSION.
