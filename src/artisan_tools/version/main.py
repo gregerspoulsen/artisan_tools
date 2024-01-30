@@ -6,7 +6,7 @@ import os
 import semver
 
 
-def check_version(version: str, release = True) -> None:
+def check_version(version: str, release=True) -> None:
     """
     Check that the version is a proper semver version.
 
@@ -56,26 +56,6 @@ def bump_version(version, part):
     return str(new_version)
 
 
-def bump_version_file(file_path, part):
-    """
-    Read a version from a file, bump it, and write the bumped version back to the file.
-
-    Parameters:
-    file_path (str): Path to the file containing the version string.
-    part (str): The part of the version to bump ('major', 'minor', or 'patch').
-    """
-    current_version = read_version_file(file_path)
-
-    # Bump the version using the bump_version function
-    new_version = bump_version(current_version, part)
-
-    # Write the new version to the file
-    with open(file_path, "w") as file:
-        file.write(new_version)
-
-    return new_version
-
-
 def read_version_file(file_path="VERSION"):
     """
     Read a version from a file.
@@ -92,3 +72,25 @@ def read_version_file(file_path="VERSION"):
         current_version = file.read().strip()
 
     return current_version
+
+
+def replace_in_file(file_path, target, replacement):
+    """
+    Replace the version in a file.
+
+    Parameters
+    ----------
+    file_path (str): Path to the file.
+    target (str): The target string to replace.
+    replacement (str): The new string.
+    """
+    # Read the file
+    with open(file_path, "r") as file:
+        file_contents = file.read()
+
+    # Replace the version
+    file_contents = file_contents.replace(target, replacement)
+
+    # Write the file back to disk
+    with open(file_path, "w") as file:
+        file.write(file_contents)
