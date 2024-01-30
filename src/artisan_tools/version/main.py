@@ -5,6 +5,10 @@ Tools to support release of a package.
 import os
 import semver
 
+from artisan_tools.log import get_logger
+
+logger = get_logger("version.main")
+
 
 def check_version(version: str, release=True) -> None:
     """
@@ -74,7 +78,7 @@ def read_version_file(file_path="VERSION"):
     return current_version
 
 
-def replace_in_file(file_path, target, replacement):
+def replace_in_file(file_path, current_version, new_version):
     """
     Replace the version in a file.
 
@@ -89,8 +93,42 @@ def replace_in_file(file_path, target, replacement):
         file_contents = file.read()
 
     # Replace the version
-    file_contents = file_contents.replace(target, replacement)
+    file_contents = file_contents.replace(current_version, new_version)
 
     # Write the file back to disk
     with open(file_path, "w") as file:
         file.write(file_contents)
+
+    logger.info(f"Updated version in file: {file_path} to {new_version}")
+
+
+available_hooks = {"string_replace": replace_in_file}
+
+
+def run_hook(hook, current_version, new_version):
+    """
+    Execute a hook.
+
+    Parameters
+    ----------
+    hook : str
+        The hook to execute.
+    current_version : str
+        The current version.
+    new_version : str
+        The new version.
+    """
+    if not isinstance(hook, dict):
+        raise ValueError(
+            f"Invalid hook: {hook}, it must be a dictionary with a 'method' key"
+        )
+    if "method" not in hook:
+        raise ValueError(
+            f"Invalid hook: {hook}, it must be a dictionary with a 'method' key"
+        )
+    method = hook["method"]
+    if method not in available_hooks:
+        raise ValueError(f"Invalid hook: {hook}, it m {list(available_hooks.keys())}")
+    hook_func = available_hooks[method]
+    hook.pop("method")
+    hook_func(current_version=current_version, new_version=new_version, **hook)

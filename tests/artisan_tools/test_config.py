@@ -63,7 +63,7 @@ def test_load_config_merged_correctly(tmp_path):
 
     config = load_config(config_dir=tmp_path)
 
-    assert config["version"] == {"file": "./VERSION"}
+    assert config["version"] == {"file": "./VERSION", "hooks": []}
     assert config["setting2"] == "local"
     assert config["setting3"] == "local"
 

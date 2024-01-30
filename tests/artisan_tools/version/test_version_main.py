@@ -1,6 +1,11 @@
 import pytest
 import unittest
-from artisan_tools.version.main import bump_version, check_version, replace_in_file
+from artisan_tools.version.main import (
+    bump_version,
+    check_version,
+    replace_in_file,
+    run_hook,
+)
 
 
 # --- bump_version -------------------------------------------------------------
@@ -56,3 +61,22 @@ def test_replace_in_file_simple(tmpdir):
 
     # Assert
     assert file_path.read() == new_version
+
+
+def test_run_hook_invalid():
+    with pytest.raises(ValueError):
+        run_hook("invalid_hook", new_version="0.1.0", current_version="0.0.1")
+
+
+def test_run_hook_string_replace(tmpdir):
+    file_content = "test\nversion: 0.0.1\ntest"
+    expected_content = "test\nversion: 0.1.0\ntest"
+
+    # Create file:
+    file_path = tmpdir.join("test.txt")
+    file_path.write(file_content)
+
+    hook = {"method": "string_replace", "file_path": file_path}
+    run_hook(hook, new_version="0.1.0", current_version="0.0.1")
+
+    assert file_path.read() == expected_content
