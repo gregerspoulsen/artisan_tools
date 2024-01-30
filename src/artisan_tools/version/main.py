@@ -6,16 +6,24 @@ import os
 import semver
 
 
-def check_version(version: str) -> None:
+def check_version(version: str, release = True) -> None:
     """
-    Check that the version is a proper semver release version.
+    Check that the version is a proper semver version.
 
-    :param version: The version to check
+    Parameters
+    ----------
+    version : str
+        The version string to check.
+    release : bool
+        Flag indicating whether to check for a release version, default True.
 
     """
     try:
         parsed_version = semver.Version.parse(version)
-        return parsed_version.prerelease is None and parsed_version.build is None
+        if release:
+            return parsed_version.prerelease is None and parsed_version.build is None
+        else:
+            return True
     except ValueError:
         return False
 

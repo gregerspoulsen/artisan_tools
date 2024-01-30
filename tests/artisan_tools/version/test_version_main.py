@@ -52,10 +52,14 @@ class TestVersionCheck(unittest.TestCase):
         # Test with a pre-release version
         self.assertFalse(check_version("1.2.3-alpha.1"))
 
-    # def test_build_metadata(self):
-    #     # Test with a version that includes build metadata
-    #     self.assertFalse(check_version("1.2.3+build.4"))
-
     def test_invalid_version(self):
         # Test with an invalid version string
         self.assertFalse(check_version("invalid-version"))
+
+    def test_build_metadata_release(self):
+        # Test with a version that includes build metadata
+        self.assertFalse(check_version("1.2.3+build.4"))
+
+    def test_build_metadata(self):
+        # Test with a version that includes build metadata
+        self.assertTrue(check_version("1.2.3+build.4", release=False))
