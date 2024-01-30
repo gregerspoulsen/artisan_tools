@@ -92,6 +92,12 @@ def replace_in_file(file_path, current_version, new_version):
     with open(file_path, "r") as file:
         file_contents = file.read()
 
+    # Make sure the target string is at least once in the file:
+    if current_version not in file_contents:
+        raise ValueError(
+            f"Target string '{current_version}' not found in file: {file_path}"
+        )
+
     # Replace the version
     file_contents = file_contents.replace(current_version, new_version)
 

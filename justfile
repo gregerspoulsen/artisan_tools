@@ -44,7 +44,7 @@ doc:
 
 # Bump the version. Usage: just bump major|minor|patch
 bump *args: 
-  just run at version bump {{args}} VERSION
+  just run at version bump {{args}}
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:

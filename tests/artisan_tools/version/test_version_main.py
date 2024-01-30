@@ -49,7 +49,7 @@ class TestVersionCheck(unittest.TestCase):
         self.assertTrue(check_version("1.2.3+build.4", release=False))
 
 
-def test_replace_in_file_simple(tmpdir):
+def test_replace_in_file(tmpdir):
     # Arrange
     old_version = "0.1.0"
     new_version = "0.2.0"
@@ -61,6 +61,18 @@ def test_replace_in_file_simple(tmpdir):
 
     # Assert
     assert file_path.read() == new_version
+
+
+def test_replace_in_file_no_occurrence(tmpdir):
+    # Arrange
+    old_version = "0.1.0"
+    new_version = "0.2.0"
+    file_path = tmpdir.join("VERSION")
+    file_path.write("0.2.0")
+
+    # Act
+    with pytest.raises(ValueError):
+        replace_in_file(file_path, old_version, new_version)
 
 
 def test_run_hook_invalid():
