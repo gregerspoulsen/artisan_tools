@@ -1,5 +1,8 @@
 version:
   file: ./VERSION
+  hooks: [] # List of hooks to run when version is updated, example below
+  # hooks:
+  #   - {method: string_replace, file_path: pyproject.toml}
 extensions: []
 vcs:
   username: "Artisan Tools" # User name to use for git commits

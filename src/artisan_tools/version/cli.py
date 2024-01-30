@@ -1,7 +1,7 @@
 import typer
 
-from artisan_tools.version.main import bump_version_file, check_version
-from artisan_tools.version.api import get_version
+from artisan_tools.version.main import check_version
+from artisan_tools.version.api import get_version, update_version
 
 
 def factory(app):
@@ -13,23 +13,14 @@ def factory(app):
     @cli.command()
     def bump(
         part: str = typer.Argument(  # noqa: B008
-            ..., help="The part of the version to bump ('major', 'minor', or 'patch')."
-        ),
-        file_path: str = typer.Argument(  # noqa: B008
-            None,
-            help="Path to file containing the version string. Defaults to 'VERSION'.",
+            ..., help=("Part to bump [major|minor|patch] or a full version " "string.")
         ),
     ):
         """
         Bump the version in the specified file.
         """
-        if file_path is None:
-            file_path = app.config["version"]["file"]
-        try:
-            new_version = bump_version_file(file_path, part)
-            typer.echo(f"Version bumped to {new_version} in {file_path}")
-        except FileNotFoundError:
-            raise typer.BadParameter(f"File not found: {file_path}")
+        new_version = update_version(app, part)
+        typer.secho(f"Version bumped to {new_version}", fg=typer.colors.GREEN)
 
     @cli.command()
     def verify(

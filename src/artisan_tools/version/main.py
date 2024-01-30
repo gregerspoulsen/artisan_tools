@@ -5,17 +5,29 @@ Tools to support release of a package.
 import os
 import semver
 
+from artisan_tools.log import get_logger
 
-def check_version(version: str) -> None:
+logger = get_logger("version.main")
+
+
+def check_version(version: str, release=True) -> None:
     """
-    Check that the version is a proper semver release version.
+    Check that the version is a proper semver version.
 
-    :param version: The version to check
+    Parameters
+    ----------
+    version : str
+        The version string to check.
+    release : bool
+        Flag indicating whether to check for a release version, default True.
 
     """
     try:
         parsed_version = semver.Version.parse(version)
-        return parsed_version.prerelease is None and parsed_version.build is None
+        if release:
+            return parsed_version.prerelease is None and parsed_version.build is None
+        else:
+            return True
     except ValueError:
         return False
 
@@ -48,26 +60,6 @@ def bump_version(version, part):
     return str(new_version)
 
 
-def bump_version_file(file_path, part):
-    """
-    Read a version from a file, bump it, and write the bumped version back to the file.
-
-    Parameters:
-    file_path (str): Path to the file containing the version string.
-    part (str): The part of the version to bump ('major', 'minor', or 'patch').
-    """
-    current_version = read_version_file(file_path)
-
-    # Bump the version using the bump_version function
-    new_version = bump_version(current_version, part)
-
-    # Write the new version to the file
-    with open(file_path, "w") as file:
-        file.write(new_version)
-
-    return new_version
-
-
 def read_version_file(file_path="VERSION"):
     """
     Read a version from a file.
@@ -84,3 +76,65 @@ def read_version_file(file_path="VERSION"):
         current_version = file.read().strip()
 
     return current_version
+
+
+def replace_in_file(file_path, current_version, new_version):
+    """
+    Replace the version in a file.
+
+    Parameters
+    ----------
+    file_path (str): Path to the file.
+    target (str): The target string to replace.
+    replacement (str): The new string.
+    """
+    # Read the file
+    with open(file_path, "r") as file:
+        file_contents = file.read()
+
+    # Make sure the target string is at least once in the file:
+    if current_version not in file_contents:
+        raise ValueError(
+            f"Target string '{current_version}' not found in file: {file_path}"
+        )
+
+    # Replace the version
+    file_contents = file_contents.replace(current_version, new_version)
+
+    # Write the file back to disk
+    with open(file_path, "w") as file:
+        file.write(file_contents)
+
+    logger.info(f"Updated version in file: {file_path} to {new_version}")
+
+
+available_hooks = {"string_replace": replace_in_file}
+
+
+def run_hook(hook, current_version, new_version):
+    """
+    Execute a hook.
+
+    Parameters
+    ----------
+    hook : str
+        The hook to execute.
+    current_version : str
+        The current version.
+    new_version : str
+        The new version.
+    """
+    if not isinstance(hook, dict):
+        raise ValueError(
+            f"Invalid hook: {hook}, it must be a dictionary with a 'method' key"
+        )
+    if "method" not in hook:
+        raise ValueError(
+            f"Invalid hook: {hook}, it must be a dictionary with a 'method' key"
+        )
+    method = hook["method"]
+    if method not in available_hooks:
+        raise ValueError(f"Invalid hook: {hook}, it m {list(available_hooks.keys())}")
+    hook_func = available_hooks[method]
+    hook.pop("method")
+    hook_func(current_version=current_version, new_version=new_version, **hook)
