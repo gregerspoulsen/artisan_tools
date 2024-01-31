@@ -37,6 +37,13 @@ ci:
   just tox
   just doc
 
+# Run tests locally in venv to verify docker commands
+local-test:
+  python3 -m venv venv
+  ./venv/bin/pip install -e .
+  ./venv/bin/pip install -r requirements_dev.txt
+  ./venv/bin/pytest
+
 doc:
   docker compose -f env/docker-compose.yml run --rm -u $(id -u) dev sphinx-build -b html doc/source doc/build
 
