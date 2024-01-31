@@ -1,7 +1,9 @@
 import subprocess
 import os
+import uuid
 
 from artisan_tools.log import get_logger
+
 
 logger = get_logger("container")
 
@@ -139,7 +141,7 @@ def logout(
 
 def push(source: str, target: str, engine: str = "docker", options: list = ()) -> None:
     """
-    Tag and push a Docker image to a container registry.
+    Tag and push a container image to registry.
 
     Parameters
     ----------
@@ -160,4 +162,65 @@ def push(source: str, target: str, engine: str = "docker", options: list = ()) -
         subprocess.run([engine, "push", target] + list(options), check=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to push image: {e.output}")
+        raise
+
+
+def build_push(repository, tags, platforms="linux/amd64", context=".", options=()):
+    """
+    Build and push a multi-arch container image to registry. This relies
+    on the docker buildx command.
+
+    Parameters
+    ----------
+    repository : str
+        The repository to push to.
+    tags : list
+        List of tags to push.
+    platforms : str, optional
+        List of platforms to build for. Default is linux/amd64.
+    context : str, optional
+        The build context. Default is current directory.
+
+    """
+    # Generate a unique name for the builder instance
+    builder_name = "at-" + str(uuid.uuid4())
+
+    # Build the image
+    try:
+        # Create a builder instance
+        subprocess.run(
+            [
+                "docker",
+                "buildx",
+                "create",
+                "--name",
+                builder_name,
+                "--driver=docker-container",
+                "--driver-opt=network=host",  # Support localhost registry for testing
+            ],
+            check=True,
+        )
+        # Build and push
+        subprocess.run(
+            [
+                "docker",
+                "buildx",
+                "build",
+                f"--builder={builder_name}",
+                f"--platform={','.join(platforms)}",
+                *[f"-t={repository}:{tag}" for tag in tags],
+                *options,
+                "--push",
+                context,
+            ],
+            check=True,
+        )
+        # Remove builder:
+        subprocess.run(
+            ["docker", "buildx", "rm", builder_name],
+            check=True,
+        )
+
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to build image: {e.output}")
         raise

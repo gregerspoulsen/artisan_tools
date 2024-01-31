@@ -31,10 +31,8 @@ def load_config(config_dir=None):
     # Check local config exists:
     if not os.path.exists(local_config_file):
         raise FileNotFoundError(
-            (
-                f"{local_config_file} not found. Please create this file in the "
-                "root of your project."
-            )
+            f"{local_config_file} not found. Please create this file in the "
+            "root of your project."
         )
 
     # Load local config:

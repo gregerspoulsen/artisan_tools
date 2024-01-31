@@ -1,11 +1,12 @@
 import typer
 import subprocess
+import typing
 
 from artisan_tools.container import api
 
 
 def factory(app):
-    cli = typer.Typer(name="container", help=("Tools for container images"))
+    cli = typer.Typer(name="container", help="Tools for container images")
 
     @cli.command()
     def login():
@@ -60,6 +61,39 @@ def factory(app):
         except subprocess.CalledProcessError as e:
             typer.secho("Error running command", fg=typer.colors.RED)
             raise typer.Exit(code=e.returncode)
+
+    @cli.command()
+    def build_push(
+        repository: str = typer.Argument(..., help="The repository to push to."),
+        tags: typing.List[str] = typer.Argument(
+            ..., help="List of tags. Tags will be parsed by the parser extension"
+        ),
+        platform: typing.List[str] = typer.Option(
+            ["linux/amd64"],
+            "--platform",
+            help=(
+                "Platform to build for. Can be used multiple times. Default is"
+                " ('linux/amd64')."
+            ),
+        ),
+        context: str = typer.Option(
+            ".", "--context", help="The build context. Default is current directory."
+        ),
+        options: typing.List[str] = typer.Option(
+            [], "--options", help="Additional options to pass to the build command."
+        ),
+    ):
+        """
+        Build and push a container image to a container registry.
+        Example: `build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
+          --platform linux/arm64`
+        """
+        print(repository, tags, platform, context, options)
+        api.build_push(app, repository, tags, platform, context, options)
+        typer.secho(
+            f"Successfully built and pushed {repository} with tags {tags}",
+            fg=typer.colors.GREEN,
+        )
 
     return cli
 

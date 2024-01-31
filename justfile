@@ -25,7 +25,7 @@ build:
 
 # Run code formatter
 format:
-  just run black .
+  just run black --preview .
 
 # Lint code
 lint:
@@ -33,7 +33,7 @@ lint:
 
 # Run CI pipeline tasks
 ci:
-  just lint
+  just lint 
   just tox
   just doc
 

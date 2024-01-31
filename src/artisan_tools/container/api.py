@@ -1,11 +1,13 @@
 from .main import login as login_main
 from .main import logout as logout_main
 from .main import push as push_main
+from .main import build_push as build_push_main
 from .main import check_login as check_login_main
 
 from artisan_tools.utils import get_item, get_env_var
 
 import subprocess
+from contextlib import contextmanager
 
 
 def login(app):
@@ -38,17 +40,13 @@ def login(app):
         token_var = get_item(auth, "token_var", "environment variable for token")
         user = get_env_var(
             user_var,
-            (
-                f"Error, environment variable {user_var} not set, it should "
-                "contain username for logging in to registry."
-            ),
+            f"Error, environment variable {user_var} not set, it should "
+            "contain username for logging in to registry.",
         )
         token = get_env_var(
             token_var,
-            (
-                f"Error, environment variable {token_var} not set, it should "
-                "contain token for logging in to registry."
-            ),
+            f"Error, environment variable {token_var} not set, it should "
+            "contain token for logging in to registry.",
         )
 
     options = get_item(config, "options", "options")
@@ -79,6 +77,19 @@ def logout(app):
     )
 
 
+@contextmanager
+def authorized_registry(app):
+    """
+    Context manager for running commands with access to container registry.
+    """
+    logged_in = login(app)
+    try:
+        yield
+    finally:
+        if logged_in:
+            logout(app)
+
+
 def push(app, source: str, target: str, tags: list[str]) -> None:
     """
     Push a Docker image to a container registry. Logging in/out is handled
@@ -107,19 +118,47 @@ def push(app, source: str, target: str, tags: list[str]) -> None:
     engine = get_item(config, "engine", "container engine")
     options = get_item(config, "options", "options")
 
-    logged_in = login(app)
+    with authorized_registry(app):
+        for target in targets:
+            push_main(
+                source=source,
+                target=target,
+                engine=engine,
+                options=options,
+            )
+            print(f"Successfully pushed {source} to {target}")
 
-    for target in targets:
-        push_main(
-            source=source,
-            target=target,
-            engine=engine,
+
+def build_push(app, repository, tags, platforms="linux/amd64", context=".", options=()):
+    """
+    Build and push a container image.
+
+    Parameters
+    ----------
+    repository : str
+        The repository to push to.
+    tags : list[str]
+        List of tags to push to the target image. Tags will be parsed by
+        the parser extension.
+    platforms : list[str], optional
+        List of platforms to build for. Default is linux/amd64.
+    context : str, optional
+        The build context. Default is current directory.
+    options : list, optional
+        Additional options to pass to the build command.
+    """
+    # Parse tags:
+    parser = app.get_extension("parser")
+    parsed_tags = [parser.parse(app, tag) for tag in tags]
+
+    with authorized_registry(app):
+        build_push_main(
+            repository=repository,
+            tags=parsed_tags,
+            platforms=platforms,
+            context=context,
             options=options,
         )
-        print(f"Successfully pushed {source} to {target}")
-
-    if logged_in:
-        logout(app)
 
 
 def run_command_with_auth(app, command: str):
@@ -129,12 +168,5 @@ def run_command_with_auth(app, command: str):
     (and log out again).
     """
 
-    logged_in = login(app)
-
-    try:
+    with authorized_registry(app):
         subprocess.run(command, shell=True, check=True)
-    except Exception:
-        raise
-    finally:
-        if logged_in:
-            logout(app)

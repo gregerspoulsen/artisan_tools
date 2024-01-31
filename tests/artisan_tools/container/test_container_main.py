@@ -1,7 +1,7 @@
 import subprocess
 import pytest
 
-from artisan_tools.container.main import check_login, login, logout, push
+from artisan_tools.container.main import check_login, login, logout, push, build_push
 from artisan_tools.utils import container_engines
 
 available_engines = container_engines()
@@ -59,3 +59,23 @@ def test_push(registry, engine):
 
     # Push the image
     push(image, f"{registry}/{image}", engine, options=options[engine])
+
+
+@pytest.mark.skipif("docker" not in available_engines, reason="Requires docker")
+def test_build_push(registry, tmpdir):
+    # Create a Dockerfile
+    dockerfile = tmpdir.join("Dockerfile")
+    dockerfile.write("FROM alpine")
+
+    # Build and push
+    tags = ["tag1", "tag2"]
+    repository = f"{registry}/test_build_push"
+    platforms = ("linux/amd64", "linux/arm64")
+    build_push(repository, tags, platforms, context=str(tmpdir))
+
+    # Check that the image exists
+    for tag in tags:
+        subprocess.run(
+            ["docker", "pull", f"{repository}:{tag}"],
+            check=True,
+        )

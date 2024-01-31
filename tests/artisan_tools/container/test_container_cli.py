@@ -35,6 +35,7 @@ def test_logout(runner, app_with_config):
 
 
 # Test Push
+@pytest.mark.skipif("podman" not in container_engines(), reason="Requires podman")
 def test_push(runner, app_with_config, registry):
     src = "alpine"
     target = "localhost:5000/alpine"
@@ -58,8 +59,38 @@ def test_push(runner, app_with_config, registry):
         )
 
 
-def test_command_error(runner, app_with_config, registry):
+@pytest.mark.skipif("docker" not in container_engines(), reason="Requires docker")
+def test_build_push(runner, app_with_config, registry):
+    # Create a Dockerfile
+    with open("Dockerfile", "w") as f:
+        f.write("FROM alpine\n")
 
+    # Build and push
+    repository = f"{registry}/test"
+    tags = ["test", "test2"]
+    runner.invoke(
+        factory(app_with_config),
+        [
+            "build-push",
+            repository,
+            *tags,
+            "--platform",
+            "linux/amd64",
+            "--platform",
+            "linux/arm64",
+        ],
+        catch_exceptions=False,
+    )
+
+    # Check that the image exists
+    for tag in tags:
+        subprocess.run(
+            ["docker", "pull", f"{repository}:{tag}"],
+            check=True,
+        )
+
+
+def test_command_error(runner, app_with_config, registry):
     command = "ls -j"
     result = runner.invoke(
         factory(app_with_config), ["command", command], catch_exceptions=True
@@ -68,7 +99,6 @@ def test_command_error(runner, app_with_config, registry):
 
 
 def test_command(runner, app_with_config, registry):
-
     command = "ls"
     result = runner.invoke(
         factory(app_with_config), ["command", command], catch_exceptions=True

@@ -1,4 +1,4 @@
-""""
+"""
 Simple file for exposing click object to sphinx
 """
 
