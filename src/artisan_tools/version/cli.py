@@ -7,13 +7,13 @@ from artisan_tools.version.api import get_version, update_version
 def factory(app):
     cli = typer.Typer(
         name="version",
-        help=("Tools for managing version information."),
+        help="Tools for managing version information.",
     )
 
     @cli.command()
     def bump(
         part: str = typer.Argument(  # noqa: B008
-            ..., help=("Part to bump [major|minor|patch] or a full version " "string.")
+            ..., help="Part to bump [major|minor|patch] or a full version string."
         ),
     ):
         """

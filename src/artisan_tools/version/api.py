@@ -39,10 +39,8 @@ def update_version(app, target: str):
         new_version = target
         if not check_version(target, release=False):
             raise ValueError(
-                (
-                    f"Invalid value: {target}. Target must be 'major', 'minor', "
-                    "'patch', or a valid semver string."
-                )
+                f"Invalid value: {target}. Target must be 'major', 'minor', "
+                "'patch', or a valid semver string."
             )
 
     # Update version file
