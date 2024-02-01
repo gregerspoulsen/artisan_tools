@@ -49,10 +49,6 @@ def app():
     """
     from artisan_tools.app import App
 
-    # Create empty artisan.yaml file:
-    with open("artisan.yaml", "w"):
-        pass
-
     app = App()
     app.load_extensions()
     return app
