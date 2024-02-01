@@ -3,6 +3,7 @@ import os
 import uuid
 
 from artisan_tools.log import get_logger
+from artisan_tools import error
 
 
 logger = get_logger("container")
@@ -188,7 +189,7 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
     # Build the image
     try:
         # Create a builder instance
-        subprocess.run(
+        out = subprocess.run(
             [
                 "docker",
                 "buildx",
@@ -201,7 +202,7 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
             check=True,
         )
         # Build and push
-        subprocess.run(
+        out = subprocess.run(
             [
                 "docker",
                 "buildx",
@@ -215,12 +216,11 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
             ],
             check=True,
         )
+    except subprocess.CalledProcessError as e:
+        raise error.ExternalError(f"Failed to build and push image:") from e
+    finally:
         # Remove builder:
         subprocess.run(
             ["docker", "buildx", "rm", builder_name],
             check=True,
         )
-
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to build image: {e.output}")
-        raise

@@ -1,6 +1,7 @@
 import typer
 import subprocess
 import typing
+from artisan_tools import error
 
 from artisan_tools.container import api
 
@@ -88,12 +89,18 @@ def factory(app):
         Example: `build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
           --platform linux/arm64`
         """
-        print(repository, tags, platform, context, options)
-        api.build_push(app, repository, tags, platform, context, options)
+        typer.echo((
+            f"Preparing to build an push to {repository} with tags {tags} "
+            "for platforms {platform}"
+        ))
+        try:
+            api.build_push(app, repository, tags, platform, context, options)
+        except error.ExternalError as e:
+            typer.secho("Error building and pushing image", fg=typer.colors.RED)
         typer.secho(
             f"Successfully built and pushed {repository} with tags {tags}",
             fg=typer.colors.GREEN,
-        )
+            )
 
     return cli
 
