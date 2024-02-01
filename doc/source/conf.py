@@ -18,6 +18,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx_click",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -30,4 +31,4 @@ exclude_patterns = []
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
-version = "0.11.0"
+version = "0.11.1"

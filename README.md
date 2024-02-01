@@ -24,9 +24,7 @@ project/
 sufficient. `VERSION` should contain the current version of the project
 (e.g. 1.3.5).
 
-Documentation of the CLI will follow soon. Until then you can seel inspiration 
-in the justfile in this project or run `at --help` to see the available commands
-and how to use them.
+For more information have a look at [](https://artisan-tools.readthedocs.io/).
 
 
 ## Development
