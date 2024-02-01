@@ -7,9 +7,9 @@ typical workflows in software development.
 
 Artisan tools can be installed directly from source with PIP:
 
-.. code-block:: bash
-
-    pip install git+https://github.com/gregerspoulsen/artisan_tools.git@container_arch
+```bash
+pip install git+https://github.com/gregerspoulsen/artisan_tools.git@container_arch
+```
 
 After installation the `at` command should be available in the shell.
 
