@@ -86,8 +86,8 @@ def factory(app):
     ):
         """
         Build and push a container image to a container registry.
-        Example: `build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
-          --platform linux/arm64`
+        Example: ``build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
+          --platform linux/arm64``
         """
         typer.echo((
             f"Preparing to build an push to {repository} with tags {tags} "
