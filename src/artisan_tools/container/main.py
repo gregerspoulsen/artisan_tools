@@ -189,7 +189,7 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
     # Build the image
     try:
         # Create a builder instance
-        out = subprocess.run(
+        subprocess.run(
             [
                 "docker",
                 "buildx",
@@ -202,7 +202,7 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
             check=True,
         )
         # Build and push
-        out = subprocess.run(
+        subprocess.run(
             [
                 "docker",
                 "buildx",
@@ -217,7 +217,7 @@ def build_push(repository, tags, platforms="linux/amd64", context=".", options=(
             check=True,
         )
     except subprocess.CalledProcessError as e:
-        raise error.ExternalError(f"Failed to build and push image:") from e
+        raise error.ExternalError("Failed to build and push image") from e
     finally:
         # Remove builder:
         subprocess.run(

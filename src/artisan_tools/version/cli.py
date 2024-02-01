@@ -1,5 +1,5 @@
 import typer
-
+from rich import print as rprint
 from artisan_tools.version.main import check_version
 from artisan_tools.version.api import get_version, update_version
 
@@ -20,7 +20,7 @@ def factory(app):
         Bump the version in the specified file.
         """
         new_version = update_version(app, part)
-        typer.secho(f"Version bumped to {new_version}", fg=typer.colors.GREEN)
+        rprint(f"[green]Version bumped to {new_version}")
 
     @cli.command()
     def verify(
@@ -37,23 +37,19 @@ def factory(app):
         result = check_version(version)
 
         if result:
-            typer.secho(
-                "Version is a proper semver release version.", fg=typer.colors.GREEN
-            )
+            rprint(f"[green]{version} is a proper semver release")
         else:
-            typer.secho("Invalid semver version.", fg=typer.colors.RED)
+            rprint(f"[bold red]Invalid semver version: {version}.")
             raise typer.Exit(code=1)
 
         if check_tag:
             vcs_version = "v" + version
             vcs = app.get_extension("vcs")
             if vcs.check_tag(vcs_version):
-                typer.secho(f"Tag '{vcs_version}' already exists.", fg=typer.colors.RED)
+                rprint(f"[bold red]Tag '{vcs_version}' already exists.")
                 raise typer.Exit(code=2)
             else:
-                typer.secho(
-                    f"Tag '{vcs_version}' does not exist.", fg=typer.colors.GREEN
-                )
-        typer.secho("All checks passed.", fg=typer.colors.GREEN)
+                rprint(f"[green]Tag '{vcs_version}' does not exist.")
+        rprint("[bold green]Verification passed.")
 
     return cli

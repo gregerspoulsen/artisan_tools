@@ -95,12 +95,12 @@ def factory(app):
         ))
         try:
             api.build_push(app, repository, tags, platform, context, options)
-        except error.ExternalError as e:
+        except error.ExternalError:
             typer.secho("Error building and pushing image", fg=typer.colors.RED)
         typer.secho(
             f"Successfully built and pushed {repository} with tags {tags}",
             fg=typer.colors.GREEN,
-            )
+        )
 
     return cli
 
