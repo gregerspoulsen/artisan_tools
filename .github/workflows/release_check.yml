@@ -13,7 +13,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Check version
+    - name: Bootstrap
       run: |
         ./ci_bootstrap.sh
+
+    - name: Check version
+      run: |
         just check-release
+
+    - name: Run tests locally to verify docker functionality
+      run: |
+        just local-test

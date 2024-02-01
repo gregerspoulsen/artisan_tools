@@ -26,10 +26,8 @@ def setup_git_repos(tmp_path, monkeypatch):
     run_git_command("add file.txt", cwd=repo1)
     run_git_command("add artisan.yaml", cwd=repo1)
     run_git_command(
-        (
-            "-c 'user.name=Test Bot' -c 'user.email=bot@none.com' "
-            "commit -m 'Initial commit'"
-        ),
+        "-c 'user.name=Test Bot' -c 'user.email=bot@none.com' "
+        "commit -m 'Initial commit'",
         cwd=repo1,
     )
     run_git_command("tag v1.0.1", cwd=repo1)
@@ -50,10 +48,6 @@ def app():
     Fixture for creating a Artisan Tool app for testing
     """
     from artisan_tools.app import App
-
-    # Create empty artisan.yaml file:
-    with open("artisan.yaml", "w"):
-        pass
 
     app = App()
     app.load_extensions()
