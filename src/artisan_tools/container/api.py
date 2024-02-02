@@ -115,7 +115,7 @@ def push(app: App, source: str, target: str, tags: List[str]) -> None:
 
     # Parse tags:
     parser = app.get_extension("parser")
-    targets = [target + ":" + parser.parse(app, tag) for tag in tags]
+    targets = [target + ":" + parser.parse(app, tag) for tag in tags]  # type: ignore[attr-defined]
 
     config = app.config["container"]
     engine = get_item(config, "engine", "container engine")
@@ -136,9 +136,9 @@ def build_push(
     app: App,
     repository: str,
     tags: List[str],
-    platforms: str = "linux/amd64",
+    platforms: tuple[str] = ("linux/amd64",),
     context: str = ".",
-    options: List[str] = (),
+    options: tuple[str, ...] = (),
 ) -> None:
     """
     Build and push a container image.
@@ -154,7 +154,7 @@ def build_push(
     """
     # Parse tags:
     parser = app.get_extension("parser")
-    parsed_tags = [parser.parse(app, tag) for tag in tags]
+    parsed_tags = [parser.parse(app, tag) for tag in tags]  # type: ignore[attr-defined]
 
     with authorized_registry(app):
         build_push_main(

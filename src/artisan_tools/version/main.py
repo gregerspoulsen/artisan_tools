@@ -10,17 +10,17 @@ from artisan_tools.log import get_logger
 logger = get_logger("version.main")
 
 
-def check_version(version: str, release=True) -> None:
+def check_version(version: str, release=True) -> bool:
     """
     Check that the version is a proper semver version.
 
-    Parameters
-    ----------
-    version : str
-        The version string to check.
-    release : bool
-        Flag indicating whether to check for a release version, default True.
+    Args:
+    version (str): The version string to check.
+    release (bool, optional): Flag indicating whether to check for a release
+    version. Defaults to True.
 
+    Returns:
+    bool: True if the version is a proper semver version, False otherwise.
     """
     try:
         parsed_version = semver.Version.parse(version)

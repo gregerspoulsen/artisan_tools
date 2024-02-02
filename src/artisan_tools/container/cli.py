@@ -76,7 +76,7 @@ def factory(app):
         tags: typing.List[str] = typer.Argument(
             ..., help="List of tags. Tags will be parsed by the parser extension"
         ),
-        platform: typing.List[str] = typer.Option(
+        platform: tuple[str] = typer.Option(
             ["linux/amd64"],
             "--platform",
             help=(
@@ -87,7 +87,7 @@ def factory(app):
         context: str = typer.Option(
             ".", "--context", help="The build context. Default is current directory."
         ),
-        options: typing.List[str] = typer.Option(
+        options: tuple[str] = typer.Option(
             [], "--options", help="Additional options to pass to the build command."
         ),
     ):

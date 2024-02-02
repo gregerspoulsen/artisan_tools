@@ -65,7 +65,7 @@ def login(
     token: str,
     registry: str = "https://index.docker.io/v1",
     engine: str = "docker",
-    options: list = (),
+    options: tuple = (),
 ):
     """
     Log in to a container registry using CLI.
@@ -113,7 +113,7 @@ def login(
 def logout(
     registry: str = "https://index.docker.io/v1",
     engine: str = "docker",
-    options: list = (),
+    options: tuple = (),
 ):
     """
     Log out of container registry using CLI.
@@ -142,7 +142,7 @@ def logout(
         raise
 
 
-def push(source: str, target: str, engine: str = "docker", options: list = ()) -> None:
+def push(source: str, target: str, engine: str = "docker", options: tuple = ()) -> None:
     """
     Tag and push a container image to registry.
 
@@ -170,9 +170,9 @@ def push(source: str, target: str, engine: str = "docker", options: list = ()) -
 def build_push(
     repository: str,
     tags: List[str],
-    platforms: List[str] = ["linux/amd64"],
+    platforms: tuple[str] = ("linux/amd64",),
     context: str = ".",
-    options: List[str] = (),
+    options: tuple[str, ...] = (),
 ):
     """
     Build and push a multi-arch container image to a registry using docker buildx.

@@ -15,5 +15,5 @@ def parse(app: App, string: str) -> str:
     string : str
         The string to parse.
     """
-    version = app.get_extension("version").get_version(app)
+    version = app.get_extension("version").get_version(app)  # type: ignore[attr-defined]
     return string.replace("@version", version)
