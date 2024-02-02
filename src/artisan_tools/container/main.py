@@ -2,6 +2,8 @@ import subprocess
 import os
 import uuid
 
+from typing import List
+
 from artisan_tools.log import get_logger
 from artisan_tools import error
 
@@ -144,12 +146,11 @@ def push(source: str, target: str, engine: str = "docker", options: list = ()) -
     """
     Tag and push a container image to registry.
 
-    Parameters
-    ----------
-    source : str
-        The source image.
-    target : str
-        Target to push to.
+    Args:
+        source: The source image to push, can contain tags.
+        target: The target image to push to, must not include tags.
+        engine: The container engine to use. Default is 'docker'.
+        options: Additional options to pass to the push command.
     """
     # Tag the image
     try:
@@ -166,21 +167,25 @@ def push(source: str, target: str, engine: str = "docker", options: list = ()) -
         raise
 
 
-def build_push(repository, tags, platforms="linux/amd64", context=".", options=()):
+def build_push(
+    repository: str,
+    tags: List[str],
+    platforms: List[str] = ["linux/amd64"],
+    context: str = ".",
+    options: List[str] = (),
+):
     """
-    Build and push a multi-arch container image to registry. This relies
-    on the docker buildx command.
+    Build and push a multi-arch container image to a registry using docker buildx.
 
-    Parameters
-    ----------
-    repository : str
-        The repository to push to.
-    tags : list
-        List of tags to push.
-    platforms : str, optional
-        List of platforms to build for. Default is linux/amd64.
-    context : str, optional
-        The build context. Default is current directory.
+    Args:
+        repository: The repository to push the image to.
+        tags: List of tags to assign to the image.
+        platforms: List of platforms to build for. Defaults to ["linux/amd64"].
+        context: The build context. Defaults to the current directory.
+        options: Additional options to pass to the docker build command. Defaults to [].
+
+    Raises:
+        error.ExternalError: If the build and push process fails.
 
     """
     # Generate a unique name for the builder instance

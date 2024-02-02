@@ -5,6 +5,9 @@ get_logger = logging.getLogger
 
 
 def setup_root_handler(level="info"):
+    """
+    Setup the root logger with a human-readable output.
+    """
     root = logging.getLogger()
     root.setLevel(level.upper())
     handler = logging.StreamHandler()

@@ -5,14 +5,17 @@ from .main import build_push as build_push_main
 from .main import check_login as check_login_main
 
 from artisan_tools.utils import get_item, get_env_var
+from artisan_tools.app import App
 
 import subprocess
 from contextlib import contextmanager
+from typing import List
 
 
 def login(app):
     """
     Login to container registry as specified in the configuration file.
+
     When `auth == direct`, use the `user` and `token` directly.
     When `auth == env`, use the environment variables specified in `user` and `token`
 
@@ -21,7 +24,6 @@ def login(app):
     bool
         True if login was successful, False otherwise.
     """
-
     config = app.config["container"]
     registry = get_item(config, "registry", "registry")
     engine = get_item(config, "engine", "container engine")
@@ -66,7 +68,6 @@ def logout(app):
     """
     Log out of container registry as specified in the configuration file.
     """
-
     config = app.config["container"]
     registry = get_item(config, "registry", "registry")
     engine = get_item(config, "engine", "container engine")
@@ -90,20 +91,22 @@ def authorized_registry(app):
             logout(app)
 
 
-def push(app, source: str, target: str, tags: list[str]) -> None:
+def push(app: App, source: str, target: str, tags: List[str]) -> None:
     """
-    Push a Docker image to a container registry. Logging in/out is handled
-    automatically using with details from the configuration file.
+    Push a Docker image to a container registry.
 
-    Parameters
-    ----------
-    source : str
-        The source image to push, can contain tags.
-    target : str
-        The target image to push to, must not include tags
-    tags : list[str]
-        List of tags to push to the target image. Tags will be parsed by
-        the parser extension.
+    Logging in/out is handled automatically using with details from the
+    configuration file.
+
+    Args:
+        app: The application instance.
+        source: The source image to push, can contain tags.
+        target: The target image to push to, must not include tags.
+        tags: List of tags to push to the target image. Tags will be parsed by
+            the parser extension.
+
+    Raises:
+        ValueError: If the target image contains tags.
     """
     # Check that target doesn't contain tags, that is no colons after
     # the last slash:
@@ -129,23 +132,25 @@ def push(app, source: str, target: str, tags: list[str]) -> None:
             print(f"Successfully pushed {source} to {target}")
 
 
-def build_push(app, repository, tags, platforms="linux/amd64", context=".", options=()):
+def build_push(
+    app: App,
+    repository: str,
+    tags: List[str],
+    platforms: str = "linux/amd64",
+    context: str = ".",
+    options: List[str] = (),
+) -> None:
     """
     Build and push a container image.
 
-    Parameters
-    ----------
-    repository : str
-        The repository to push to.
-    tags : list[str]
-        List of tags to push to the target image. Tags will be parsed by
-        the parser extension.
-    platforms : list[str], optional
-        List of platforms to build for. Default is linux/amd64.
-    context : str, optional
-        The build context. Default is current directory.
-    options : list, optional
-        Additional options to pass to the build command.
+    Args:
+        app: The application instance.
+        repository: The repository to push to.
+        tags: List of tags to push to the target image.
+            Tags will be parsed by the parser extension.
+        platforms: List of platforms to build for. Default is linux/amd64.
+        context : The build context. Default is current directory.
+        options : Additional options to pass to the build command.
     """
     # Parse tags:
     parser = app.get_extension("parser")
@@ -163,10 +168,10 @@ def build_push(app, repository, tags, platforms="linux/amd64", context=".", opti
 
 def run_command_with_auth(app, command: str):
     """
-    Run shell command with access to container registry. The command will log in
-    to the registry (if not already logged in), execute the shell command
-    (and log out again).
-    """
+    Run shell command with access to container registry.
 
+    The command will log in to the registry (if not already logged in), execute
+    the shell command (and log out again).
+    """
     with authorized_registry(app):
         subprocess.run(command, shell=True, check=True)

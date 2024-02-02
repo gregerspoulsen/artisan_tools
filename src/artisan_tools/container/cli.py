@@ -1,18 +1,24 @@
 import typer
 import subprocess
 import typing
+
+
 from artisan_tools import error
 
 from artisan_tools.container import api
 
 
 def factory(app):
+    """
+    Create CLI for container extension.
+    """
     cli = typer.Typer(name="container", help="Tools for container images")
 
     @cli.command()
     def login():
         """
         Login to container registry as specified in the configuration file.
+
         When `auth == direct`, use the `user` and `token` directly.
         When `auth == env`, use the environment variables specified in `user`
         and `token`
@@ -23,29 +29,30 @@ def factory(app):
     @cli.command()
     def logout():
         """
-        Log out of the container registry. Registry and engine are read from
-        the configuration file.
+        Log out of the container registry.
+
+        Registry and engine are read from the configuration file.
         """
         api.logout(app)
         typer.echo("Successfully logged out of {config['registry']}")
 
     @cli.command()
-    def push(source: str, target: str, tags: list[str]) -> None:
+    def push(source: str, target: str, tags: typing.List[str]):
         """
-        Push a Docker image to a container registry. Logging in/out is handled
-        automatically using with details from the configuration file.
+        Pushes a Docker image to a container registry.
 
-        Parameters
-        ----------
-        source : str
-            The source image to push, can contain tags.
-        target : str
-            The target image to push to, must not include tags
-        tags : list[str]
-            List of tags to push to the target image. Tags will be parsed by
+        Args:
+        source: The source image to push, can contain tags.
+        target: The target image to push to, must not include tags.
+        tags: List of tags to push to the target image. Tags will be parsed by
             the parser extension.
-        """
 
+        Returns:
+            None: This method does not return anything.
+
+        Raises:
+            None: This method does not raise any exceptions.
+        """
         api.push(app, source, target, tags)
         typer.secho(
             f"Successfully pushed {source} to {target} with tags {tags}",
@@ -55,7 +62,7 @@ def factory(app):
     @cli.command()
     def command(command: str):
         """
-        Run a command with authentication to container registry
+        Run a command with authentication to container registry.
         """
         try:
             api.run_command_with_auth(app, command)
@@ -86,13 +93,14 @@ def factory(app):
     ):
         """
         Build and push a container image to a container registry.
+
         Example: ``build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
           --platform linux/arm64``
         """
-        typer.echo((
+        typer.echo(
             f"Preparing to build an push to {repository} with tags {tags} "
             "for platforms {platform}"
-        ))
+        )
         try:
             api.build_push(app, repository, tags, platform, context, options)
         except error.ExternalError:

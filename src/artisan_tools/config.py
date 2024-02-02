@@ -44,13 +44,14 @@ def load_config(config_dir=None):
     return config
 
 
-def read_yaml(file_path):
+def read_yaml(file_path: str):
     """
-    Reads a YAML file and returns its contents as a Python dictionary. If the
-    file is empty an empty dictionary is returned.
+    Read YAML file and return contents as a dictionary.
 
-    Parameters:
-    file_path (str): The path to the YAML file to be read.
+    If the file is empty an empty dictionary is returned.
+
+    Args:
+    file_path: The path to the YAML file to be read.
 
     Returns:
     dict: The contents of the YAML file as a dictionary.
@@ -63,15 +64,16 @@ def read_yaml(file_path):
         return output
 
 
-def recursive_merge(d1, d2):
+def recursive_merge(d1: dict, d2: dict):
     """
-    Recursively merges two dictionaries. If a key exists in both,
-    and both values are dictionaries, merge them. Otherwise,
+    Recursively merges two dictionaries.
+
+    If a key exists in both, and both values are dictionaries, merge them. Otherwise,
     the value from the second dictionary overwrites the one in the first.
 
-    Parameters:
-    d1 (dict): The first dictionary to be merged.
-    d2 (dict): The second dictionary, whose values will be merged into the first.
+    Args:
+    d1: The first dictionary to be merged.
+    d2: The second dictionary, whose values will be merged into the first.
 
     Returns:
     dict: A new dictionary with the merged content of d1 and d2.
@@ -85,16 +87,13 @@ def recursive_merge(d1, d2):
     return merged
 
 
-def write_yaml(data, file_path):
+def write_yaml(data: dict, file_path: str):
     """
     Writes a Python dictionary to a YAML file.
 
-    Parameters:
-    data (dict): The dictionary to write to the YAML file.
-    file_path (str): The path to the file where the YAML content should be written.
-
-    Returns:
-    None
+    Args:
+    data: The dictionary to write to the YAML file.
+    file_path: The path to the file where the YAML content should be written.
     """
     with open(file_path, "w") as file:
         yaml.dump(data, file, default_flow_style=False)

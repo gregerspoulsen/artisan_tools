@@ -8,6 +8,9 @@ import artisan_tools
 
 
 def factory(app):
+    """
+    Create CLI for vcs extension.
+    """
     cli = typer.Typer(name="vcs", help="Tools for version control system")
 
     @cli.command()

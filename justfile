@@ -4,7 +4,7 @@
   just --list
 
 # Run pre-commit hooks
-pre-commit: 
+pre-commit:
   just test
   just format
   just lint
@@ -33,7 +33,7 @@ lint:
 
 # Run CI pipeline tasks
 ci:
-  just lint 
+  just lint
   just tox
   just doc
 
@@ -50,7 +50,7 @@ doc:
 # --- Release Tasks ---
 
 # Bump the version. Usage: just bump major|minor|patch
-bump *args: 
+bump *args:
   just run at version bump {{args}}
 
 # Check VERSION contains a valid semver and the tag does not exist
@@ -58,7 +58,7 @@ check-release:
   just run at version verify --check-tag
 
 # Create a release
-release: 
+release:
   just run at vcs add-tag
 
 # --- Utilities ---

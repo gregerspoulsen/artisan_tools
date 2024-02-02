@@ -5,6 +5,9 @@ from artisan_tools.version.api import get_version, update_version
 
 
 def factory(app):
+    """
+    Create CLI for version extension.
+    """
     cli = typer.Typer(
         name="version",
         help="Tools for managing version information.",

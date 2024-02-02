@@ -18,7 +18,14 @@ _std_extensions = [
 
 
 class App:
+    """
+    Artisan Tools Application.
+    """
+
     def __init__(self):
+        """
+        Artisan Tools Application.
+        """
         self.cli = typer.Typer()
         self.extensions = {}
         self.logger = get_logger("App")
@@ -26,7 +33,7 @@ class App:
 
     def load_extensions(self):
         """
-        Load extensions (standard and config specified)
+        Load extensions (standard and config specified).
         """
         for extension in _std_extensions + self.config["extensions"]:
             self._load_extension(extension)
@@ -35,8 +42,8 @@ class App:
         """
         Add a (sub)cli to this app.
 
-        Parameters:
-        cli (typer.Typer): The cli to add.
+        Args:
+        cli: The cli to add.
         """
         self.cli.add_typer(cli)
         self.logger.debug(f"Added sub-cli: {cli}")
@@ -45,9 +52,9 @@ class App:
         """
         Register a extension with this app.
 
-        Parameters:
-        name (str): The name of the extension
-        extension (object | dict): The extension to register.
+        Args:
+        name: The name of the extension
+        extension: The extension to register.
         """
         if isinstance(extension, dict):
             extension = types.SimpleNamespace(**extension)
@@ -58,8 +65,8 @@ class App:
         """
         Get an extension by name.
 
-        Parameters:
-        name (str): The name of the extension to get.
+        Args:
+        name: The name of the extension to get.
 
         Returns:
         object: The extension
@@ -74,8 +81,8 @@ class App:
         """
         Load an extension by name.
 
-        Parameters:
-        extension (str): The name of the extension to load.
+        Args:
+        extension: The name of the extension to load.
         """
         ext = importlib.import_module(extension)
         ext.setup(self)

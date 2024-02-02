@@ -4,7 +4,7 @@ from . import cli
 
 def setup(app):
     """
-    Setup the version module.
+    Set up the version module.
     """
     app.register_extension("vcs", api)
 

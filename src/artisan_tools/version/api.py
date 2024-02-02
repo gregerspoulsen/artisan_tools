@@ -1,3 +1,4 @@
+from artisan_tools.app import App
 from artisan_tools.version.main import (
     read_version_file,
     bump_version,
@@ -7,11 +8,14 @@ from artisan_tools.version.main import (
 )
 
 
-def get_version(app):
+def get_version(app: App):
     """
-    Retrieve version. If a file path is provided, the version will be read from
-    that file. Otherwise, the version will be read from the configured version
-    file.
+    Retrieve current project version.
+
+    The version will be read from the configured version file.
+
+    Args:
+    app (App): The application object.
 
     Returns:
     str: The version of the package.
@@ -21,16 +25,26 @@ def get_version(app):
     return read_version_file(file_path)
 
 
-def update_version(app, target: str):
+def update_version(app: App, target: str):
     """
-    Update version in file using string subsitution.
+    Update version in file using string substitution.
 
-    Parameters:
-    file_path (str): Path to file containing the version string.
-    target (str): Either part to bump [major|minor|patch] or a full version
-        string. In the latter case it must be a valid semver string.
+    Args:
+        app (App): The application object.
+        target (str): Either part to bump [major|minor|patch] or a full version
+            string. In the latter case it must be a valid semver string.
+
+    Returns:
+        str: The updated version string.
+
+    Raises:
+        ValueError: If the target is not a valid value.
+
+    Example:
+        >>> app = App()
+        >>> update_version(app, "minor")
+        '1.2.0'
     """
-
     current_version = get_version(app)
 
     if target in ["major", "minor", "patch"]:
