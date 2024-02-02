@@ -12,7 +12,6 @@ def run_git_command(command, cwd=None):
     Returns:
     str: The output of the git command
     """
-
     options = "-c safe.directory=*"
     git_command = f"git {options} {command}"
     result = subprocess.check_output(
@@ -72,13 +71,10 @@ def add_and_push_tag(config, tag_name, message, remote="origin"):
     Add a tag to the current commit and push it to a remote repository.
 
     Args:
-    tag_name (str): The name of the tag to be added.
-    message (str): The message associated with the tag.
-    remote (str): The name of the remote repository. Defaults to 'origin'.
-    git_config (dict): A dictionary of git configuration options. This can be useful
-        when running the command in a CI environment where the user's name and email
-        are not configured. Defaults to None. E.g.:
-        {'user.name': 'Test Bot', 'user.email': 'bot@none.com'}
+        config (dict): The configuration dict with the 'username' and 'email'.
+        tag_name (str): The name of the tag to be added.
+        message (str): The message associated with the tag.
+        remote (str): The name of the remote repository. Defaults to 'origin'.
 
     """
     # Add the tag

@@ -1,4 +1,9 @@
+"""
+Errors used in Artisan Tools.
+"""
+
+
 class ExternalError(Exception):
     """
-    Exception raised when an external command fails.
+    Exception relating to external command fails.
     """

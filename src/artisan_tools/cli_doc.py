@@ -1,5 +1,5 @@
 """
-Simple file for exposing click object to sphinx
+Simple file for exposing click object to sphinx.
 """
 
 import artisan_tools.app

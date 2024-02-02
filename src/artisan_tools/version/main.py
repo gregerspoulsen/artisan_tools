@@ -10,17 +10,17 @@ from artisan_tools.log import get_logger
 logger = get_logger("version.main")
 
 
-def check_version(version: str, release=True) -> None:
+def check_version(version: str, release=True) -> bool:
     """
     Check that the version is a proper semver version.
 
-    Parameters
-    ----------
-    version : str
-        The version string to check.
-    release : bool
-        Flag indicating whether to check for a release version, default True.
+    Args:
+    version (str): The version string to check.
+    release (bool, optional): Flag indicating whether to check for a release
+    version. Defaults to True.
 
+    Returns:
+    bool: True if the version is a proper semver version, False otherwise.
     """
     try:
         parsed_version = semver.Version.parse(version)
@@ -32,13 +32,13 @@ def check_version(version: str, release=True) -> None:
         return False
 
 
-def bump_version(version, part):
+def bump_version(version: str, part: str):
     """
     Bump the specified part (major, minor, or patch) of a semantic version string.
 
-    Parameters:
-    version (str): A semantic version string (e.g., '1.2.3').
-    part (str): The part of the version to bump ('major', 'minor', or 'patch').
+    Args:
+    version: A semantic version string (e.g., '1.2.3').
+    part: The part of the version to bump ('major', 'minor', or 'patch').
 
     Returns:
     str: The bumped version string.
@@ -60,12 +60,12 @@ def bump_version(version, part):
     return str(new_version)
 
 
-def read_version_file(file_path="VERSION"):
+def read_version_file(file_path: str = "VERSION"):
     """
     Read a version from a file.
 
-    Parameters:
-    file_path (str): Path to the file containing the version string.
+    Args:
+    file_path: Path to the file containing the version string.
     """
     # Check the file exists:
     if not os.path.exists(file_path):
@@ -78,15 +78,17 @@ def read_version_file(file_path="VERSION"):
     return current_version
 
 
-def replace_in_file(file_path, current_version, new_version):
+def replace_in_file(file_path: str, current_version: str, new_version: str):
     """
     Replace the version in a file.
 
-    Parameters
-    ----------
-    file_path (str): Path to the file.
-    target (str): The target string to replace.
-    replacement (str): The new string.
+    Args:
+    file_path: The path to the file.
+    current_version: The current version string.
+    new_version: The new version string.
+
+    Raises:
+    ValueError: If the current version is not found in the file.
     """
     # Read the file
     with open(file_path, "r") as file:

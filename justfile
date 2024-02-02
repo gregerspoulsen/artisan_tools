@@ -4,7 +4,7 @@
   just --list
 
 # Run pre-commit hooks
-pre-commit: 
+pre-commit:
   just test
   just format
   just lint
@@ -20,7 +20,7 @@ tox *args:
   just run "rm -rf src/artisan_tools.egg-info/"
 
 # Build the development environment, relevant when dependencies change
-build:
+env:
   cd env/ && docker compose build
 
 # Run code formatter
@@ -29,20 +29,23 @@ format:
 
 # Lint code
 lint:
+  just run black --check .
   just run flake8
+  just run mypy .
+  just run pydocstyle
 
 # Run CI pipeline tasks
 ci:
-  just lint 
+  just lint
   just tox
   just doc
 
 # Run tests locally in venv to verify docker commands
 local-test:
-  python3 -m venv venv
-  ./venv/bin/pip install -e .
-  ./venv/bin/pip install -r requirements_dev.txt
-  ./venv/bin/pytest
+  python3 -m venv .venv
+  ./.venv/bin/pip install -e .
+  ./.venv/bin/pip install -r requirements_dev.txt
+  ./.venv/bin/pytest
 
 doc:
   docker compose -f env/docker-compose.yml run --rm -u $(id -u) dev sphinx-build -b html doc/source doc/build
@@ -50,7 +53,7 @@ doc:
 # --- Release Tasks ---
 
 # Bump the version. Usage: just bump major|minor|patch
-bump *args: 
+bump *args:
   just run at version bump {{args}}
 
 # Check VERSION contains a valid semver and the tag does not exist
@@ -58,7 +61,7 @@ check-release:
   just run at version verify --check-tag
 
 # Create a release
-release: 
+release:
   just run at vcs add-tag
 
 # --- Utilities ---

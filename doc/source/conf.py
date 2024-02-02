@@ -22,7 +22,6 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = []
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -31,4 +30,4 @@ exclude_patterns = []
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
-version = "0.11.1"
+version = "0.11.2"
