@@ -170,7 +170,7 @@ def push(source: str, target: str, engine: str = "docker", options: tuple = ()) 
 def build_push(
     repository: str,
     tags: List[str],
-    platforms: tuple[str] = ("linux/amd64",),
+    platforms: tuple[str, ...] = ("linux/amd64",),
     context: str = ".",
     options: tuple[str, ...] = (),
 ):

@@ -76,7 +76,7 @@ def factory(app):
         tags: typing.List[str] = typer.Argument(
             ..., help="List of tags. Tags will be parsed by the parser extension"
         ),
-        platform: tuple[str] = typer.Option(
+        platform: typing.List[str] = typer.Option(
             ["linux/amd64"],
             "--platform",
             help=(
@@ -87,7 +87,7 @@ def factory(app):
         context: str = typer.Option(
             ".", "--context", help="The build context. Default is current directory."
         ),
-        options: tuple[str] = typer.Option(
+        options: typing.List[str] = typer.Option(
             [], "--options", help="Additional options to pass to the build command."
         ),
     ):
@@ -102,7 +102,9 @@ def factory(app):
             "for platforms {platform}"
         )
         try:
-            api.build_push(app, repository, tags, platform, context, options)
+            api.build_push(
+                app, repository, tags, tuple(platform), context, tuple(options)
+            )
         except error.ExternalError:
             typer.secho("Error building and pushing image", fg=typer.colors.RED)
         typer.secho(

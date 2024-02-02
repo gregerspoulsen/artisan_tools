@@ -136,7 +136,7 @@ def build_push(
     app: App,
     repository: str,
     tags: List[str],
-    platforms: tuple[str] = ("linux/amd64",),
+    platforms: tuple[str, ...] = ("linux/amd64",),
     context: str = ".",
     options: tuple[str, ...] = (),
 ) -> None:
