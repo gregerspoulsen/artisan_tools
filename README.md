@@ -43,7 +43,7 @@ just test
 
 To force a re-build of the container (e.g. for dependency changes):
 ```shell
-just build
+just env
 ```
 
 To run a command in the development environment (in this case `bash`):

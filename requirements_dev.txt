@@ -5,3 +5,5 @@ flake8
 flake8-bugbear
 tox
 pydocstyle
+mypy
+types-PyYaml
