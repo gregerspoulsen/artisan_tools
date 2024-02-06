@@ -190,7 +190,10 @@ def build_push(
     """
     # Generate a unique name for the builder instance
     builder_name = "at-" + str(uuid.uuid4())
-
+    if tags:
+        args = ["--push"]
+    else:
+        args = []
     # Build the image
     try:
         # Create a builder instance
@@ -216,7 +219,7 @@ def build_push(
                 f"--platform={','.join(platforms)}",
                 *[f"-t={repository}:{tag}" for tag in tags],
                 *options,
-                "--push",
+                *args,
                 context,
             ],
             check=True,

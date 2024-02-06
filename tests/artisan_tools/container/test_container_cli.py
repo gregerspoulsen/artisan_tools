@@ -60,14 +60,14 @@ def test_push(runner, app_with_config, registry):
 
 
 @pytest.mark.skipif("docker" not in container_engines(), reason="Requires docker")
-def test_build_push(runner, app_with_config, registry):
+@pytest.mark.parametrize("tags", [[], ["test", "test2"]])
+def test_build_push(runner, app_with_config, registry, tags):
     # Create a Dockerfile
     with open("Dockerfile", "w") as f:
         f.write("FROM alpine\n")
 
     # Build and push
     repository = f"{registry}/test"
-    tags = ["test", "test2"]
     runner.invoke(
         factory(app_with_config),
         [

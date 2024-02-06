@@ -17,7 +17,7 @@ def factory(app):
     def check_no_tag(
         tag: str = typer.Argument(  # noqa: B008
             ..., help="The tag to check in the remote repository."
-        )
+        ),
     ):
         """
         Check if a specific tag exists in the remote Git repository.
@@ -34,7 +34,7 @@ def factory(app):
     def check_branch(
         expected_branch: str = typer.Argument(  # noqa: B008
             ..., help="The branch name to check."
-        )
+        ),
     ):
         """
         Check if the current Git branch is the specified branch.
