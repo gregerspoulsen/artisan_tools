@@ -74,7 +74,11 @@ def factory(app):
     def build_push(
         repository: str = typer.Argument(..., help="The repository to push to."),
         tags: typing.List[str] = typer.Argument(
-            ..., help="List of tags. Tags will be parsed by the parser extension"
+            default=None,
+            help=(
+                "List of tags. Tags will be parsed by the parser extension, if no tags"
+                " are provided the containers are just build"
+            ),
         ),
         platform: typing.List[str] = typer.Option(
             ["linux/amd64"],
@@ -92,7 +96,7 @@ def factory(app):
         ),
     ):
         """
-        Build and push a container image to a container registry.
+        Build (and push) a container image to a container registry.
 
         Example: ``build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
           --platform linux/arm64``

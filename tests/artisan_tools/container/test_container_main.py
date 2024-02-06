@@ -79,3 +79,15 @@ def test_build_push(registry, tmpdir):
             ["docker", "pull", f"{repository}:{tag}"],
             check=True,
         )
+
+
+@pytest.mark.skipif("docker" not in available_engines, reason="Requires docker")
+def test_build_push_no_tag(registry, tmpdir):
+    # Create a Dockerfile
+    dockerfile = tmpdir.join("Dockerfile")
+    dockerfile.write("FROM alpine")
+
+    # Build and push
+    repository = f"{registry}/test_build_push"
+    platforms = ("linux/amd64", "linux/arm64")
+    build_push(repository, (), platforms, context=str(tmpdir))
