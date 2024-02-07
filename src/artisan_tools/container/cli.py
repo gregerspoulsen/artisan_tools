@@ -103,7 +103,7 @@ def factory(app):
         """
         typer.echo(
             f"Preparing to build an push to {repository} with tags {tags} "
-            "for platforms {platform}"
+            f"for platforms {platform}"
         )
         try:
             api.build_push(
