@@ -91,23 +91,28 @@ def factory(app):
         context: str = typer.Option(
             ".", "--context", help="The build context. Default is current directory."
         ),
-        options: typing.List[str] = typer.Option(
-            [], "--options", help="Additional options to pass to the build command."
+        option: typing.List[str] = typer.Option(
+            [],
+            "--option",
+            help=(
+                "Additional options to pass to the build command, can be "
+                "used multiple times"
+            ),
         ),
     ):
         """
         Build (and push) a container image to a container registry.
 
         Example: ``build-push ghcr.io/user/test tag1 tag2 --platform linux/amd64
-          --platform linux/arm64``
+          --platform linux/arm64 --option "--file=/path/to/Dockerfile"``
         """
         typer.echo(
             f"Preparing to build an push to {repository} with tags {tags} "
-            f"for platforms {platform}"
+            f"for platforms {platform} and options {option}"
         )
         try:
             api.build_push(
-                app, repository, tags, tuple(platform), context, tuple(options)
+                app, repository, tags, tuple(platform), context, tuple(option)
             )
         except error.ExternalError:
             typer.secho("Error building and pushing image", fg=typer.colors.RED)
