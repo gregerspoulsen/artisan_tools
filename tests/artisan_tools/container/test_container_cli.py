@@ -78,6 +78,8 @@ def test_build_push(runner, app_with_config, registry, tags):
             "linux/amd64",
             "--platform",
             "linux/arm64",
+            "--option",
+            "--file=Dockerfile",
         ],
         catch_exceptions=False,
     )
