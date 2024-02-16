@@ -42,10 +42,10 @@ def factory(app):
         Pushes a Docker image to a container registry.
 
         Args:
-        source: The source image to push, can contain tags.
-        target: The target image to push to, must not include tags.
-        tags: List of tags to push to the target image. Tags will be parsed by
-            the parser extension.
+            source: The source image to push, can contain tags.
+            target: The target image to push to, must not include tags.
+            tags: List of tags to push to the target image. Tags will be parsed by
+                the parser extension.
 
         Returns:
             None: This method does not return anything.
