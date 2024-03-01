@@ -55,4 +55,12 @@ def factory(app):
                 rprint(f"[green]Tag '{vcs_version}' does not exist.")
         rprint("[bold green]Verification passed.")
 
+    @cli.command()
+    def get():
+        """
+        Print the current version to stdout.
+        """
+        version = get_version(app)
+        print(f"{version}", end="")
+
     return cli
