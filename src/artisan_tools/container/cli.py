@@ -116,7 +116,7 @@ def factory(app):
             )
         except error.ExternalError:
             typer.secho("Error building and pushing image", fg=typer.colors.RED)
-            typer.exit(code=1)
+            typer.Exit(code=1)
         typer.secho(
             f"Successfully built and pushed {repository} with tags {tags}",
             fg=typer.colors.GREEN,
