@@ -30,4 +30,4 @@ templates_path = ["_templates"]
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
-version = "0.14.2"
+version = "0.15.0"
