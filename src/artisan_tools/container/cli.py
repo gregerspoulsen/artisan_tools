@@ -110,6 +110,7 @@ def factory(app):
             f"Preparing to build an push to {repository} with tags {tags} "
             f"for platforms {platform} and options {option}"
         )
+        tags = [] if tags is None else tags  # typer does not support [] as default
         try:
             api.build_push(
                 app, repository, tags, tuple(platform), context, tuple(option)
