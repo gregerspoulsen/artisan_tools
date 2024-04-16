@@ -24,7 +24,8 @@ project/
 sufficient. `VERSION` should contain the current version of the project
 (e.g. 1.3.5).
 
-For more information have a look at [](https://artisan-tools.readthedocs.io/).
+For more information have a look at
+[https://readthedocs.org/projects/artisan-tools/](https://artisan-tools.readthedocs.io/).
 
 
 ## Development

@@ -41,11 +41,11 @@ ci:
   just doc
 
 # Run tests locally in venv to verify docker commands
-local-test:
+local-test *args:
   python3 -m venv .venv
   ./.venv/bin/pip install -e .
   ./.venv/bin/pip install -r requirements_dev.txt
-  ./.venv/bin/pytest
+  ./.venv/bin/pytest {{args}}
 
 doc:
   docker compose -f env/docker-compose.yml run --rm -u $(id -u) dev sphinx-build -b html doc/source doc/build
