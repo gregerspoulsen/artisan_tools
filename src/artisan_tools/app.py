@@ -5,6 +5,7 @@ import sys
 import os
 from .log import get_logger
 from .config import load_config
+from .main_cli import cli
 
 # Add CWD to path to allow import of local extensions
 sys.path.append(os.getcwd())
@@ -26,7 +27,7 @@ class App:
         """
         Artisan Tools Application.
         """
-        self.cli = typer.Typer()
+        self.cli = cli
         self.extensions = {}
         self.logger = get_logger("App")
         self.config = load_config()

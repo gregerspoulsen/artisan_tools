@@ -12,6 +12,7 @@ pip install git+https://github.com/gregerspoulsen/artisan_tools.git@container_ar
 ```
 
 After installation the `at` command should be available in the shell.
+`at --version` will display the current version of artisan-tools.
 
 ## Usage
 
