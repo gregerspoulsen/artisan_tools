@@ -5,6 +5,8 @@ from artisan_tools.version.main import (
     check_version,
     replace_in_file,
     run_hook,
+    replace_regex_in_file,
+    replace_in_pyproject,
 )
 
 
@@ -75,6 +77,40 @@ def test_replace_in_file_no_occurrence(tmpdir):
         replace_in_file(file_path, old_version, new_version)
 
 
+def test_replace_regex_in_file(tmpdir):
+    # Arrange
+    file_path = tmpdir.join("test_file.txt")
+    file_path.write("Version: 1.2.3")
+    pattern = r"\d+\.\d+\.\d+"
+    new_version = "2.0.0"
+
+    # Act
+    replace_regex_in_file(str(file_path), pattern, new_version)
+
+    # Assert
+    assert file_path.read() == "Version: 2.0.0"
+
+
+def test_replace_in_pyproject(tmpdir):
+    # Create a temporary pyproject.toml file
+    pyproject_file = tmpdir.join("pyproject.toml")
+    pyproject_file.write('[tool.poetry]\nname = "my-package"\nversion = "1.0.0"')
+
+    # Call the function to update the version
+    new_version = "2.0.0"
+    replace_in_pyproject(str(pyproject_file), new_version)
+
+    # Read the updated pyproject.toml file
+    with open(str(pyproject_file), "r") as file:
+        updated_content = file.read()
+
+    # Check if the version is updated
+    assert 'version = "2.0.0"' in updated_content
+
+
+# --- Hooks --------------------------------------------------------------------
+
+
 def test_run_hook_invalid():
     with pytest.raises(ValueError):
         run_hook("invalid_hook", new_version="0.1.0", current_version="0.0.1")
@@ -92,3 +128,43 @@ def test_run_hook_string_replace(tmpdir):
     run_hook(hook, new_version="0.1.0", current_version="0.0.1")
 
     assert file_path.read() == expected_content
+
+
+def test_run_hook_regex_replace(tmpdir):
+    # Create a test file
+    test_file = tmpdir.join("testfile.txt")
+    test_file.write("The initial version is 1.0.0.")
+
+    # Define the file path, pattern, and new version
+    file_path = str(test_file)
+    pattern = r"1\.0\.0"
+    new_version = "2.0.0"
+
+    # Call the function to replace the version
+    replace_regex_in_file(file_path, pattern, new_version)
+
+    # Read the modified file
+    modified_content = test_file.read()
+
+    # Assert to check if the replacement was successful
+    assert (
+        modified_content == "The initial version is 2.0.0."
+    ), f"Expected 'The initial version is 2.0.0.', but got '{modified_content}'"
+
+
+def test_run_hook_pyproject_replace(tmpdir):
+    # Create a temporary pyproject.toml file
+    pyproject_file = tmpdir.join("pyproject.toml")
+    pyproject_file.write('[tool.poetry]\nname = "my-package"\nversion = "1.0.0"')
+
+    # Call the function to update the version
+    new_version = "2.0.0"
+    hook = {"method": "pyproject_replace", "file_path": str(pyproject_file)}
+    run_hook(hook, new_version=new_version, current_version="1.0.0")
+
+    # Read the updated pyproject.toml file
+    with open(str(pyproject_file), "r") as file:
+        updated_content = file.read()
+
+    # Check if the version is updated
+    assert 'version = "2.0.0"' in updated_content

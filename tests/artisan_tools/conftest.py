@@ -2,6 +2,7 @@ import shutil
 import pytest
 import subprocess
 import yaml
+import time
 
 from artisan_tools.log import setup_root_handler
 from artisan_tools.vcs.main import run_git_command
@@ -88,7 +89,7 @@ def registry(request):
         ],
         check=True,
     )
-
+    time.sleep(0.5)
     yield "localhost:5000"
 
     # Stop the registry
