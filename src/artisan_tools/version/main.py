@@ -3,6 +3,7 @@ Tools to support release of a package.
 """
 
 import os
+import re
 import semver
 
 from artisan_tools.log import get_logger
@@ -110,7 +111,62 @@ def replace_in_file(file_path: str, current_version: str, new_version: str):
     logger.info(f"Updated version in file: {file_path} to {new_version}")
 
 
-available_hooks = {"string_replace": replace_in_file}
+def replace_regex_in_file(
+    file_path: str, pattern: str, new_version: str, **kwargs
+) -> None:
+    """
+    Replaces version in a file based on a regex pattern.
+
+    Args:
+    file_path (str): The path to the file where replacements are made.
+    pattern (str): The regex pattern to match.
+    new_version (str): The new version to write
+
+    Returns:
+    None
+    """
+    # Read the file contents
+    with open(file_path, "r", encoding="utf-8") as file:
+        file_content = file.read()
+
+    # Replace the text using the provided regex pattern and replacement
+    modified_content = re.sub(pattern, new_version, file_content, flags=re.MULTILINE)
+
+    # Write the modified content back to the file
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.write(modified_content)
+
+    logger.info(
+        f"Updated version in file: {file_path} to {new_version} using regex pattern:"
+        f" {pattern}"
+    )
+
+
+def replace_in_pyproject(file_path: str, new_version: str, **kwargs) -> None:
+    """
+    Updates the version number in a pyproject.toml file.
+
+    Args:
+    file_path (str): The path to the pyproject.toml file.
+    new_version (str): The new version number to write.
+
+    Returns:
+    None
+    """
+    # Regex pattern to match the entire line containing the version
+    pattern = r'^(version\s*=\s*")([^"]+)(")$'
+    # Replacement pattern includes the new version number
+    replacement = r"\g<1>" + new_version + r"\g<3>"
+    replace_regex_in_file(file_path, pattern, replacement)
+
+    logger.info(f"Version updated to {new_version} in {file_path}")
+
+
+available_hooks = {
+    "string_replace": replace_in_file,
+    "regex_replace": replace_regex_in_file,
+    "pyproject_replace": replace_in_pyproject,
+}
 
 
 def run_hook(hook, current_version, new_version):
