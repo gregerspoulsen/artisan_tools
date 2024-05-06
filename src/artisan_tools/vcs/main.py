@@ -85,3 +85,18 @@ def add_and_push_tag(config, tag_name, message, remote="origin"):
 
     # Push the tag to the remote repository
     run_git_command(f"push {remote} {tag_name}")
+
+
+def get_commit_hash(short=True):
+    """
+    Returns the short hash of the current commit.
+    """
+    options = "--short" if short else ""
+    return run_git_command(f"rev-parse {options} HEAD")
+
+
+def check_clean():
+    """
+    Check if the working directory is clean.
+    """
+    return not run_git_command("status --porcelain")
