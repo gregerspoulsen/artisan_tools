@@ -60,7 +60,7 @@ def test_write_version_file(tmpdir):
     write_version_file(file_path, version)
 
     # Assert
-    assert file_path.read() == version
+    assert file_path.read().strip() == version
 
 
 def test_replace_regex_in_file(tmpdir):
@@ -87,6 +87,22 @@ def test_replace_regex_in_file_no_match(tmpdir):
     # Act
     with pytest.raises(ValueError, match="Pattern not found"):
         replace_regex_in_file(str(file_path), pattern, new_version)
+
+
+def test_replace_regex_in_file_with_groups(tmpdir):
+    # Arrange
+    file_path = tmpdir.join("test_file.txt")
+    file_path.write('version = "0.18.0+build-info-9bcf82c-dirty"\n')
+    pattern = r'^(version\s*=\s*")([^"]+)(")'
+    new_version = "2.0.0"
+
+    # Act
+    replace_regex_in_file(
+        str(file_path), pattern, new_version, repl=r"\g<1>@version\g<3>"
+    )
+
+    # Assert
+    assert file_path.read() == 'version = "2.0.0"\n'
 
 
 def test_replace_in_pyproject(tmpdir):

@@ -97,15 +97,19 @@ def write_version_file(file_path: str, version: str) -> None:
 
 
 def replace_regex_in_file(
-    file_path: str, pattern: str, new_version: str, **kwargs
+    file_path: str, pattern: str, new_version: str, repl: str | None = None, **kwargs
 ) -> None:
     """
     Replaces version in a file based on a regex pattern.
+
+    Uses the re.sub function to replace the text in the file.
 
     Args:
     file_path (str): The path to the file where replacements are made.
     pattern (str): The regex pattern to match.
     new_version (str): The new version to write
+    repl (str, optional): Replacement if pattern requires addressing a specific
+       group. Use @version to refer to the new version.
 
     Returns:
     None
@@ -118,8 +122,14 @@ def replace_regex_in_file(
     if not re.search(pattern, file_content, flags=re.MULTILINE):
         raise ValueError(f"Pattern not found in file: {file_path}")
 
+    if repl is not None:
+        # Replace @version with the new version in the replacement string
+        repl = repl.replace("@version", new_version)
+    else:
+        repl = new_version
+
     # Replace the text using the provided regex pattern and replacement
-    modified_content = re.sub(pattern, new_version, file_content, flags=re.MULTILINE)
+    modified_content = re.sub(pattern, repl, file_content, flags=re.MULTILINE)
 
     # Write the modified content back to the file
     with open(file_path, "w", encoding="utf-8") as file:

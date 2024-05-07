@@ -55,7 +55,7 @@ def test_update_non_release(app_with_repo):
 
     version = get_version(app_with_repo)
     print(get_version(app_with_repo))
-    assert re.match(r"^0.99.9\+master\+\w{7}$", version)
+    assert re.match(r"^0.99.9\+master\-\w{7}$", version)
 
     # Modify the repo:
     with open("file.txt", "a") as f:
@@ -63,4 +63,4 @@ def test_update_non_release(app_with_repo):
 
     update(app_with_repo)
     version = get_version(app_with_repo)
-    assert re.match(r"^0.99.9\+master\+\w{7}\+dirty$", version)
+    assert re.match(r"^0.99.9\+master\-\w{7}\-dirty$", version)

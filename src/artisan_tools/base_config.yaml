@@ -3,7 +3,10 @@ version:
   release: ./RELEASE # Path to the file containing the next release version
   hooks: [] # List of hooks to run when version is updated, example below
   # hooks:
-  #   - {method: regex_replace, file_path: file.txt, pattern: "1.0.0"}
+  #   - method: regex_replace
+  #     file_path: doc/source/conf.py
+  #     pattern: '^(version\s*=\s*")([^"]+)(")'
+  #     repl: '\g<1>@version\g<3>'
 extensions: []
 vcs:
   username: "Artisan Tools" # User name to use for git commits
