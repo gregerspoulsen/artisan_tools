@@ -95,9 +95,13 @@ def update(app, release: bool = False):
         hash = app.get_extension("vcs").get_commit_hash()
         # Get clean status:
         is_clean = app.get_extension("vcs").check_clean()
-        dirty = "+dirty" if not is_clean else ""
+        dirty = "-dirty" if not is_clean else ""
 
-        version = f"{version}+{branch}+{hash}{dirty}"
+        version = f"{version}+{branch}-{hash}{dirty}"
+
+    # Check version is valid semver:
+    if not check_version(version, release=False):
+        raise ValueError(f"Invalid version: {version}")
 
     # Write to VERSION file:
     version_file = app.config["version"]["current"]
