@@ -7,6 +7,7 @@ from artisan_tools.version.main import (
     run_hook,
     replace_regex_in_file,
     replace_in_pyproject,
+    write_version_file,
 )
 
 
@@ -49,6 +50,18 @@ class TestVersionCheck(unittest.TestCase):
     def test_build_metadata(self):
         # Test with a version that includes build metadata
         self.assertTrue(check_version("1.2.3+build.4", release=False))
+
+
+def test_write_version_file(tmpdir):
+    # Arrange
+    version = "0.1.0"
+    file_path = tmpdir.join("VERSION")
+
+    # Act
+    write_version_file(file_path, version)
+
+    # Assert
+    assert file_path.read() == version
 
 
 def test_replace_in_file(tmpdir):

@@ -79,6 +79,20 @@ def read_version_file(file_path: str = "VERSION"):
     return current_version
 
 
+def write_version_file(file_path: str, version: str) -> None:
+    """
+    Write version to a file.
+
+    Args:
+    file_path: Path to the file to write the version string.
+    version: The version string to write.
+    """
+    with open(file_path, "w") as file:
+        file.write(version)
+
+    logger.info(f"Version written to file: {file_path}")
+
+
 def replace_in_file(file_path: str, current_version: str, new_version: str):
     """
     Replace the version in a file.

@@ -1,7 +1,11 @@
 import typer
 from rich import print as rprint
 from artisan_tools.version.main import check_version
-from artisan_tools.version.api import get_version, update_version
+from artisan_tools.version.api import (
+    get_version,
+    bump as api_bump,
+    update as api_update,
+)
 
 
 def factory(app):
@@ -22,7 +26,7 @@ def factory(app):
         """
         Bump the version in the specified file.
         """
-        new_version = update_version(app, part)
+        new_version = api_bump(app, part)
         rprint(f"[green]Version bumped to {new_version}")
 
     @cli.command()
@@ -62,5 +66,20 @@ def factory(app):
         """
         version = get_version(app)
         print(f"{version}", end="")
+
+    @cli.command()
+    def update(
+        release: bool = typer.Option(  # noqa: B008
+            False, help="Flag to indicate if the version is a release"
+        ),
+    ):
+        """
+        Update version in `VERSION` file.
+
+        If the version is not a release additional build info is added to the
+        version read from the 'RELEASE' file.
+        """
+        version = api_update(app, release=release)
+        rprint(f"[green]Version updated to {version}")
 
     return cli

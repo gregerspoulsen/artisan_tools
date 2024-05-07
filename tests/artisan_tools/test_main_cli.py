@@ -1,5 +1,6 @@
 from typer.testing import CliRunner
 from artisan_tools.main_cli import cli
+import re
 
 
 def test_version_command():
@@ -11,5 +12,7 @@ def test_version_command():
 
     # Assert
     assert result.exit_code == 0
-    with open("VERSION", "r") as file:
-        assert result.output.strip() == file.read().strip()
+    assert re.match(
+        r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$",
+        result.stdout,
+    )

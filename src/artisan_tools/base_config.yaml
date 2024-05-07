@@ -1,5 +1,6 @@
 version:
-  file: ./VERSION
+  current: ./VERSION # Path to the file containing the current version
+  release: ./RELEASE # Path to the file containing the next release version
   hooks: [] # List of hooks to run when version is updated, example below
   # hooks:
   #   - {method: string_replace, file_path: pyproject.toml}

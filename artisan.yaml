@@ -1,4 +1,4 @@
 version:
   hooks:
-   - {method: string_replace, file_path: doc/source/conf.py}
+   - {method: regex_replace, file_path: doc/source/conf.py, pattern: '(?<=version = ")\d+\.\d+\.\d+(?=")'}
    - {method: pyproject_replace, file_path: pyproject.toml}

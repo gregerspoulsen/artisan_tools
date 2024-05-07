@@ -20,8 +20,13 @@ To use artisan tools create a file called `artisan.yml` in the root of the
 project repository. The file can be left empty in which case the [default
 configuration](config) is used.
 
-Create a file containing the current version of the project. Default is a file
-called `VERSION` in the root of project.
+Versioning happens through two files `RELEASE` and `VERSION`. `RELEASE`
+holds the next intended version and should be tracked by source control.
+`VERSION` holds the current version and is generated using the
+`at version update` command. `VERSION` should not be tracked by source control.
+
+With the two files `artisan.yml` and `RELEASE` you can start using the basic
+functionality in artisan-tools.
 
 Functionality in artisan-tools comes through extensions, explore the available
 commands with `at --help`. The standard extensions

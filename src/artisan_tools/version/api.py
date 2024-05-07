@@ -4,8 +4,13 @@ from artisan_tools.version.main import (
     bump_version,
     check_version,
     replace_in_file,
+    write_version_file,
     run_hook,
 )
+
+from artisan_tools.log import get_logger
+
+log = get_logger("version.api")
 
 
 def get_version(app: App):
@@ -20,14 +25,14 @@ def get_version(app: App):
     Returns:
     str: The version of the package.
     """
-    file_path = app.config["version"]["file"]
+    file_path = app.config["version"]["current"]
 
     return read_version_file(file_path)
 
 
-def update_version(app: App, target: str):
+def bump(app: App, target: str):
     """
-    Update version in file using string substitution.
+    Replace version in file using string substitution.
 
     Args:
         app (App): The application object.
@@ -42,10 +47,10 @@ def update_version(app: App, target: str):
 
     Example:
         >>> app = App()
-        >>> update_version(app, "minor")
+        >>> replace_version(app, "minor")
         '1.2.0'
     """
-    current_version = get_version(app)
+    current_version = read_version_file(app.config["version"]["release"])
 
     if target in ["major", "minor", "patch"]:
         new_version = bump_version(current_version, target)
@@ -58,7 +63,7 @@ def update_version(app: App, target: str):
             )
 
     # Update version file
-    main_file = app.config["version"]["file"]
+    main_file = app.config["version"]["release"]
     replace_in_file(main_file, current_version, new_version)
 
     # Run hooks
@@ -67,3 +72,36 @@ def update_version(app: App, target: str):
         run_hook(hook, current_version, new_version)
 
     return new_version
+
+
+def update(app, release: bool = False):
+    """
+    Update version in `VERSION` file.
+
+    If the version is not a release additional build info is added to the
+    version read from the 'RELEASE' file.
+
+    Args:
+        app (App): The application object.
+        release (bool): Flag to indicate if the version is a release
+            in which case build info is not added.
+    """
+    # Read RELEASE file:
+    version = read_version_file(app.config["version"]["release"])
+
+    if not release:
+        # Get curren branch:
+        branch = app.get_extension("vcs").get_current_branch()
+        # Get commit hash:
+        hash = app.get_extension("vcs").get_commit_hash()
+        # Get clean status:
+        is_clean = app.get_extension("vcs").check_clean()
+        dirty = "+dirty" if not is_clean else ""
+
+        version = f"{version}+{branch}+{hash}{dirty}"
+
+    # Write to VERSION file:
+    version_file = app.config["version"]["current"]
+    write_version_file(version_file, version)
+    log.info(f"File: {version_file} updated to {version}")
+    return version
