@@ -22,8 +22,11 @@ configuration](config) is used.
 
 Versioning happens through two files `RELEASE` and `VERSION`. `RELEASE`
 holds the next intended version and should be tracked by source control.
-`VERSION` holds the current version and is generated using the
-`at version update` command. `VERSION` should not be tracked by source control.
+`VERSION` holds the current version, functionality using the version should read
+from this file or register a hook for updates elsewhere. `VERSION` is generated
+using the `at version update` command and should not be tracked by source control.
+If `at version update` is run in non-release mode additional build information
+is added.
 
 With the two files `artisan.yml` and `RELEASE` you can start using the basic
 functionality in artisan-tools.

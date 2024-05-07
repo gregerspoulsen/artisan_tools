@@ -87,42 +87,13 @@ def write_version_file(file_path: str, version: str) -> None:
     file_path: Path to the file to write the version string.
     version: The version string to write.
     """
+    # Make sure version ends with a single newline:
+    version = version.strip() + "\n"
+
     with open(file_path, "w") as file:
         file.write(version)
 
     logger.info(f"Version written to file: {file_path}")
-
-
-def replace_in_file(file_path: str, current_version: str, new_version: str):
-    """
-    Replace the version in a file.
-
-    Args:
-    file_path: The path to the file.
-    current_version: The current version string.
-    new_version: The new version string.
-
-    Raises:
-    ValueError: If the current version is not found in the file.
-    """
-    # Read the file
-    with open(file_path, "r") as file:
-        file_contents = file.read()
-
-    # Make sure the target string is at least once in the file:
-    if current_version not in file_contents:
-        raise ValueError(
-            f"Target string '{current_version}' not found in file: {file_path}"
-        )
-
-    # Replace the version
-    file_contents = file_contents.replace(current_version, new_version)
-
-    # Write the file back to disk
-    with open(file_path, "w") as file:
-        file.write(file_contents)
-
-    logger.info(f"Updated version in file: {file_path} to {new_version}")
 
 
 def replace_regex_in_file(
@@ -142,6 +113,10 @@ def replace_regex_in_file(
     # Read the file contents
     with open(file_path, "r", encoding="utf-8") as file:
         file_content = file.read()
+
+    # Make sure the pattern is found in the file:
+    if not re.search(pattern, file_content, flags=re.MULTILINE):
+        raise ValueError(f"Pattern not found in file: {file_path}")
 
     # Replace the text using the provided regex pattern and replacement
     modified_content = re.sub(pattern, new_version, file_content, flags=re.MULTILINE)
@@ -177,13 +152,12 @@ def replace_in_pyproject(file_path: str, new_version: str, **kwargs) -> None:
 
 
 available_hooks = {
-    "string_replace": replace_in_file,
     "regex_replace": replace_regex_in_file,
     "pyproject_replace": replace_in_pyproject,
 }
 
 
-def run_hook(hook, current_version, new_version):
+def run_hook(hook, new_version):
     """
     Execute a hook.
 
@@ -209,4 +183,4 @@ def run_hook(hook, current_version, new_version):
         raise ValueError(f"Invalid hook: {hook}, it m {list(available_hooks.keys())}")
     hook_func = available_hooks[method]
     hook.pop("method")
-    hook_func(current_version=current_version, new_version=new_version, **hook)
+    hook_func(new_version=new_version, **hook)

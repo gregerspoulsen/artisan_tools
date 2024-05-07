@@ -31,7 +31,11 @@ def test_update_with_hook(app_with_config, tmpdir):
     test_file = tmpdir.join("hook.txt")
     test_file.write("afsdf\nversion: 0.99.9\nasdfasdf")
 
-    hook = {"method": "string_replace", "file_path": test_file}
+    hook = {
+        "method": "regex_replace",
+        "file_path": "hook.txt",
+        "pattern": r"\d+\.\d+\.\d+",
+    }
     app_with_config.config["version"]["hooks"] = [hook]
 
     # Act

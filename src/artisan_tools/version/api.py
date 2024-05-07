@@ -3,7 +3,6 @@ from artisan_tools.version.main import (
     read_version_file,
     bump_version,
     check_version,
-    replace_in_file,
     write_version_file,
     run_hook,
 )
@@ -64,12 +63,12 @@ def bump(app: App, target: str):
 
     # Update version file
     main_file = app.config["version"]["release"]
-    replace_in_file(main_file, current_version, new_version)
+    write_version_file(main_file, new_version)
 
     # Run hooks
     hooks = app.config["version"]["hooks"]
     for hook in hooks:
-        run_hook(hook, current_version, new_version)
+        run_hook(hook, new_version)
 
     return new_version
 
@@ -104,4 +103,10 @@ def update(app, release: bool = False):
     version_file = app.config["version"]["current"]
     write_version_file(version_file, version)
     log.info(f"File: {version_file} updated to {version}")
+
+    # Run hooks
+    hooks = app.config["version"]["hooks"]
+    for hook in hooks:
+        run_hook(hook, version)
+
     return version
