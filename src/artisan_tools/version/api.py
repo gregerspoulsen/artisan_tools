@@ -66,7 +66,7 @@ def bump(app: App, target: str):
     write_version_file(main_file, new_version)
 
     # Run hooks
-    hooks = app.config["version"]["hooks"]
+    hooks = app.config["version"]["bump-hooks"]
     for hook in hooks:
         run_hook(hook, new_version)
 
@@ -109,7 +109,7 @@ def update(app, release: bool = False):
     log.info(f"File: {version_file} updated to {version}")
 
     # Run hooks
-    hooks = app.config["version"]["hooks"]
+    hooks = app.config["version"]["update-hooks"]
     for hook in hooks:
         run_hook(hook, version)
 

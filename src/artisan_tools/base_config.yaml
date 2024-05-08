@@ -1,8 +1,9 @@
 version:
   current: ./VERSION # Path to the file containing the current version
   release: ./RELEASE # Path to the file containing the next release version
-  hooks: [] # List of hooks to run when version is updated, example below
-  # hooks:
+  bump-hooks: [] # List of hooks to run when version is bumped, example below
+  update-hooks: [] # List of hooks to run when version is updated, example below
+  # bump-hooks:
   #   - method: regex_replace
   #     file_path: doc/source/conf.py
   #     pattern: '^(version\s*=\s*")([^"]+)(")'

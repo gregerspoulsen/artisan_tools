@@ -36,7 +36,7 @@ def test_update_with_hook(app_with_config, tmpdir):
         "file_path": "hook.txt",
         "pattern": r"\d+\.\d+\.\d+",
     }
-    app_with_config.config["version"]["hooks"] = [hook]
+    app_with_config.config["version"]["bump-hooks"] = [hook]
 
     # Act
     bump(app_with_config, "minor")

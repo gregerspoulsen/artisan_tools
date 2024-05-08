@@ -66,7 +66,8 @@ def test_load_config_merged_correctly(tmp_path):
     assert config["version"] == {
         "current": "./VERSION",
         "release": "./RELEASE",
-        "hooks": [],
+        "bump-hooks": [],
+        "update-hooks": [],
     }
     assert config["setting2"] == "local"
     assert config["setting3"] == "local"
