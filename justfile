@@ -58,10 +58,12 @@ bump *args:
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:
+  just run at version update --release
   just run at version verify --check-tag
 
 # Create a release
 release:
+  just run at version update --release
   just run at vcs add-tag
 
 # --- Utilities ---
