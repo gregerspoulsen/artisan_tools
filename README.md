@@ -18,10 +18,10 @@ To use artisan tools in your project create a structure like:
 ```
 project/
   + artisan.yaml
-  + VERSION
+  + RELEASE
 ```
 `artisan.yaml` can in most cases be left empty when default settings are
-sufficient. `VERSION` should contain the current version of the project
+sufficient. `RELEASE` should contain the expected release version of the project
 (e.g. 1.3.5).
 
 For more information have a look at

@@ -34,13 +34,14 @@ functionality in artisan-tools.
 Functionality in artisan-tools comes through extensions, explore the available
 commands with `at --help`. The standard extensions
 (`version`, `container`, `vcs`) are loaded automatically, Additional extensions
-can be specified in the [configuration](config).
+can be specified in the [configuration](config). To get an overview of the
+available functionality have a look at [CLI documentation](cli).
 
+Help can be used at any level on the command line.
 To get more information about the `version` command type `at version --help`.
 This will show that you can bump the minor version using the command
 `at version bump minor`. Get more information about the bump command using
-`at version bump --help`. To get an overview of the available functionality
-have a look at [CLI documentation](cli).
+`at version bump --help`.
 
 For more inspiration have a look in the `justfile` to see how artisan tools
 is utilized to automate workflows internally.
