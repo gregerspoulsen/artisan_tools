@@ -119,6 +119,10 @@ def app_with_config(tmp_path, monkeypatch):
     with open("artisan.yaml", "w") as f:
         yaml.dump(config, f)
 
+    # Create RELEASE file:
+    with open("RELEASE", "w") as f:
+        f.write("0.99.9")
+
     # Create VERSION file:
     with open("VERSION", "w") as f:
         f.write("0.99.9")
@@ -129,4 +133,17 @@ def app_with_config(tmp_path, monkeypatch):
 
     app = App()
     app.load_extensions()
+
     return app
+
+
+@pytest.fixture()
+def app_with_repo(app_with_config):
+    """
+    Fixture for creating and app with a repo.
+    """
+    run_git_command("init")
+    run_git_command("add .")
+    git_options = '-c user.name="at" -c user.email="at@at.com"'
+    run_git_command(f"{git_options} commit -m 'Initial commit'")
+    return app_with_config

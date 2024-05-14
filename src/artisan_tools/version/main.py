@@ -79,48 +79,37 @@ def read_version_file(file_path: str = "VERSION"):
     return current_version
 
 
-def replace_in_file(file_path: str, current_version: str, new_version: str):
+def write_version_file(file_path: str, version: str) -> None:
     """
-    Replace the version in a file.
+    Write version to a file.
 
     Args:
-    file_path: The path to the file.
-    current_version: The current version string.
-    new_version: The new version string.
-
-    Raises:
-    ValueError: If the current version is not found in the file.
+    file_path: Path to the file to write the version string.
+    version: The version string to write.
     """
-    # Read the file
-    with open(file_path, "r") as file:
-        file_contents = file.read()
+    # Make sure version ends with a single newline:
+    version = version.strip() + "\n"
 
-    # Make sure the target string is at least once in the file:
-    if current_version not in file_contents:
-        raise ValueError(
-            f"Target string '{current_version}' not found in file: {file_path}"
-        )
-
-    # Replace the version
-    file_contents = file_contents.replace(current_version, new_version)
-
-    # Write the file back to disk
     with open(file_path, "w") as file:
-        file.write(file_contents)
+        file.write(version)
 
-    logger.info(f"Updated version in file: {file_path} to {new_version}")
+    logger.info(f"Version written to file: {file_path}")
 
 
 def replace_regex_in_file(
-    file_path: str, pattern: str, new_version: str, **kwargs
+    file_path: str, pattern: str, new_version: str, repl: str | None = None, **kwargs
 ) -> None:
     """
     Replaces version in a file based on a regex pattern.
+
+    Uses the re.sub function to replace the text in the file.
 
     Args:
     file_path (str): The path to the file where replacements are made.
     pattern (str): The regex pattern to match.
     new_version (str): The new version to write
+    repl (str, optional): Replacement if pattern requires addressing a specific
+       group. Use @version to refer to the new version.
 
     Returns:
     None
@@ -129,8 +118,18 @@ def replace_regex_in_file(
     with open(file_path, "r", encoding="utf-8") as file:
         file_content = file.read()
 
+    # Make sure the pattern is found in the file:
+    if not re.search(pattern, file_content, flags=re.MULTILINE):
+        raise ValueError(f"Pattern not found in file: {file_path}")
+
+    if repl is not None:
+        # Replace @version with the new version in the replacement string
+        repl = repl.replace("@version", new_version)
+    else:
+        repl = new_version
+
     # Replace the text using the provided regex pattern and replacement
-    modified_content = re.sub(pattern, new_version, file_content, flags=re.MULTILINE)
+    modified_content = re.sub(pattern, repl, file_content, flags=re.MULTILINE)
 
     # Write the modified content back to the file
     with open(file_path, "w", encoding="utf-8") as file:
@@ -163,13 +162,12 @@ def replace_in_pyproject(file_path: str, new_version: str, **kwargs) -> None:
 
 
 available_hooks = {
-    "string_replace": replace_in_file,
     "regex_replace": replace_regex_in_file,
     "pyproject_replace": replace_in_pyproject,
 }
 
 
-def run_hook(hook, current_version, new_version):
+def run_hook(hook, new_version):
     """
     Execute a hook.
 
@@ -195,4 +193,4 @@ def run_hook(hook, current_version, new_version):
         raise ValueError(f"Invalid hook: {hook}, it m {list(available_hooks.keys())}")
     hook_func = available_hooks[method]
     hook.pop("method")
-    hook_func(current_version=current_version, new_version=new_version, **hook)
+    hook_func(new_version=new_version, **hook)

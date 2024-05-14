@@ -1,8 +1,13 @@
 version:
-  file: ./VERSION
-  hooks: [] # List of hooks to run when version is updated, example below
-  # hooks:
-  #   - {method: string_replace, file_path: pyproject.toml}
+  current: ./VERSION # Path to the file containing the current version
+  release: ./RELEASE # Path to the file containing the next release version
+  bump-hooks: [] # List of hooks to run when version is bumped, example below
+  update-hooks: [] # List of hooks to run when version is updated, example below
+  # bump-hooks:
+  #   - method: regex_replace
+  #     file_path: doc/source/conf.py
+  #     pattern: '^(version\s*=\s*")([^"]+)(")'
+  #     repl: '\g<1>@version\g<3>'
 extensions: []
 vcs:
   username: "Artisan Tools" # User name to use for git commits

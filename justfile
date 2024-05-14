@@ -58,13 +58,17 @@ bump *args:
 
 # Check VERSION contains a valid semver and the tag does not exist
 check-release:
+  just run at version update --release
   just run at version verify --check-tag
 
 # Create a release
 release:
+  just run at version update --release
   just run at vcs add-tag
 
 # --- Utilities ---
 # Run command in development environment
 run *ARGS: # Run a command in the development environment
   docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}
+  # Make sure files are owned by local user:
+  docker compose -f env/docker-compose.yml run --rm dev chown -R $(id -u):$(id -g) .

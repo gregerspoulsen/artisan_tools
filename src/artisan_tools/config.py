@@ -41,7 +41,20 @@ def load_config(config_dir=None):
 
     # Merge configs:
     config = recursive_merge(base_config, local_config)
+    check_config(config)
     return config
+
+
+def check_config(config: dict) -> None:
+    """
+    Check the configuration.
+    """
+    if "version" in config:
+        if "file" in config["version"]:
+            raise ValueError(
+                "With artisan-tools 1.0.0 version.file is no longer a valid key. "
+                "see CHANGELOG.md and documentation for details."
+            )
 
 
 def read_yaml(file_path: str):

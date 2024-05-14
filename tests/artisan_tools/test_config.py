@@ -1,7 +1,7 @@
 import pytest
 import yaml
 
-from artisan_tools.config import recursive_merge, load_config, read_yaml
+from artisan_tools.config import recursive_merge, load_config, read_yaml, check_config
 
 
 def test_merge_with_unique_keys():
@@ -63,7 +63,12 @@ def test_load_config_merged_correctly(tmp_path):
 
     config = load_config(config_dir=tmp_path)
 
-    assert config["version"] == {"file": "./VERSION", "hooks": []}
+    assert config["version"] == {
+        "current": "./VERSION",
+        "release": "./RELEASE",
+        "bump-hooks": [],
+        "update-hooks": [],
+    }
     assert config["setting2"] == "local"
     assert config["setting3"] == "local"
 
@@ -111,3 +116,14 @@ def test_read_yaml_with_empty_file(tmpdir):
     # Read the YAML file
     result = read_yaml(str(empty_yaml))
     assert result == {}
+
+
+def test_check_config_with_valid_config():
+    config = {"version": {"release": "./VERSION"}}
+    check_config(config)
+
+
+def test_check_config_with_invalid_config():
+    config = {"version": {"file": "./VERSION"}}
+    with pytest.raises(ValueError):
+        check_config(config)

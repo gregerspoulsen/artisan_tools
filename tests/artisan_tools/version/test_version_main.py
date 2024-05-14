@@ -3,10 +3,10 @@ import unittest
 from artisan_tools.version.main import (
     bump_version,
     check_version,
-    replace_in_file,
     run_hook,
     replace_regex_in_file,
     replace_in_pyproject,
+    write_version_file,
 )
 
 
@@ -51,30 +51,16 @@ class TestVersionCheck(unittest.TestCase):
         self.assertTrue(check_version("1.2.3+build.4", release=False))
 
 
-def test_replace_in_file(tmpdir):
+def test_write_version_file(tmpdir):
     # Arrange
-    old_version = "0.1.0"
-    new_version = "0.2.0"
+    version = "0.1.0"
     file_path = tmpdir.join("VERSION")
-    file_path.write(old_version)
 
     # Act
-    replace_in_file(file_path, old_version, new_version)
+    write_version_file(file_path, version)
 
     # Assert
-    assert file_path.read() == new_version
-
-
-def test_replace_in_file_no_occurrence(tmpdir):
-    # Arrange
-    old_version = "0.1.0"
-    new_version = "0.2.0"
-    file_path = tmpdir.join("VERSION")
-    file_path.write("0.2.0")
-
-    # Act
-    with pytest.raises(ValueError):
-        replace_in_file(file_path, old_version, new_version)
+    assert file_path.read().strip() == version
 
 
 def test_replace_regex_in_file(tmpdir):
@@ -89,6 +75,34 @@ def test_replace_regex_in_file(tmpdir):
 
     # Assert
     assert file_path.read() == "Version: 2.0.0"
+
+
+def test_replace_regex_in_file_no_match(tmpdir):
+    # Arrange
+    file_path = tmpdir.join("test_file.txt")
+    file_path.write("Version: 1.2.3")
+    pattern = r"\d+\.\d+\.\d+.\d+"
+    new_version = "2.0.0"
+
+    # Act
+    with pytest.raises(ValueError, match="Pattern not found"):
+        replace_regex_in_file(str(file_path), pattern, new_version)
+
+
+def test_replace_regex_in_file_with_groups(tmpdir):
+    # Arrange
+    file_path = tmpdir.join("test_file.txt")
+    file_path.write('version = "0.18.0+build-info-9bcf82c-dirty"\n')
+    pattern = r'^(version\s*=\s*")([^"]+)(")'
+    new_version = "2.0.0"
+
+    # Act
+    replace_regex_in_file(
+        str(file_path), pattern, new_version, repl=r"\g<1>@version\g<3>"
+    )
+
+    # Assert
+    assert file_path.read() == 'version = "2.0.0"\n'
 
 
 def test_replace_in_pyproject(tmpdir):
@@ -113,21 +127,7 @@ def test_replace_in_pyproject(tmpdir):
 
 def test_run_hook_invalid():
     with pytest.raises(ValueError):
-        run_hook("invalid_hook", new_version="0.1.0", current_version="0.0.1")
-
-
-def test_run_hook_string_replace(tmpdir):
-    file_content = "test\nversion: 0.0.1\ntest"
-    expected_content = "test\nversion: 0.1.0\ntest"
-
-    # Create file:
-    file_path = tmpdir.join("test.txt")
-    file_path.write(file_content)
-
-    hook = {"method": "string_replace", "file_path": file_path}
-    run_hook(hook, new_version="0.1.0", current_version="0.0.1")
-
-    assert file_path.read() == expected_content
+        run_hook("invalid_hook", new_version="0.1.0")
 
 
 def test_run_hook_regex_replace(tmpdir):
@@ -136,12 +136,14 @@ def test_run_hook_regex_replace(tmpdir):
     test_file.write("The initial version is 1.0.0.")
 
     # Define the file path, pattern, and new version
-    file_path = str(test_file)
-    pattern = r"1\.0\.0"
     new_version = "2.0.0"
-
+    hook = {
+        "method": "regex_replace",
+        "file_path": str(test_file),
+        "pattern": r"1\.0\.0",
+    }
     # Call the function to replace the version
-    replace_regex_in_file(file_path, pattern, new_version)
+    run_hook(hook, new_version=new_version)
 
     # Read the modified file
     modified_content = test_file.read()
@@ -160,7 +162,7 @@ def test_run_hook_pyproject_replace(tmpdir):
     # Call the function to update the version
     new_version = "2.0.0"
     hook = {"method": "pyproject_replace", "file_path": str(pyproject_file)}
-    run_hook(hook, new_version=new_version, current_version="1.0.0")
+    run_hook(hook, new_version=new_version)
 
     # Read the updated pyproject.toml file
     with open(str(pyproject_file), "r") as file:

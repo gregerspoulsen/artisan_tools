@@ -1,4 +1,3 @@
 version:
   hooks:
-   - {method: string_replace, file_path: doc/source/conf.py}
    - {method: pyproject_replace, file_path: pyproject.toml}

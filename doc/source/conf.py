@@ -30,4 +30,5 @@ templates_path = ["_templates"]
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
-version = "0.17.0"
+with open("../../VERSION", "r") as f:
+    version = f.read().strip()

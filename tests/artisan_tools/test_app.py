@@ -32,6 +32,7 @@ def test_load_extension_module():
     app._load_extension("artisan_tools.version")
 
     # Test API call:
+    app.get_extension("version").update(app, release=True)
     app.get_extension("version").get_version(app)
 
 
