@@ -1,7 +1,10 @@
 # Changelog
 
+## [1.0.1] - 2024-05-16
+- Fix incorrect version reported with `at --version`
 
-## [1.0.0]
+
+## [1.0.0] - 2024-05-14
 
 ## Changed
 - Use two files for versioning. `RELEASE` is next intended release, `VERSION`
