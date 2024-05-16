@@ -55,6 +55,11 @@ def check_config(config: dict) -> None:
                 "With artisan-tools 1.0.0 version.file is no longer a valid key. "
                 "see CHANGELOG.md and documentation for details."
             )
+    if "hooks" in config["version"]:
+        raise ValueError(
+            "With artisan-tools 1.0.0 hooks is no longer a valid key. "
+            "see CHANGELOG.md and documentation for details."
+        )
 
 
 def read_yaml(file_path: str):
