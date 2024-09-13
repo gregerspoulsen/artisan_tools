@@ -10,8 +10,8 @@ pre-commit:
   just lint
 
 # Run the test suite
-test target="":
-  just run pytest {{target}}
+test *args:
+  just run pytest {{args}}
 
 # Run tox tests:
 tox *args:
@@ -72,3 +72,6 @@ run *ARGS: # Run a command in the development environment
   docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}
   # Make sure files are owned by local user:
   docker compose -f env/docker-compose.yml run --rm dev chown -R $(id -u):$(id -g) .
+
+just test:
+  just run time at version update
