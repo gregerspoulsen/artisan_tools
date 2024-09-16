@@ -1,3 +1,5 @@
+import re
+
 from artisan_tools.app import App
 from artisan_tools.version.main import (
     read_version_file,
@@ -89,8 +91,19 @@ def update(app, release: bool = False):
     version = read_version_file(app.config["version"]["release"])
 
     if not release:
-        # Get curren branch:
+        # Get current branch:
         branch = app.get_extension("vcs").get_current_branch()
+
+        # Replace underscores with dashes in branch name
+        branch = branch.replace("_", "-")
+
+        # Check if branch contains invalid characters
+        if re.search(r"[^A-Za-z0-9-]", branch):
+            raise ValueError(
+                "Invalid characters found in branch name, "
+                "only A-Z;0-9 and - are allowed."
+            )
+
         # Get commit hash:
         hash = app.get_extension("vcs").get_commit_hash()
         # Get clean status:

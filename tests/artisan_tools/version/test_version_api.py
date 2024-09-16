@@ -1,6 +1,8 @@
 import re
+import pytest
 
 from artisan_tools.version.api import get_version, bump, update
+from artisan_tools.vcs.main import run_git_command
 
 
 # --- get_version --------------------------------------------------------------
@@ -64,3 +66,17 @@ def test_update_non_release(app_with_repo):
     update(app_with_repo)
     version = get_version(app_with_repo)
     assert re.match(r"^0.99.9\+master\-\w{7}\-dirty$", version)
+
+
+def test_update_branch_with_invalid_character(app_with_repo):
+    run_git_command("switch -c feature/branch")
+    with pytest.raises(ValueError, match="Invalid character"):
+        update(app_with_repo)
+
+
+def test_update_branch_with_underscore(app_with_repo):
+    # Test underscore is replaced with dash
+    run_git_command("switch -c feature_branch")
+    update(app_with_repo)
+    version = get_version(app_with_repo)
+    assert re.match(r"^0.99.9\+feature-branch\-\w{7}$", version)

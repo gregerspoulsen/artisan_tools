@@ -10,8 +10,8 @@ pre-commit:
   just lint
 
 # Run the test suite
-test target="":
-  just run pytest {{target}}
+test *args:
+  just run pytest {{args}}
 
 # Run tox tests:
 tox *args:
