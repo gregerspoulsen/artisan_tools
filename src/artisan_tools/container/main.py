@@ -225,7 +225,7 @@ def build_push(
             check=True,
         )
     except subprocess.CalledProcessError as e:
-        raise error.ExternalError("Failed to build and push image") from e
+        raise error.ExternalError("Failed to build and push image", e.returncode) from e
     finally:
         # Remove builder:
         subprocess.run(

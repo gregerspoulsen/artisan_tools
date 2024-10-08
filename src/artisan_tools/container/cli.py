@@ -112,12 +112,13 @@ def factory(app):
         )
         tags = [] if tags is None else tags  # typer does not support [] as default
         try:
+            typer.secho("Start build and push")
             api.build_push(
                 app, repository, tags, tuple(platform), context, tuple(option)
             )
-        except error.ExternalError:
-            typer.secho("Error building and pushing image", fg=typer.colors.RED)
-            typer.Exit(code=1)
+        except error.ExternalError as e:
+            typer.secho("Error building/pushing image", fg=typer.colors.RED)
+            raise typer.Exit(code=e.args[1])
         typer.secho(
             f"Successfully built and pushed {repository} with tags {tags}",
             fg=typer.colors.GREEN,

@@ -92,10 +92,36 @@ def test_build_push(runner, app_with_config, registry, tags):
         )
 
 
+@pytest.mark.skipif("docker" not in container_engines(), reason="Requires docker")
+def test_build_push_error(runner, app_with_config, registry):
+    # Create a Dockerfile
+    with open("Dockerfile", "w") as f:
+        f.write("FROM alpine-does-not-exist\n")
+
+    # Build and push
+    repository = f"{registry}/test"
+    result = runner.invoke(
+        factory(app_with_config),
+        [
+            "build-push",
+            repository,
+            "test",
+            "--platform",
+            "linux/amd64",
+            "--platform",
+            "linux/arm64",
+            "--option",
+            "--file=Dockerfile",
+        ],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 1, result.stdout
+
+
 def test_command_error(runner, app_with_config, registry):
     command = "ls -j"
     result = runner.invoke(
-        factory(app_with_config), ["command", command], catch_exceptions=True
+        factory(app_with_config), ["command", command], catch_exceptions=False
     )
     assert result.exit_code == 2, result.stdout
 
@@ -103,6 +129,6 @@ def test_command_error(runner, app_with_config, registry):
 def test_command(runner, app_with_config, registry):
     command = "ls"
     result = runner.invoke(
-        factory(app_with_config), ["command", command], catch_exceptions=True
+        factory(app_with_config), ["command", command], catch_exceptions=False
     )
     assert result.exit_code == 0, result.stdout
