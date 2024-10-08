@@ -33,23 +33,27 @@ def login(app):
         return False
 
     auth = config["auth"]
-    if auth["method"] == "direct":
-        user = get_item(auth, "user", "username")
-        token = get_item(auth, "token", "token")
-
-    if auth["method"] == "env":
-        user_var = get_item(auth, "user_var", "environment variable for username")
-        token_var = get_item(auth, "token_var", "environment variable for token")
-        user = get_env_var(
-            user_var,
-            f"Error, environment variable {user_var} not set, it should "
-            "contain username for logging in to registry.",
-        )
-        token = get_env_var(
-            token_var,
-            f"Error, environment variable {token_var} not set, it should "
-            "contain token for logging in to registry.",
-        )
+    match auth["method"]:
+        case "direct":
+            user = get_item(auth, "user", "username")
+            token = get_item(auth, "token", "token")
+        case "env":
+            user_var = get_item(auth, "user_var", "environment variable for username")
+            token_var = get_item(auth, "token_var", "environment variable for token")
+            user = get_env_var(
+                user_var,
+                f"Error, environment variable {user_var} not set, it should "
+                "contain username for logging in to registry.",
+            )
+            token = get_env_var(
+                token_var,
+                f"Error, environment variable {token_var} not set, it should "
+                "contain token for logging in to registry.",
+            )
+        case _:
+            raise ValueError(
+                "Error, invalid value for auth method, should be 'direct' or 'env'"
+            )
 
     options = get_item(config, "options", "options")
 
