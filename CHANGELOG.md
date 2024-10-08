@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.1] - 2024-10-08
+- Fix errors not propagating from container.build_push
+
 ## [1.1.0] - 2024-09-13
 - Add support for underscores in branch names
 
