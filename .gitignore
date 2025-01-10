@@ -4,3 +4,4 @@ doc/build/*
 .venv/*
 build/*
 VERSION
+rs/target/*

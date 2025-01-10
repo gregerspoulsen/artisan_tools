@@ -72,3 +72,14 @@ run *ARGS: # Run a command in the development environment
   docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}
   # Make sure files are owned by local user:
   docker compose -f env/docker-compose.yml run --rm dev chown -R $(id -u):$(id -g) .
+
+clean:
+  rm VERSION
+
+# --- Rust Recipes ---
+
+build-rs:
+  cd rs/ && cargo build
+
+run-rs *args:
+  rs/target/debug/artisan-tools {{args}}
