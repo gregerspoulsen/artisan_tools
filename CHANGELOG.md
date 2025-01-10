@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.2] - 2025-01-10
+- Create structure for rustification
+
 ## [1.1.1] - 2024-10-08
 - Fix errors not propagating from container.build_push
 
