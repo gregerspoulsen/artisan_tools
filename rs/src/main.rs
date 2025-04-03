@@ -13,7 +13,7 @@ struct Cli {
 
 /// Top-level commands for the CLI.
 #[derive(Subcommand)]
-enum Commands {
+enum Command {
     /// Manage version-related operations
     #[command(subcommand)]
     Version(VersionCommands),
