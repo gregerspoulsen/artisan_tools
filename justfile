@@ -82,4 +82,4 @@ build-rs:
   cd rs/ && cargo build
 
 run-rs *args:
-  rs/target/debug/artisan-tools {{args}}
+  cd rs && cargo run -- {{args}}
