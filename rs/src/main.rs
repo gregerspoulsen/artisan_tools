@@ -21,7 +21,7 @@ enum Command {
 
 /// Subcommands under `artisan-tools version`
 #[derive(Subcommand)]
-enum VersionCommands {
+enum VersionCommand {
     /// Print current version to stdout
     Get,
     /// Update version in `VERSION` file
