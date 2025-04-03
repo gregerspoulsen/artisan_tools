@@ -5,7 +5,6 @@ use std::fs;
 /// Simple CLI for Artisan Tools.
 #[derive(Parser)]
 #[command(name = "artisan-tools")]
-#[command(version = "0.1.0")]
 #[command(about = "Artisan Tools CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]
