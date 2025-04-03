@@ -10,8 +10,17 @@ pre-commit:
   just lint
 
 # Run the test suite
-test *args:
+test:
+  just test-python
+  just test-rs
+
+test-python *args:
   just run pytest {{args}}
+
+test-rs *args:
+  just build-rs
+  just run-rs version update
+  just run-rs version get
 
 # Run tox tests:
 tox *args:
@@ -82,4 +91,4 @@ build-rs:
   cd rs/ && cargo build
 
 run-rs *args:
-  cd rs && cargo run -- {{args}}
+    rs/target/debug/artisan-tools {{args}}

@@ -67,3 +67,10 @@ just bump <major|minor|patch>
 ```
 When the pull-request is merged to master the release will automatically be
 tagged with the version in the file VERSION.
+
+
+## Rust Port Notes
+
+just build-rs
+just run-rs version update
+just run-rs version get

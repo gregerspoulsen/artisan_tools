@@ -8,7 +8,7 @@ use std::fs;
 #[command(about = "Artisan Tools CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Command,
 }
 
 /// Top-level commands for the CLI.
@@ -16,7 +16,7 @@ struct Cli {
 enum Command {
     /// Manage version-related operations
     #[command(subcommand)]
-    Version(VersionCommands),
+    Version(VersionCommand),
 }
 
 /// Subcommands under `artisan-tools version`
@@ -32,14 +32,14 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Version(subcmd) => match subcmd {
-            VersionCommands::Get => {
+        Command::Version(subcmd) => match subcmd {
+            VersionCommand::Get => {
                 // Print current version to stdout
                 let version = fs::read_to_string("VERSION")
                     .context("No VERSION file available - did you forget to run update?")?;
                 println!("{}", version);
             }
-            VersionCommands::Update => {
+            VersionCommand::Update => {
                 // Update version in `VERSION` file
                 let release_contents = fs::read_to_string("RELEASE")
                     .context("Failed to read the RELEASE file")?;
