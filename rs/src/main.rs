@@ -1,3 +1,5 @@
+mod version_mod;
+
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::fs;
@@ -35,8 +37,8 @@ fn main() -> Result<()> {
         Command::Version(subcmd) => match subcmd {
             VersionCommand::Get => {
                 // Print current version to stdout
-                let version = fs::read_to_string("VERSION")
-                    .context("No VERSION file available - did you forget to run update?")?;
+                let version = version_mod::read_at_version(Some("VERSION"))
+                    .context("Failed to read the version file")?;
                 println!("{}", version);
             }
             VersionCommand::Update => {
