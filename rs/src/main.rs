@@ -37,7 +37,7 @@ fn main() -> Result<()> {
         Command::Version(subcmd) => match subcmd {
             VersionCommand::Get => {
                 // Print current version to stdout
-                let version = version_mod::read_at_version(Some("VERSION"))
+                let version = version_mod::get()
                     .context("Failed to read the version file")?;
                 println!("{}", version);
             }
