@@ -2,6 +2,10 @@ name: Unit Testing
 
 on: [push]
 
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -13,3 +17,20 @@ jobs:
       run: |
         ./ci_bootstrap.sh
         just ci
+
+  test-rs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo test --verbose
+        working-directory: rs
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack check --rust-version --workspace --all-targets --ignore-private
+        working-directory: rs
