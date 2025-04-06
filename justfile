@@ -1,3 +1,5 @@
+mod rs 'rs/rs.just'
+
 # --- Development Tasks ---
 # List tasks
 @default:
@@ -12,15 +14,10 @@ pre-commit:
 # Run the test suite
 test:
   just test-python
-  just test-rs
+  just rs test-run
 
 test-python *args:
   just run pytest {{args}}
-
-test-rs *args:
-  just build-rs
-  just run-rs version update
-  just run-rs version get
 
 # Run tox tests:
 tox *args:
@@ -84,11 +81,3 @@ run *ARGS: # Run a command in the development environment
 
 clean:
   rm VERSION
-
-# --- Rust Recipes ---
-
-build-rs:
-  cd rs/ && cargo build
-
-run-rs *args:
-  cd rs && cargo run -- {{args}}
