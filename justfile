@@ -1,3 +1,5 @@
+mod rs 'rs/rs.just'
+
 # --- Development Tasks ---
 # List tasks
 @default:
@@ -10,7 +12,11 @@ pre-commit:
   just lint
 
 # Run the test suite
-test *args:
+test:
+  just test-python
+  just rs test-run
+
+test-python *args:
   just run pytest {{args}}
 
 # Run tox tests:
@@ -72,3 +78,6 @@ run *ARGS: # Run a command in the development environment
   docker compose -f env/docker-compose.yml run --rm dev {{ARGS}}
   # Make sure files are owned by local user:
   docker compose -f env/docker-compose.yml run --rm dev chown -R $(id -u):$(id -g) .
+
+clean:
+  rm VERSION
