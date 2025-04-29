@@ -7,7 +7,7 @@ use std::fs;
 /// Simple CLI for Artisan Tools.
 #[derive(Parser)]
 #[command(name = "artisan-tools")]
-#[command(about = "Artisan Tools CLI", long_about = None)]
+#[command(about = "Artisan Tools CLI", version)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
