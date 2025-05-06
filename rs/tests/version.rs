@@ -1,9 +1,9 @@
+use artisan_tools::version_mod;
 use assert_cmd::prelude::*; // Add methods on commands
 use predicates::prelude::*; // Used for writing assertions
 use pretty_assertions::assert_str_eq;
 use std::{fs, process::Command};
 use testresult::TestResult;
-use artisan_tools::version_mod;
 
 /// Helper function to create and initialize a temporary directory with .at-version file and git repo
 fn initialize_temp_dir(version: &str, init_git: bool) -> TestResult<assert_fs::TempDir> {
@@ -17,7 +17,7 @@ fn initialize_temp_dir(version: &str, init_git: bool) -> TestResult<assert_fs::T
             .args(["init"])
             .current_dir(&test_dir)
             .output()?;
-        
+
         // Configure git user for commit
         Command::new("git")
             .args(["config", "user.email", "test@example.com"])
@@ -27,7 +27,7 @@ fn initialize_temp_dir(version: &str, init_git: bool) -> TestResult<assert_fs::T
             .args(["config", "user.name", "Test User"])
             .current_dir(&test_dir)
             .output()?;
-        
+
         // Add and commit the version file
         Command::new("git")
             .args(["add", ".at-version"])
@@ -53,9 +53,9 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
 
     // Act
     // Assert (assert also runs the command)
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Failed to read from version file: .at-version"));
+    cmd.assert().failure().stderr(predicate::str::contains(
+        "Failed to read from version file: .at-version",
+    ));
 
     Ok(())
 }
@@ -87,7 +87,7 @@ fn version_get_without_git_info() -> TestResult {
     // Arrange
     const VERSION: &str = "1.2.3";
     let test_dir = initialize_temp_dir(VERSION, false)?;
-    
+
     // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
     std::env::set_current_dir(&test_dir)?;
@@ -106,7 +106,7 @@ fn version_get_without_git_info() -> TestResult {
 fn version_get_with_git_info() -> TestResult {
     const VERSION: &str = "1.2.3";
     let test_dir = initialize_temp_dir(VERSION, true)?;
-    
+
     // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
     std::env::set_current_dir(&test_dir)?;
@@ -115,13 +115,21 @@ fn version_get_with_git_info() -> TestResult {
     let result = version_mod::get(true)?;
 
     std::env::set_current_dir(original_dir)?;
-    
+
     // The result should be in format: version+branch-hash
     // We know the version is "1.2.3" and branch should be "main" or "master"
-    assert!(result.starts_with("1.2.3+"), "Version should start with 1.2.3+");
-    assert!(result.contains("main-") || result.contains("master-"), "Should contain branch name");
-    assert!(!result.ends_with("-dirty"), "Should not be dirty as we committed all changes");
-    
+    assert!(
+        result.starts_with("1.2.3+"),
+        "Version should start with 1.2.3+"
+    );
+    assert!(
+        result.contains("main-") || result.contains("master-"),
+        "Should contain branch name"
+    );
+    assert!(
+        !result.ends_with("-dirty"),
+        "Should not be dirty as we committed all changes"
+    );
+
     Ok(())
 }
-
