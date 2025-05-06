@@ -1,4 +1,4 @@
-mod version_mod;
+use artisan_tools::version_mod;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -25,7 +25,11 @@ enum Command {
 #[derive(Subcommand)]
 enum VersionCommand {
     /// Print current version to stdout
-    Get,
+    Get {
+        /// Include git information in version string
+        #[arg(long)]
+        git_info: bool,
+    },
     /// Update version in `VERSION` file
     Update,
 }
@@ -35,21 +39,21 @@ fn main() -> Result<()> {
 
     match cli.command {
         Command::Version(subcmd) => match subcmd {
-            VersionCommand::Get => {
+            VersionCommand::Get { git_info } => {
                 // Print current version to stdout
-                let version = version_mod::get()
+                let version = version_mod::get(git_info)
                     .context("Failed to read the version file")?;
                 println!("{}", version);
             }
             VersionCommand::Update => {
                 // Update version in `VERSION` file
-                let release_contents = fs::read_to_string("RELEASE")
-                    .context("Failed to read the RELEASE file")?;
-                let release_contents = release_contents.trim_end();
+                let version_contents = version_mod::get(false)
+                    .context("Failed to read the version file")?;
+                let version_contents = version_contents.trim_end();
 
-                fs::write("VERSION", release_contents)
+                fs::write("VERSION", version_contents)
                     .context("Failed to write to the VERSION file")?;
-                println!("VERSION updated to {}", release_contents);
+                println!("VERSION updated to {}", version_contents);
             }
         },
     }
