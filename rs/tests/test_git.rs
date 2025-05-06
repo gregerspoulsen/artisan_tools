@@ -12,11 +12,8 @@ fn test_get_branch() {
     // Set up git repository
     setup_git_repo(temp_path);
     
-    // Change to the temporary directory
-    std::env::set_current_dir(temp_path).expect("Failed to change directory");
-    
     // Test the get_branch function
-    let branch = artisan_tools::git::get_branch().expect("Failed to get branch");
+    let branch = artisan_tools::git::get_branch(temp_path).expect("Failed to get branch");
     assert_eq!(branch, "master");
 }
 
@@ -29,15 +26,13 @@ fn test_get_commit_hash() {
     // Set up git repository
     setup_git_repo(temp_path);
     
-    // Change to the temporary directory
-    std::env::set_current_dir(temp_path).expect("Failed to change directory");
-    
     // Get the hash using our function
-    let our_hash = artisan_tools::git::get_commit_hash().expect("Failed to get commit hash");
+    let our_hash = artisan_tools::git::get_commit_hash(temp_path).expect("Failed to get commit hash");
     
     // Get the hash using git command
     let git_output = Command::new("git")
         .args(["rev-parse", "--short", "HEAD"])
+        .current_dir(temp_path)
         .output()
         .expect("Failed to get git hash");
     let git_hash = String::from_utf8(git_output.stdout)
@@ -58,18 +53,16 @@ fn test_get_status() {
     // Set up git repository
     setup_git_repo(temp_path);
     
-    // Change to the temporary directory
-    std::env::set_current_dir(temp_path).expect("Failed to change directory");
-    
     // Print git status for debugging
     let status_output = Command::new("git")
         .args(["status", "--porcelain"])
+        .current_dir(temp_path)
         .output()
         .expect("Failed to get git status");
     println!("Git status after setup: {:?}", String::from_utf8_lossy(&status_output.stdout));
 
     // Initially the repository should be clean
-    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
     assert!(!status, "Repository should be clean after initial setup");
     
     // Create a new untracked file
@@ -84,7 +77,7 @@ fn test_get_status() {
         .expect("Failed to stage file");
     
     // Repository should still be dirty with staged changes
-    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
     assert!(status, "Repository should be dirty with staged changes");
     
     // Commit the file
@@ -95,7 +88,7 @@ fn test_get_status() {
         .expect("Failed to commit");
     
     // Repository should be clean again
-    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
     assert!(!status, "Repository should be clean after committing");
 }
 
@@ -137,7 +130,4 @@ fn setup_git_repo(path: &Path) {
         .current_dir(path)
         .output()
         .expect("Failed to commit");
-    
-    // Set the current directory to the git repo
-    std::env::set_current_dir(path).expect("Failed to change directory");
 } 
