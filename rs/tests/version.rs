@@ -88,7 +88,7 @@ fn version_get_without_git_info() -> TestResult {
     const VERSION: &str = "1.2.3";
     let test_dir = initialize_temp_dir(VERSION, false)?;
     
-    // Need to be in the directory with the .at-version file
+    // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
     std::env::set_current_dir(&test_dir)?;
 
@@ -104,18 +104,16 @@ fn version_get_without_git_info() -> TestResult {
 /// Test that version_mod::get returns version with git info when git_info is true
 #[test]
 fn version_get_with_git_info() -> TestResult {
-    // Arrange
     const VERSION: &str = "1.2.3";
     let test_dir = initialize_temp_dir(VERSION, true)?;
     
-    // Need to be in the directory with the .at-version file
+    // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
     std::env::set_current_dir(&test_dir)?;
 
     // Act
     let result = version_mod::get(true)?;
 
-    // Cleanup and Assert
     std::env::set_current_dir(original_dir)?;
     
     // The result should be in format: version+branch-hash
