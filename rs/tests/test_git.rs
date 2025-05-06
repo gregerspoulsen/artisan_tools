@@ -3,7 +3,6 @@ use std::path::Path;
 use std::process::Command;
 use tempfile::TempDir;
 
-
 #[test]
 fn test_get_branch() {
     // Create a temporary directory for our test git repository
@@ -18,7 +17,86 @@ fn test_get_branch() {
     
     // Test the get_branch function
     let branch = artisan_tools::git::get_branch().expect("Failed to get branch");
-    assert_eq!(branch, "main");
+    assert_eq!(branch, "master");
+}
+
+#[test]
+fn test_get_commit_hash() {
+    // Create a temporary directory for our test git repository
+    let temp_dir = TempDir::new().expect("Failed to create temp directory");
+    let temp_path = temp_dir.path();
+    
+    // Set up git repository
+    setup_git_repo(temp_path);
+    
+    // Change to the temporary directory
+    std::env::set_current_dir(temp_path).expect("Failed to change directory");
+    
+    // Get the hash using our function
+    let our_hash = artisan_tools::git::get_commit_hash().expect("Failed to get commit hash");
+    
+    // Get the hash using git command
+    let git_output = Command::new("git")
+        .args(["rev-parse", "--short", "HEAD"])
+        .output()
+        .expect("Failed to get git hash");
+    let git_hash = String::from_utf8(git_output.stdout)
+        .expect("Git output was not valid UTF-8")
+        .trim()
+        .to_string();
+    
+    // Compare the hashes
+    assert_eq!(our_hash, git_hash, "Our hash should match git's hash");
+}
+
+#[test]
+fn test_get_status() {
+    // Create a temporary directory for our test git repository
+    let temp_dir = TempDir::new().expect("Failed to create temp directory");
+    let temp_path = temp_dir.path();
+    
+    // Set up git repository
+    setup_git_repo(temp_path);
+    
+    // Change to the temporary directory
+    std::env::set_current_dir(temp_path).expect("Failed to change directory");
+    
+    // Print git status for debugging
+    let status_output = Command::new("git")
+        .args(["status", "--porcelain"])
+        .output()
+        .expect("Failed to get git status");
+    println!("Git status after setup: {:?}", String::from_utf8_lossy(&status_output.stdout));
+
+    // Initially the repository should be clean
+    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    assert!(!status, "Repository should be clean after initial setup");
+    
+    // Create a new untracked file
+    let file_path = temp_path.join("untracked.txt");
+    fs::write(&file_path, "untracked content").expect("Failed to write untracked file");
+    
+    // Stage the file
+    Command::new("git")
+        .args(["add", "untracked.txt"])
+        .current_dir(temp_path)
+        .output()
+        .expect("Failed to stage file");
+    
+    // Repository should still be dirty with staged changes
+    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    assert!(status, "Repository should be dirty with staged changes");
+    
+    // Commit the file
+    Command::new("git")
+        .args(["commit", "-m", "Add untracked file"])
+        .current_dir(temp_path)
+        .output()
+        .expect("Failed to commit");
+    
+    // Repository should be clean again
+    let status = artisan_tools::git::get_status().expect("Failed to get status");
+    assert!(!status, "Repository should be clean after committing");
 }
 
 /// Helper function to set up a git repository in the given directory
@@ -29,10 +107,6 @@ fn setup_git_repo(path: &Path) {
         .current_dir(path)
         .output()
         .expect("Failed to initialize git repository");
-    
-    // Create a dummy file and commit it
-    let file_path = path.join("dummy.txt");
-    fs::write(&file_path, "dummy content").expect("Failed to write dummy file");
     
     // Configure git user for the test
     Command::new("git")
@@ -47,6 +121,10 @@ fn setup_git_repo(path: &Path) {
         .output()
         .expect("Failed to configure git user email");
     
+    // Create a dummy file and commit it
+    let file_path = path.join("dummy.txt");
+    fs::write(&file_path, "dummy content").expect("Failed to write dummy file");
+    
     // Add and commit the file
     Command::new("git")
         .args(["add", "dummy.txt"])
@@ -60,10 +138,6 @@ fn setup_git_repo(path: &Path) {
         .output()
         .expect("Failed to commit");
     
-    // Rename the default branch to main (in case it's master)
-    Command::new("git")
-        .args(["branch", "-M", "main"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to rename branch to main");
+    // Set the current directory to the git repo
+    std::env::set_current_dir(path).expect("Failed to change directory");
 } 
