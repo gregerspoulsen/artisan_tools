@@ -5,6 +5,43 @@ use std::{fs, process::Command};
 use testresult::TestResult;
 use artisan_tools::version_mod;
 
+/// Helper function to create and initialize a temporary directory with .at-version file and git repo
+fn initialize_temp_dir(version: &str, init_git: bool) -> TestResult<assert_fs::TempDir> {
+    let test_dir = assert_fs::TempDir::new()?;
+    let version_file = test_dir.join(".at-version");
+    fs::write(&version_file, version)?;
+
+    if init_git {
+        // Initialize git repo
+        Command::new("git")
+            .args(["init"])
+            .current_dir(&test_dir)
+            .output()?;
+        
+        // Configure git user for commit
+        Command::new("git")
+            .args(["config", "user.email", "test@example.com"])
+            .current_dir(&test_dir)
+            .output()?;
+        Command::new("git")
+            .args(["config", "user.name", "Test User"])
+            .current_dir(&test_dir)
+            .output()?;
+        
+        // Add and commit the version file
+        Command::new("git")
+            .args(["add", ".at-version"])
+            .current_dir(&test_dir)
+            .output()?;
+        Command::new("git")
+            .args(["commit", "-m", "Initial commit"])
+            .current_dir(&test_dir)
+            .output()?;
+    }
+
+    Ok(test_dir)
+}
+
 /// Test that when cwd has no .at-version file, we error with an informative error message
 #[test]
 fn at_version_update_no_at_version_file_errors() -> TestResult {
@@ -28,9 +65,7 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
 fn at_version_update_at_version_file_exists_ok() -> TestResult {
     // Arrange
     const VERSION: &str = "0.1.0";
-    let test_dir = assert_fs::TempDir::new()?;
-    let version_file = test_dir.join(".at-version");
-    fs::write(version_file, VERSION)?;
+    let test_dir = initialize_temp_dir(VERSION, false)?;
     let mut cmd = Command::cargo_bin("at")?;
     cmd.args(["version", "update"]).current_dir(&test_dir);
 
@@ -50,10 +85,8 @@ fn at_version_update_at_version_file_exists_ok() -> TestResult {
 #[test]
 fn version_get_without_git_info() -> TestResult {
     // Arrange
-    let test_dir = assert_fs::TempDir::new()?;
-    let version_file = test_dir.join(".at-version");
     const VERSION: &str = "1.2.3";
-    fs::write(&version_file, VERSION)?;
+    let test_dir = initialize_temp_dir(VERSION, false)?;
     
     // Need to be in the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
@@ -72,36 +105,9 @@ fn version_get_without_git_info() -> TestResult {
 #[test]
 fn version_get_with_git_info() -> TestResult {
     // Arrange
-    let test_dir = assert_fs::TempDir::new()?;
-    let version_file = test_dir.join(".at-version");
     const VERSION: &str = "1.2.3";
-    fs::write(&version_file, VERSION)?;
+    let test_dir = initialize_temp_dir(VERSION, true)?;
     
-    // Initialize git repo
-    let mut cmd = Command::new("git");
-    cmd.args(["init"]).current_dir(&test_dir);
-    cmd.output()?;
-    
-    // Configure git user for commit
-    let mut cmd = Command::new("git");
-    cmd.args(["config", "user.email", "test@example.com"])
-        .current_dir(&test_dir);
-    cmd.output()?;
-    let mut cmd = Command::new("git");
-    cmd.args(["config", "user.name", "Test User"])
-        .current_dir(&test_dir);
-    cmd.output()?;
-    
-    // Add and commit the version file
-    let mut cmd = Command::new("git");
-    cmd.args(["add", ".at-version"])
-        .current_dir(&test_dir);
-    cmd.output()?;
-    let mut cmd = Command::new("git");
-    cmd.args(["commit", "-m", "Initial commit"])
-        .current_dir(&test_dir);
-    cmd.output()?;
-
     // Need to be in the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
     std::env::set_current_dir(&test_dir)?;
