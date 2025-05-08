@@ -9,7 +9,6 @@ fn test_get_branch() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    // Set up git repository
     setup_git_repo(temp_path);
 
     // Test the get_branch function
