@@ -11,7 +11,6 @@ fn test_get_branch() {
 
     setup_git_repo(temp_path);
 
-    // Test the get_branch function
     let branch = artisan_tools::git::get_branch(temp_path).expect("Failed to get branch");
     assert_eq!(branch, "master");
 }
