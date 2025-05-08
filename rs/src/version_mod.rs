@@ -23,14 +23,11 @@ pub fn get(git_info: bool) -> Result<String> {
     let mut version = read_at_version().context("Failed to read the version file")?;
 
     if git_info {
-        // Get current branch
         let branch = git::get_branch(".")?;
         let branch = branch.replace('_', "-");
 
-        // Get commit hash
         let hash = git::get_commit_hash(".")?;
 
-        // Get clean status
         let is_clean = !git::get_status(".")?;
         let dirty = if is_clean { "" } else { "-dirty" };
 
