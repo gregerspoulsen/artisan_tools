@@ -21,7 +21,6 @@ fn test_get_commit_hash() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    // Set up git repository
     setup_git_repo(temp_path);
 
     // Get the hash using our function
