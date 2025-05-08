@@ -31,9 +31,6 @@ pub fn get_commit_hash<P: AsRef<Path>>(path: P) -> Result<String> {
 }
 
 /// Return whether the git repository has uncommitted changes.
-///
-/// Returns true if there are any uncommitted changes
-/// false if the working directory is clean.
 pub fn is_dirty<P: AsRef<Path>>(path: P) -> Result<bool> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
