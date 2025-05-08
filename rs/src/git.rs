@@ -37,5 +37,5 @@ pub fn get_commit_hash<P: AsRef<Path>>(path: P) -> Result<String> {
 pub fn get_status<P: AsRef<Path>>(path: P) -> Result<bool> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
-    repo.is_dirty()
+    Ok(repo.is_dirty()?)
 }
