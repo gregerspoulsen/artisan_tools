@@ -45,7 +45,7 @@ fn test_get_commit_hash() {
 }
 
 #[test]
-fn test_get_status() {
+fn test_is_dirty() {
     // Create a temporary directory for our test git repository
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
@@ -65,7 +65,7 @@ fn test_get_status() {
     );
 
     // Initially the repository should be clean
-    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
+    let status = artisan_tools::git::is_dirty(temp_path).expect("Failed to get status");
     assert!(!status, "Repository should be clean after initial setup");
 
     // Create a new untracked file
@@ -80,7 +80,7 @@ fn test_get_status() {
         .expect("Failed to stage file");
 
     // Repository should still be dirty with staged changes
-    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
+    let status = artisan_tools::git::is_dirty(temp_path).expect("Failed to get status");
     assert!(status, "Repository should be dirty with staged changes");
 
     // Commit the file
@@ -91,7 +91,7 @@ fn test_get_status() {
         .expect("Failed to commit");
 
     // Repository should be clean again
-    let status = artisan_tools::git::get_status(temp_path).expect("Failed to get status");
+    let status = artisan_tools::git::is_dirty(temp_path).expect("Failed to get status");
     assert!(!status, "Repository should be clean after committing");
 }
 

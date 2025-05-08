@@ -28,8 +28,8 @@ pub fn get(git_info: bool) -> Result<String> {
 
         let hash = git::get_commit_hash(".")?;
 
-        let is_clean = !git::get_status(".")?;
-        let dirty = if is_clean { "" } else { "-dirty" };
+        let is_dirty = git::is_dirty(".")?;
+        let dirty = if is_dirty { "-dirty" } else { "" };
 
         version = format!("{}+{}-{}{}", version, branch, hash, dirty);
     }
