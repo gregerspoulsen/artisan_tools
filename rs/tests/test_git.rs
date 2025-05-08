@@ -48,7 +48,6 @@ fn test_is_dirty() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    // Set up git repository
     setup_git_repo(temp_path);
 
     // Print git status for debugging
