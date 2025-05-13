@@ -21,7 +21,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('rs/flake.lock') }}
       - name: Check
         run: nix develop --command which cargo
-
+        working-directory: rs
       - name: Run tests
         run: nix develop --command cargo test --verbose
         working-directory: rs
