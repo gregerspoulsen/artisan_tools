@@ -3,7 +3,6 @@ description: Sets up the environment for rust
 runs:
   using: "composite"
   steps:
-    - name: Checkout
     - uses: nixbuild/nix-quick-install-action@v30
       with:
         nix_conf: |
