@@ -10,19 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v30
-        with:
-          nix_conf: |
-            keep-env-derivations = true
-            keep-outputs = true
-      - uses: nix-community/cache-nix-action@v6
-        with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('rs/*.nix', 'rs/flake.lock') }}
-      
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: "rs"
+      - uses: ./.github/actions/setup-env
       - name: Run tests
         run: nix develop --command cargo test --verbose
         working-directory: rs
