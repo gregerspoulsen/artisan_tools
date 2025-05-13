@@ -21,10 +21,8 @@ jobs:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('rs/*.nix', 'rs/flake.lock') }}
       
       - uses: Swatinem/rust-cache@v2
-
-      - name: Check
-        run: nix develop --command which cargo
-        working-directory: rs
+        with:
+          workspaces: "rs"
       - name: Run tests
         run: nix develop --command cargo test --verbose
         working-directory: rs
