@@ -29,6 +29,11 @@ lint *args:
 format *args:
     cargo fmt {{args}}
 
+ci:
+    just rs format --check
+    just rs lint
+    just rs test
+
 test-run: \
     (run "--quiet -- version update") \
     (run "--quiet -- version get")
