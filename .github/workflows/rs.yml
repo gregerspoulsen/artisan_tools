@@ -11,14 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+      - uses: nixbuild/nix-quick-install-action@v30
+        with:
+          nix_conf: |
+            keep-env-derivations = true
+            keep-outputs = true
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('rs/*.nix', 'rs/flake.lock') }}
+      
       - uses: Swatinem/rust-cache@v2
 
-      - uses: actions/cache@v4
-        with:
-          path: /nix/store
-          key: ${{ runner.os }}-${{ hashFiles('rs/flake.lock') }}
       - name: Check
         run: nix develop --command which cargo
         working-directory: rs
