@@ -23,6 +23,8 @@
           just
           cargo-nextest
           cargo-hack
+          figlet
+          lolcat
         ]; };
       }
     );
