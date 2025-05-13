@@ -15,6 +15,13 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@main
       - uses: Swatinem/rust-cache@v2
 
+      - uses: actions/cache@v4
+        with:
+          path: /nix/store
+          key: ${{ runner.os }}-${{ hashFiles('rs/flake.lock') }}
+      - name: Check
+        run: nix develop --command which cargo
+
       - name: Run tests
         run: nix develop --command cargo test --verbose
         working-directory: rs
