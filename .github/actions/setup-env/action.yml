@@ -4,7 +4,6 @@ runs:
   using: "composite"
   steps:
     - name: Checkout
-    - uses: actions/checkout@v4
     - uses: nixbuild/nix-quick-install-action@v30
       with:
         nix_conf: |
