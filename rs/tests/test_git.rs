@@ -1,7 +1,7 @@
 use std::fs;
-use std::path::Path;
 use std::process::Command;
 use tempfile::TempDir;
+mod utils;
 
 #[test]
 fn test_get_branch() {
@@ -9,7 +9,7 @@ fn test_get_branch() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    setup_git_repo(temp_path);
+    utils::setup_git_repo(temp_path, None);
 
     let branch = artisan_tools::git::get_branch(temp_path).expect("Failed to get branch");
     assert_eq!(branch, "master");
@@ -21,7 +21,7 @@ fn test_get_commit_hash() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    setup_git_repo(temp_path);
+    utils::setup_git_repo(temp_path, None);
 
     // Get the hash using our function
     let our_hash =
@@ -48,7 +48,7 @@ fn test_is_dirty() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    setup_git_repo(temp_path);
+    utils::setup_git_repo(temp_path, None);
 
     // Print git status for debugging
     let status_output = Command::new("git")
@@ -90,44 +90,4 @@ fn test_is_dirty() {
     // Repository should be clean again
     let status = artisan_tools::git::is_dirty(temp_path).expect("Failed to get status");
     assert!(!status, "Repository should be clean after committing");
-}
-
-/// Helper function to set up a git repository in the given directory
-fn setup_git_repo(path: &Path) {
-    // Initialize git repository
-    Command::new("git")
-        .args(["init"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to initialize git repository");
-
-    // Configure git user for the test
-    Command::new("git")
-        .args(["config", "user.name", "Test User"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to configure git user name");
-
-    Command::new("git")
-        .args(["config", "user.email", "test@example.com"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to configure git user email");
-
-    // Create a dummy file and commit it
-    let file_path = path.join("dummy.txt");
-    fs::write(&file_path, "dummy content").expect("Failed to write dummy file");
-
-    // Add and commit the file
-    Command::new("git")
-        .args(["add", "dummy.txt"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to add file");
-
-    Command::new("git")
-        .args(["commit", "-m", "Initial commit"])
-        .current_dir(path)
-        .output()
-        .expect("Failed to commit");
 }
