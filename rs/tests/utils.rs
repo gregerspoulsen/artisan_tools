@@ -1,9 +1,13 @@
 use std::fs;
 use std::path::Path;
 use std::process::Command;
+use semver::Version;
 
-/// Helper function to set up a git repository in the given directory with an optional version
-pub fn setup_git_repo(path: &Path, version: Option<&str>) {
+/// Default version to use when setting up a git repository
+pub const DEFAULT_VERSION: Version = Version::new(0, 1, 0);
+
+/// Helper function to set up a git repository in the given directory with a version
+pub fn setup_git_repo(path: &Path, version: Option<Version>) {
     // Initialize git repository
     Command::new("git")
         .args(["init"])
@@ -28,9 +32,12 @@ pub fn setup_git_repo(path: &Path, version: Option<&str>) {
     let file_path = path.join("dummy.txt");
     fs::write(&file_path, "dummy content").expect("Failed to write dummy file");
 
-    // Create .at-version file with provided version or default
+    // Use the provided version or default
+    let version = version.unwrap_or(DEFAULT_VERSION);
+
+    // Create .at-version file with version
     let version_file = path.join(".at-version");
-    fs::write(&version_file, version.unwrap_or("0.1.0")).expect("Failed to write version file");
+    fs::write(&version_file, version.to_string()).expect("Failed to write version file");
 
     // Add and commit both files
     Command::new("git")
