@@ -31,7 +31,7 @@ pub fn get(git_info: bool) -> Result<String> {
         let is_dirty = git::is_dirty(".")?;
         let dirty = if is_dirty { "-dirty" } else { "" };
 
-        version = format!("{}+{}-{}{}", version, branch, hash, dirty);
+        version = format!("{version}+{branch}-{hash}{dirty}");
     }
 
     Ok(version)
