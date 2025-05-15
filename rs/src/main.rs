@@ -1,4 +1,4 @@
-use artisan_tools::version_mod;
+use artisan_tools::version;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -41,14 +41,14 @@ fn main() -> Result<()> {
         Command::Version(subcmd) => match subcmd {
             VersionCommand::Get { git_info } => {
                 // Print current version to stdout
-                let version =
-                    version_mod::get(git_info).context("Failed to read the version file")?;
-                println!("{}", version);
+                let vers =
+                    version::get(git_info).context("Failed to read the version file")?;
+                println!("{}", vers);
             }
             VersionCommand::Update => {
                 // Update version in `VERSION` file
                 let version_contents =
-                    version_mod::get(false).context("Failed to read the version file")?;
+                    version::get(false).context("Failed to read the version file")?;
                 let version_contents = version_contents.trim_end();
 
                 fs::write("VERSION", version_contents)
