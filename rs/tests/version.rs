@@ -1,11 +1,11 @@
 use assert_cmd::prelude::*; // Add methods on commands
+use assert_fs::TempDir;
 use predicates::prelude::*; // Used for writing assertions
 use pretty_assertions::assert_str_eq;
 use semver::Version;
 use std::{fs, process::Command};
-use testresult::TestResult;
-use assert_fs::TempDir;
 use test_utils;
+use testresult::TestResult;
 
 /// Test that when cwd has no .at-version file, we error with an informative error message
 #[test]
@@ -32,7 +32,7 @@ fn at_version_update_at_version_file_exists_ok() -> TestResult {
     let version = Version::new(0, 1, 0);
     let test_dir = TempDir::new()?;
     test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
-    
+
     let mut cmd = Command::cargo_bin("at")?;
     cmd.args(["version", "update"]).current_dir(&test_dir);
 

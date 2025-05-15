@@ -1,7 +1,7 @@
+use semver::Version;
 use std::fs;
 use std::path::Path;
 use std::process::Command;
-use semver::Version;
 
 /// Default version to use when setting up a git repository
 pub const DEFAULT_VERSION: Version = Version::new(0, 1, 0);

@@ -24,8 +24,7 @@ fn read_at_version(path: &Path) -> Result<String> {
 /// * `git_info` - Whether to include git information in the version string
 pub fn get<P: AsRef<Path>>(path: P, git_info: bool) -> Result<String> {
     let version_path = path.as_ref().join(AT_VERSION_FILE);
-    let mut version = read_at_version(&version_path)
-        .context("Failed to read the version file")?;
+    let mut version = read_at_version(&version_path).context("Failed to read the version file")?;
 
     if git_info {
         let branch = git::get_branch(&path)?;
@@ -44,11 +43,11 @@ pub fn get<P: AsRef<Path>>(path: P, git_info: bool) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
-    use semver::Version;
-    use pretty_assertions::assert_str_eq;
-    use testresult::TestResult;
     use assert_fs::TempDir;
+    use pretty_assertions::assert_str_eq;
+    use semver::Version;
     use test_utils;
+    use testresult::TestResult;
 
     use super::*;
 
@@ -95,5 +94,4 @@ mod tests {
 
         Ok(())
     }
-
 }
