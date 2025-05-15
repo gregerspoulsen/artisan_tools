@@ -45,7 +45,7 @@ mod tests {
     use pretty_assertions::assert_str_eq;
     use testresult::TestResult;
     use assert_fs::TempDir;
-    use crate::utils;
+    use test_utils;
 
     use super::*;
 
@@ -55,7 +55,7 @@ fn version_get_without_git_info() -> TestResult {
     // Arrange
     let version = Version::new(1, 2, 3);
     let test_dir = TempDir::new()?;
-    utils::setup_git_repo(test_dir.path(), Some(version.clone()));
+    test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
     // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;
@@ -75,7 +75,7 @@ fn version_get_without_git_info() -> TestResult {
 fn version_get_with_git_info() -> TestResult {
     let version = Version::new(1, 2, 3);
     let test_dir = TempDir::new()?;
-    utils::setup_git_repo(test_dir.path(), Some(version.clone()));
+    test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
     // Switch the directory with the .at-version file
     let original_dir = std::env::current_dir()?;

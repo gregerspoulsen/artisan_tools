@@ -43,7 +43,7 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
     use std::process::Command;
-    use crate::utils;
+    use test_utils;
 
     use super::*;
 
@@ -53,7 +53,7 @@ fn test_get_branch() {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
     let temp_path = temp_dir.path();
 
-    utils::setup_git_repo(temp_path, None);
+    test_utils::setup_git_repo(temp_path, None);
 
     // Test the get_branch function
     let branch = get_branch(temp_path).expect("Failed to get branch");
@@ -67,7 +67,7 @@ fn test_get_commit_hash() {
     let temp_path = temp_dir.path();
 
     // Set up git repository
-    utils::setup_git_repo(temp_path, None);
+    test_utils::setup_git_repo(temp_path, None);
 
     // Get the hash using our function
     let our_hash =
@@ -95,7 +95,7 @@ fn test_is_dirty() {
     let temp_path = temp_dir.path();
 
     // Set up git repository
-    utils::setup_git_repo(temp_path, None);
+    test_utils::setup_git_repo(temp_path, None);
 
     // Print git status for debugging
     let status_output = Command::new("git")

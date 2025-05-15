@@ -51,4 +51,4 @@ pub fn setup_git_repo(path: &Path, version: Option<Version>) {
         .current_dir(path)
         .output()
         .expect("Failed to commit");
-} 
+}
