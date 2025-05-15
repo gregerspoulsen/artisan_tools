@@ -19,7 +19,7 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
     // Act
     // Assert (assert also runs the command)
     cmd.assert().failure().stderr(predicate::str::contains(
-        "Failed to read from version file: .at-version",
+        "Failed to read from version file: ./.at-version",
     ));
 
     Ok(())

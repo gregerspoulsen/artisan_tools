@@ -42,13 +42,13 @@ fn main() -> Result<()> {
             VersionCommand::Get { git_info } => {
                 // Print current version to stdout
                 let vers =
-                    version::get(git_info).context("Failed to read the version file")?;
+                    version::get(".", git_info).context("Failed to read the version file")?;
                 println!("{}", vers);
             }
             VersionCommand::Update => {
                 // Update version in `VERSION` file
                 let version_contents =
-                    version::get(false).context("Failed to read the version file")?;
+                    version::get(".", false).context("Failed to read the version file")?;
                 let version_contents = version_contents.trim_end();
 
                 fs::write("VERSION", version_contents)

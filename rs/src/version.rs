@@ -18,17 +18,22 @@ fn read_at_version(path: &Path) -> Result<String> {
 ///
 /// If git_info is true, appends branch, hash and dirty status in the format:
 /// version+branch-hash[-dirty]
-pub fn get(git_info: bool) -> Result<String> {
-    let mut version = read_at_version(&Path::new(AT_VERSION_FILE))
+///
+/// # Arguments
+/// * `path` - Path to the directory containing the version file
+/// * `git_info` - Whether to include git information in the version string
+pub fn get<P: AsRef<Path>>(path: P, git_info: bool) -> Result<String> {
+    let version_path = path.as_ref().join(AT_VERSION_FILE);
+    let mut version = read_at_version(&version_path)
         .context("Failed to read the version file")?;
 
     if git_info {
-        let branch = git::get_branch(".")?;
+        let branch = git::get_branch(&path)?;
         let branch = branch.replace('_', "-");
 
-        let hash = git::get_commit_hash(".")?;
+        let hash = git::get_commit_hash(&path)?;
 
-        let is_dirty = git::is_dirty(".")?;
+        let is_dirty = git::is_dirty(&path)?;
         let dirty = if is_dirty { "-dirty" } else { "" };
 
         version = format!("{version}+{branch}-{hash}{dirty}");
@@ -55,15 +60,10 @@ mod tests {
         let test_dir = TempDir::new()?;
         test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
-        // Switch the directory with the .at-version file
-        let original_dir = std::env::current_dir()?;
-        std::env::set_current_dir(&test_dir)?;
-
         // Act
-        let result = get(false)?;
+        let result = get(test_dir.path(), false)?;
 
-        // Cleanup and Assert
-        std::env::set_current_dir(original_dir)?;
+        // Assert
         assert_str_eq!(result, version.to_string());
         Ok(())
     }
@@ -75,14 +75,8 @@ mod tests {
         let test_dir = TempDir::new()?;
         test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
-        // Switch the directory with the .at-version file
-        let original_dir = std::env::current_dir()?;
-        std::env::set_current_dir(&test_dir)?;
-
         // Act
-        let result = get(true)?;
-
-        std::env::set_current_dir(original_dir)?;
+        let result = get(test_dir.path(), true)?;
 
         // The result should be in format: version+branch-hash
         // We know the version is "1.2.3" and branch should be "main" or "master"
