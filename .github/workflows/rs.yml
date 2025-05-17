@@ -18,8 +18,7 @@ jobs:
       - uses: ./.github/actions/setup-env
       - name: Run tests
         working-directory: rs
-        run: nix develop --command \
-          just rs ci
+        run: nix develop --command just rs ci
 
   test-multi-platform:
     strategy:
@@ -70,5 +69,4 @@ jobs:
       - uses: ./.github/actions/setup-env
       - name: Check Rust minimum support version
         working-directory: rs
-        run: nix develop --command \
-          cargo hack check --rust-version --workspace --all-targets --ignore-private
+        run: nix develop --command cargo hack check --rust-version --workspace --all-targets --ignore-private

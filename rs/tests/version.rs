@@ -4,7 +4,6 @@ use predicates::prelude::*; // Used for writing assertions
 use pretty_assertions::assert_str_eq;
 use semver::Version;
 use std::{fs, process::Command};
-use test_utils;
 use testresult::TestResult;
 
 /// Test that when cwd has no .at-version file, we error with an informative error message
