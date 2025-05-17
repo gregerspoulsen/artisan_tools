@@ -62,7 +62,7 @@ jobs:
         - name: Check spelling of entire workspace
           uses: crate-ci/typos@v1.32.0
 
-  msrv:
+  msrv-nix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,3 +70,12 @@ jobs:
       - name: Check Rust minimum support version
         working-directory: rs
         run: nix develop --command cargo hack check --rust-version --workspace --all-targets --ignore-private
+
+  msrv-reg:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: taiki-e/install-action@cargo-hack
+        - name: Check Rust minimum support version
+          working-directory: rs
+          run: cargo hack check --rust-version --workspace --all-targets --ignore-private
