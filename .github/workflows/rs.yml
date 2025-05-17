@@ -1,10 +1,13 @@
-name: Unit Testing
+name: CI
 
 on: [push]
 
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  JUST_VERBOSE: 1
+  JUST_COLOR: always
+
 
 jobs:
   test:
@@ -13,13 +16,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-env
       - name: Run tests
-        run: nix develop --command just rs ci
         working-directory: rs
+        run: nix develop --command \
+          just rs ci
 
   msrv:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-env
-      - run: nix develop --command cargo hack check --rust-version --workspace --all-targets --ignore-private
+      - name: Check Rust minimum support version
         working-directory: rs
+        run: nix develop --command \
+          cargo hack check --rust-version --workspace --all-targets --ignore-private
