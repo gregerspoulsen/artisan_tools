@@ -55,16 +55,22 @@ inherits = "release"
 lto = true
 codegen-units = 1
 
+[lints]
+workspace = true
 
 [workspace.lints.rust]
 missing_copy_implementations = "warn"
 trivial_casts = "warn"
 trivial_numeric_casts = "warn"
 unused_import_braces = "warn"
-unexpected_cfgs = "warn"
 unsafe_code = "warn"
 
-[lints.clippy]
+[workspace.lints.clippy]
+disallowed_macros = "warn"                   # See clippy.toml
+disallowed_methods = "warn"                  # See clippy.toml
+disallowed_names = "warn"                    # See clippy.toml
+disallowed_script_idents = "warn"            # See clippy.toml
+disallowed_types = "warn"                    # See clippy.toml
 as_ptr_cast_mut = "warn"
 await_holding_lock = "warn"
 bool_to_int_with_if = "warn"
