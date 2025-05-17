@@ -41,3 +41,11 @@ assert_fs = "1.1.1"
 testresult = "0.4.1"
 pretty_assertions = "1.4.1"
 tempfile = "3.10"
+
+[profile.release]
+opt-level = "z"   # We got the speed we need, so we optimize for size
+debug = false
+panic = "abort"
+strip = true
+lto = true
+codegen-units = 1
