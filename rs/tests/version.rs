@@ -15,11 +15,19 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
     cmd.args(["version", "update"]);
     cmd.current_dir(&test_dir);
 
+    let file_path_prefix = if cfg!(target_os = "windows") {
+        r".\"
+    } else {
+        "./"
+    };
+
     // Act
     // Assert (assert also runs the command)
-    cmd.assert().failure().stderr(predicate::str::contains(
-        "Failed to read from version file: ./.at-version",
-    ));
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains(format!(
+            "Failed to read from version file: {file_path_prefix}.at-version"
+        )));
 
     Ok(())
 }
