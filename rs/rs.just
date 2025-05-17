@@ -11,19 +11,19 @@ alias l := lint
 alias fmt := format
 
 # Quickly check if code compiles
-check *args:
+check *args="--workspace":
     cargo check {{args}}
 
-build *args:
+build *args="--workspace":
     cargo build {{args}}
 
 run *args:
     cargo run {{args}}
 
-test *args:
+test *args="--workspace":
     cargo test {{args}}
 
-lint *args:
+lint *args="--workspace":
     cargo clippy {{args}}
 
 format *args:
