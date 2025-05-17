@@ -42,10 +42,15 @@ testresult = "0.4.1"
 pretty_assertions = "1.4.1"
 tempfile = "3.10"
 
+# Relatively fast-compiling release build
 [profile.release]
-opt-level = "z"   # We got the speed we need, so we optimize for size
+opt-level = "z" # We got the speed we need, so we optimize for size
 debug = false
 panic = "abort"
 strip = true
+
+# Maximum optimizations at the cost of compilation time
+[profile.release-lto]
+inherits = "release"
 lto = true
 codegen-units = 1
