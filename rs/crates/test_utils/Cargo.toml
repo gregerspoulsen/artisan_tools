@@ -8,3 +8,6 @@ rust-version.workspace = true
 
 [dependencies]
 semver.workspace = true
+
+[lints]
+workspace = true
