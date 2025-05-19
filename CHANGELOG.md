@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.5] - 2025-05-19
+- Add osv-scanner to CI
+- Add linting (Rust) and typo checking to CI
+
 ## [1.1.4] - 2025-05-14
 - Create nix development environment 
 
