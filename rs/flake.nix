@@ -17,15 +17,9 @@
       {
         devShells.default = pkgs.mkShell { packages = with pkgs;
          [
-          #rustc
           rustup
-          #clippy
-          #rustfmt
           just
-          #cargo-nextest
           cargo-hack
-          figlet
-          lolcat
         ]; 
         RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
         RUSTC_VERSION = "stable";
