@@ -20,6 +20,7 @@
           rustup
           just
           cargo-hack
+          typos
         ]; 
         RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
         RUSTC_VERSION = "stable";

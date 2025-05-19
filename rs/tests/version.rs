@@ -4,7 +4,6 @@ use predicates::prelude::*; // Used for writing assertions
 use pretty_assertions::assert_str_eq;
 use semver::Version;
 use std::{fs, process::Command};
-use test_utils;
 use testresult::TestResult;
 
 /// Test that when cwd has no .at-version file, we error with an informative error message
@@ -16,11 +15,19 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
     cmd.args(["version", "update"]);
     cmd.current_dir(&test_dir);
 
+    let file_path_prefix = if cfg!(target_os = "windows") {
+        r".\"
+    } else {
+        "./"
+    };
+
     // Act
     // Assert (assert also runs the command)
-    cmd.assert().failure().stderr(predicate::str::contains(
-        "Failed to read from version file: ./.at-version",
-    ));
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains(format!(
+            "Failed to read from version file: {file_path_prefix}.at-version"
+        )));
 
     Ok(())
 }

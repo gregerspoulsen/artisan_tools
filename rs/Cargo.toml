@@ -1,11 +1,6 @@
-[package]
-name = "artisan_tools"
-description = "Tools to help the software artisan make their craft a breeze."
-authors.workspace = true
-version.workspace = true
-edition.workspace = true
-repository.workspace = true
-rust-version.workspace = true
+[workspace]
+members = ["crates/test_utils"]
+
 
 [workspace.package]
 authors = ["Gregers Poulsen <gp@skytem.com>"]
@@ -14,6 +9,18 @@ edition = "2021"
 repository = "https://github.com/gregerspoulsen/artisan_tools"
 categories = ["development-tools", "command-line-utilities"]
 rust-version = "1.81"
+
+[workspace.dependencies]
+semver = "^1.0"
+
+[package]
+name = "artisan_tools"
+description = "Tools to help the software artisan make their craft a breeze."
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [[bin]]
 name = "at"
@@ -27,10 +34,6 @@ semver.workspace = true
 
 test_utils = { path = "crates/test_utils" }
 
-[workspace.dependencies]
-semver = "^1.0"
-
-
 [dev-dependencies]
 assert_cmd = "2.0.14"
 predicates = "3.1.0"
@@ -39,7 +42,64 @@ testresult = "0.4.1"
 pretty_assertions = "1.4.1"
 tempfile = "3.10"
 
-[workspace]
-members = [
-    "crates/test_utils",
-]
+# Relatively fast-compiling release build
+[profile.release]
+opt-level = "z" # We got the speed we need, so we optimize for size
+debug = false
+panic = "abort"
+strip = true
+
+# Maximum optimizations at the cost of compilation time
+[profile.release-lto]
+inherits = "release"
+lto = true
+codegen-units = 1
+
+[lints]
+workspace = true
+
+[workspace.lints.rust]
+missing_copy_implementations = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_import_braces = "warn"
+unsafe_code = "warn"
+
+[workspace.lints.clippy]
+disallowed_macros = "warn"                   # See clippy.toml
+disallowed_methods = "warn"                  # See clippy.toml
+disallowed_names = "warn"                    # See clippy.toml
+disallowed_script_idents = "warn"            # See clippy.toml
+disallowed_types = "warn"                    # See clippy.toml
+as_ptr_cast_mut = "warn"
+await_holding_lock = "warn"
+bool_to_int_with_if = "warn"
+char_lit_as_u8 = "warn"
+checked_conversions = "warn"
+empty_enum = "warn"
+enum_glob_use = "warn"
+equatable_if_let = "warn"
+expl_impl_clone_on_copy = "warn"
+explicit_deref_methods = "warn"
+explicit_into_iter_loop = "warn"
+explicit_iter_loop = "warn"
+fallible_impl_from = "warn"
+fn_params_excessive_bools = "warn"
+implicit_clone = "warn"
+infinite_loop = "warn"
+literal_string_with_formatting_args = "warn"
+manual_assert = "warn"
+manual_clamp = "warn"
+manual_instant_elapsed = "warn"
+manual_is_power_of_two = "warn"
+manual_let_else = "warn"
+manual_ok_or = "warn"
+manual_string_new = "warn"
+needless_borrow = "warn"
+needless_continue = "warn"
+needless_for_each = "warn"
+needless_pass_by_ref_mut = "warn"
+needless_pass_by_value = "warn"
+needless_range_loop = "warn"
+negative_feature_names = "warn"
+non_zero_suggestions = "warn"
