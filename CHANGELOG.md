@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.6] - 2025-05-19
+- Add diagrams for future workflow
+
 ## [1.1.5] - 2025-05-19
 - Add osv-scanner to CI
 - Add linting (Rust) and typo checking to CI
