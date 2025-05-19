@@ -3,8 +3,8 @@ graph TD
     B["Dev issues command:<br>at branch my-feature minor<br>"]
     C[Create and switch to my-feature branch]
     D[".at-bump file:<br>TARGET: minor<br><br>CHANGELOG:<br>### Added<br>* Add ability to update version files"]
-    E[Dev modifies .at-bump]
-    F[Dev clicks merge]
+    E[User modifies .at-bump]
+    F[User clicks merge]
     G[CI:<br>Update version + changelog<br>delete .at-bump file]
     H[.atversion<br>5.4.0]
 
