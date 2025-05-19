@@ -20,7 +20,7 @@
           rustup
           just
           cargo-hack
-          typos-cli
+          typos
         ]; 
         RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
         RUSTC_VERSION = "stable";

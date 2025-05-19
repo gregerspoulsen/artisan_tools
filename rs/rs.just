@@ -48,7 +48,8 @@ format *args:
 # Check for typos
 [group("lint")]
 typos:
-    typos
+    # Should remove '..' when it's run from the project root
+    typos ..
 
 ci $RUSTFLAGS="--deny warnings":
     just rs format --check
