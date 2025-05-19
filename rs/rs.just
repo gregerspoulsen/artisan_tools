@@ -3,6 +3,8 @@
     echo '{{BOLD + YELLOW}}Run with {{NORMAL}}`rs `{{BOLD + YELLOW}} prefix, e.g.'
     echo '    {{GREEN}}$ just rs run'
 
+export RUSTFLAGS := "--deny warnings"
+
 alias b := build
 alias c := check
 alias r := run
