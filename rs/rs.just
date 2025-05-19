@@ -29,7 +29,7 @@ lint *args="--workspace":
 format *args:
     cargo fmt {{args}}
 
-ci:
+ci $RUSTFLAGS="--deny warnings":
     just rs format --check
     just rs lint
     just rs test
@@ -43,3 +43,6 @@ test-run: \
 [doc("Find the minimum supported Rust version")]
 find-msrv:
     cargo msrv find
+
+check-msrv:
+    cargo hack check --rust-version --workspace --all-targets --ignore-private

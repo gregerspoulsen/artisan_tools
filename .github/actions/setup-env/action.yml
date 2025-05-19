@@ -1,5 +1,10 @@
 name: Setup Environment
 description: Sets up the environment for rust
+inputs:
+  cache-key:
+    description: Additional cache-key to differentiate builds
+    required: false
+    default: default
 runs:
   using: "composite"
   steps:
@@ -16,3 +21,4 @@ runs:
     - uses: Swatinem/rust-cache@v2
       with:
         workspaces: "rs"
+        key: ${{ inputs.cache-key }}

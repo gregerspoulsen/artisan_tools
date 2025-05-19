@@ -1,3 +1,5 @@
+# Basic Dockerfile to illustrate how to setup nix and direnv on Ubuntu.
+
 FROM ubuntu
 
 # Install direnv
