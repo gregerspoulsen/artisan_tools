@@ -3,8 +3,6 @@
     echo '{{BOLD + YELLOW}}Run with {{NORMAL}}`rs `{{BOLD + YELLOW}} prefix, e.g.'
     echo '    {{GREEN}}$ just rs run'
 
-export RUSTFLAGS := "--deny warnings"
-
 alias b := build
 alias c := check
 alias r := run
@@ -31,7 +29,7 @@ lint *args:
 format *args:
     cargo fmt {{args}}
 
-ci:
+ci $RUSTFLAGS="--deny warnings":
     just rs format --check
     just rs lint
     just rs test
