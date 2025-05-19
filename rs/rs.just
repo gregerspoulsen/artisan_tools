@@ -45,3 +45,6 @@ test-run: \
 [doc("Find the minimum supported Rust version")]
 find-msrv:
     cargo msrv find
+
+check-msrv:
+    cargo hack check --rust-version --workspace --all-targets --ignore-private
