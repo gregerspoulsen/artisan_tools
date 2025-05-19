@@ -1,0 +1,16 @@
+flowchart TD
+    %% Nodes
+    A([Get Version]) --> B{Is repo dirty?}
+    B -->|Yes| C["Return <br/>version+branch-hash[-dirty]"]
+    B -->|No| D{last .at-version hash matches current?}
+
+    D -->|No| C
+    D -->|Yes| I[Return version]
+
+    %% Styling
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef decision fill:#e1f3fe,stroke:#333,stroke-width:2px;
+    classDef terminator fill:#d5e8d4,stroke:#82b366,stroke-width:2px;
+    
+    class B,G decision;
+    class A,O terminator;
