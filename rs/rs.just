@@ -10,6 +10,20 @@ alias t := test
 alias l := lint
 alias fmt := format
 
+[group("init"), doc("Install dev-tools (requires the Rust toolchain)")]
+init:
+    cargo install cargo-nextest
+    cargo install typos-cli
+
+
+# Install dev-tools including tools used sparingly (requires the Rust toolchain)
+[group("init")]
+init-extra: init
+    cargo install cargo-limit
+    cargo install cargo-shear
+    cargo install cargo-hack
+    cargo install cargo-msrv
+
 # Quickly check if code compiles
 check *args="--workspace":
     cargo check {{args}}
@@ -23,16 +37,24 @@ run *args:
 test *args="--workspace":
     cargo test {{args}}
 
+[group("lint")]
 lint *args="--workspace":
     cargo clippy {{args}}
 
+[group("lint")]
 format *args:
     cargo fmt {{args}}
+
+# Check for typos
+[group("lint")]
+typos:
+    typos
 
 ci $RUSTFLAGS="--deny warnings":
     just rs format --check
     just rs lint
     just rs test
+    just rs typos
 
 test-run: \
     (run "--quiet -- version update") \
