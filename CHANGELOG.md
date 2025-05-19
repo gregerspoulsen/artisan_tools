@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.4] - 2025-05-14
+- Create nix development environment 
+
+## [1.1.3] - 2025-05-14
+- Add git info retrieval to rust version
+
 ## [1.1.2] - 2025-01-10
 - Create structure for rustification
 
