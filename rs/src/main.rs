@@ -1,5 +1,4 @@
-use artisan_tools::version;
-
+use artisan_tools::{version, template};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::fs;
@@ -19,6 +18,10 @@ enum Command {
     /// Manage version-related operations
     #[command(subcommand)]
     Version(VersionCommand),
+    
+    /// Manage changeset operations
+    #[command(subcommand)]
+    Changeset(ChangesetCommand),
 }
 
 /// Subcommands under `artisan-tools version`
@@ -32,6 +35,17 @@ enum VersionCommand {
     },
     /// Update version in `VERSION` file
     Update,
+}
+
+/// Subcommands under `artisan-tools changeset`
+#[derive(Subcommand)]
+enum ChangesetCommand {
+    /// Initialize a new changeset file
+    Init {
+        /// The type of version bump
+        #[arg(value_enum)]
+        target: template::BumpTarget,
+    },
 }
 
 fn main() -> Result<()> {
@@ -54,6 +68,13 @@ fn main() -> Result<()> {
                 fs::write("VERSION", version_contents)
                     .context("Failed to write to the VERSION file")?;
                 println!("VERSION updated to {}", version_contents);
+            }
+        },
+        Command::Changeset(subcmd) => match subcmd {
+            ChangesetCommand::Init { target } => {
+                template::create_changeset_template("at-changeset", target)
+                    .context("Failed to create changeset template")?;
+                println!("Created new changeset file with target: {}", target.as_str());
             }
         },
     }
