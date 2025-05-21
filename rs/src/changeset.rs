@@ -31,10 +31,13 @@ impl BumpTarget {
     }
 }
 
-pub fn create_changeset_template<P: AsRef<Path>>(path: P, target: BumpTarget) -> std::io::Result<()> {
+pub fn create_changeset_template<P: AsRef<Path>>(
+    path: P,
+    target: BumpTarget,
+) -> std::io::Result<()> {
     let template = include_str!("../templates/at-changeset-template.txt");
     let content = template.replace("TARGET: patch", &format!("TARGET: {}", target.as_str()));
-    
+
     let mut file = fs::File::create(path)?;
     file.write_all(content.as_bytes())?;
     Ok(())
@@ -50,9 +53,9 @@ mod tests {
     fn test_create_changeset_template() {
         let dir = tempdir().unwrap();
         let file_path = dir.path().join("at-changeset");
-        
+
         create_changeset_template(&file_path, BumpTarget::Minor).unwrap();
-        
+
         assert!(file_path.exists());
         let content = fs::read_to_string(file_path).unwrap();
         assert!(content.contains("TARGET: MINOR"));
@@ -65,7 +68,10 @@ mod tests {
         assert_eq!(BumpTarget::from_str("major"), Some(BumpTarget::Major));
         assert_eq!(BumpTarget::from_str("MINOR"), Some(BumpTarget::Minor));
         assert_eq!(BumpTarget::from_str("patch"), Some(BumpTarget::Patch));
-        assert_eq!(BumpTarget::from_str("unreleased"), Some(BumpTarget::Unreleased));
+        assert_eq!(
+            BumpTarget::from_str("unreleased"),
+            Some(BumpTarget::Unreleased)
+        );
         assert_eq!(BumpTarget::from_str("invalid"), None);
     }
 }

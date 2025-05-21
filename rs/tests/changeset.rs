@@ -14,15 +14,15 @@ fn test_changeset_init_creates_file() -> TestResult {
     cmd.current_dir(&test_dir);
 
     // Act & Assert
-    cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("Created new changeset file with target: MAJOR"));
+    cmd.assert().success().stdout(predicate::str::contains(
+        "Created new changeset file with target: MAJOR",
+    ));
 
     let changeset_content = fs::read_to_string(test_dir.join("at-changeset"))?;
     assert!(changeset_content.contains("TARGET: MAJOR"));
     assert!(changeset_content.contains("CHANGELOG:"));
     assert!(changeset_content.contains("### Added"));
-    
+
     Ok(())
 }
 
@@ -39,7 +39,7 @@ fn test_changeset_init_invalid_target() -> TestResult {
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("invalid value 'invalid'"));
-    
+
     Ok(())
 }
 
@@ -59,13 +59,13 @@ fn test_changeset_init_all_targets() -> TestResult {
         cmd.assert()
             .success()
             .stdout(predicate::str::contains(format!(
-                "Created new changeset file with target: {}", 
+                "Created new changeset file with target: {}",
                 target.to_uppercase()
             )));
 
         let changeset_content = fs::read_to_string(test_dir.join("at-changeset"))?;
         assert!(changeset_content.contains(&format!("TARGET: {}", target.to_uppercase())));
     }
-    
+
     Ok(())
 }

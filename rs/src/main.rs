@@ -1,5 +1,5 @@
-use artisan_tools::{version, changeset};
 use anyhow::{Context, Result};
+use artisan_tools::{changeset, version};
 use clap::{Parser, Subcommand};
 use std::fs;
 
@@ -18,7 +18,7 @@ enum Command {
     /// Manage version-related operations
     #[command(subcommand)]
     Version(VersionCommand),
-    
+
     /// Manage changeset operations
     #[command(subcommand)]
     Changeset(ChangesetCommand),
@@ -74,7 +74,10 @@ fn main() -> Result<()> {
             ChangesetCommand::Init { target } => {
                 changeset::create_changeset_template("at-changeset", target)
                     .context("Failed to create changeset template")?;
-                println!("Created new changeset file with target: {}", target.as_str());
+                println!(
+                    "Created new changeset file with target: {}",
+                    target.as_str()
+                );
             }
         },
     }
