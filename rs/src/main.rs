@@ -1,4 +1,4 @@
-use artisan_tools::{version, template};
+use artisan_tools::{version, changeset};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::fs;
@@ -44,7 +44,7 @@ enum ChangesetCommand {
     Init {
         /// The type of version bump
         #[arg(value_enum)]
-        target: template::BumpTarget,
+        target: changeset::BumpTarget,
     },
 }
 
@@ -72,7 +72,7 @@ fn main() -> Result<()> {
         },
         Command::Changeset(subcmd) => match subcmd {
             ChangesetCommand::Init { target } => {
-                template::create_changeset_template("at-changeset", target)
+                changeset::create_changeset_template("at-changeset", target)
                     .context("Failed to create changeset template")?;
                 println!("Created new changeset file with target: {}", target.as_str());
             }
