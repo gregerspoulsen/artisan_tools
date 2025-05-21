@@ -1,13 +1,26 @@
 use artisan_tools::version;
 
 use anyhow::{Context, Result};
-use clap::{Parser, Subcommand};
+use clap::{
+    builder::{
+        styling::{AnsiColor, Effects},
+        Styles,
+    },
+    Parser, Subcommand,
+};
 use std::fs;
+
+const STYLES: Styles = Styles::styled()
+    .header(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .usage(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .literal(AnsiColor::Cyan.on_default().effects(Effects::BOLD))
+    .placeholder(AnsiColor::Cyan.on_default());
 
 /// Simple CLI for Artisan Tools.
 #[derive(Parser)]
 #[command(name = "artisan-tools")]
 #[command(about = "Artisan Tools CLI", version)]
+#[command(styles=STYLES)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
