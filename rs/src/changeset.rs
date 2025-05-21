@@ -19,16 +19,6 @@ impl BumpTarget {
             BumpTarget::Unreleased => "UNRELEASED",
         }
     }
-
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "major" => Some(Self::Major),
-            "minor" => Some(Self::Minor),
-            "patch" => Some(Self::Patch),
-            "unreleased" => Some(Self::Unreleased),
-            _ => None,
-        }
-    }
 }
 
 pub fn create_changeset_template<P: AsRef<Path>>(
@@ -61,17 +51,5 @@ mod tests {
         assert!(content.contains("TARGET: MINOR"));
         assert!(content.contains("CHANGELOG:"));
         assert!(content.contains("### Added"));
-    }
-
-    #[test]
-    fn test_bump_target_from_str() {
-        assert_eq!(BumpTarget::from_str("major"), Some(BumpTarget::Major));
-        assert_eq!(BumpTarget::from_str("MINOR"), Some(BumpTarget::Minor));
-        assert_eq!(BumpTarget::from_str("patch"), Some(BumpTarget::Patch));
-        assert_eq!(
-            BumpTarget::from_str("unreleased"),
-            Some(BumpTarget::Unreleased)
-        );
-        assert_eq!(BumpTarget::from_str("invalid"), None);
     }
 }
