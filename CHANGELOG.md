@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.7] - 2025-05-21
+- Add colored CLI style
+
 ## [1.1.6] - 2025-05-19
 - Add diagrams for future workflow
 
