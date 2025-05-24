@@ -140,7 +140,7 @@ impl TestRepo {
     /// Create, add, & commit the '.at-version' file with the given [Version]
     pub fn init_at_version(&self, version: &Version) {
         self.create_add_commit_file(
-            &PathBuf::from(".at-version"),
+            PathBuf::from(".at-version"),
             Some(&version.to_string()),
             "add at-version",
         );

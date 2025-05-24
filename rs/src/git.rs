@@ -64,21 +64,22 @@ pub fn is_dirty(path: impl AsRef<Path>) -> Result<bool> {
             } else {
                 log::debug!("Repo is clean - No index changes")
             }
-            return Ok(is_dirty);
+            Ok(is_dirty)
         }
+        // SHOULD only happen if the repository has no commits
         Err(e) => {
             log::warn!("{e}");
             let head = repo.head()?;
             let no_commits = matches!(head.kind, gix::head::Kind::Unborn(_));
             if no_commits {
                 log::debug!("Repo has no commits");
-                if has_staged_changes(&repo)? {
+                let staged_changes = has_staged_changes(&repo)?; 
+                if staged_changes {
                     log::debug!("Repo is dirty - staged changes");
-                    return Ok(true);
                 } else {
                     log::debug!("Repo is clean - no commits, staged, or untracked changes");
-                    return Ok(false);
                 }
+                Ok(staged_changes)
             } else {
                 bail!("Unable to determine repository status");
             }
@@ -104,9 +105,7 @@ fn has_untracked_changes(repo: &Repository) -> Result<bool> {
 // Returns whether or not a [Repository] has staged changes
 fn has_staged_changes(repo: &Repository) -> Result<bool> {
     let index = repo.index_or_empty()?;
-    let staged_changes = index.entries().len() > 0;
-
-    Ok(staged_changes)
+    Ok(!index.entries().is_empty())
 }
 
 #[cfg(test)]
