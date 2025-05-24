@@ -8,23 +8,16 @@ use std::{
 };
 use tempfile::TempDir;
 
+/// Utility for creating temporary git repositories during testing 
 #[derive(Debug)]
 pub struct TestRepo {
     tempdir: TempDir,
-    version: Version,
-    init: bool,
-    git_user_name: String,
-    git_user_mail: String,
 }
 
 #[bon]
 impl TestRepo {
-    /// Default version to use when setting up a git repository
-    pub const DEFAULT_VERSION: Version = Version::new(0, 1, 0);
-
     #[builder]
     pub fn new(
-        #[builder(default = TestRepo::DEFAULT_VERSION)] version: Version,
         #[builder(default = false)] init: bool,
         #[builder(default = "test user")] git_user_name: &str,
         #[builder(default = "test@example.com")] git_user_mail: &str,
@@ -32,10 +25,6 @@ impl TestRepo {
     ) -> Self {
         let test_repo = Self {
             tempdir: TempDir::new().expect("Failed to create temp directory"),
-            version,
-            init,
-            git_user_name: git_user_name.to_owned(),
-            git_user_mail: git_user_mail.to_owned(),
         };
 
         if init {
@@ -93,6 +82,13 @@ impl TestRepo {
             .expect("Failed checking out parent commit");
     }
 
+    /// Returns the trimmed output of `git rev-parse --short HEAD`
+    pub fn head_short_sha(&self) -> String {
+        let rev_parse_output = self.git(["rev-parse", "--short", "HEAD"]).expect("Git command failed").stdout;
+        let head_hash_output = String::from_utf8(rev_parse_output).unwrap();
+        head_hash_output.trim().to_owned()
+    }
+
     // Resolve the path to an absolute path relative to the test repo
     //
     // e.g. if you supply "dummy.txt" it will ensure that "dummy.txt" points to a path
@@ -141,10 +137,11 @@ impl TestRepo {
         self.commit(commit_msg);
     }
 
-    pub fn init_version(&self, version: Option<Version>) {
+    /// Create, add, & commit the '.at-version' file with the given [Version]
+    pub fn init_at_version(&self, version: &Version) {
         self.create_add_commit_file(
             &PathBuf::from(".at-version"),
-            Some(&version.unwrap_or(Self::DEFAULT_VERSION).to_string()),
+            Some(&version.to_string()),
             "add at-version",
         );
     }
@@ -171,7 +168,6 @@ mod tests {
     fn test_build_test_repo() -> TestResult {
         let testrepo = TestRepo::builder().build();
         testrepo.init("custom-branch-name");
-        assert_eq!(testrepo.git_user_name, "test user");
 
         let stdout = testrepo.git(["status"])?.stdout;
         let stdout = String::from_utf8(stdout)?;

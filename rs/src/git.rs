@@ -121,15 +121,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_has_untracked_empty_repo() -> TestResult {
+    fn test_has_untracked_changes_empty_repo() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
-        assert!(!has_untracked, "An empty initialized repo has no untracked");
+        assert!(!has_untracked, "An empty initialized repo has no untracked changes");
         Ok(())
     }
 
     #[test]
-    fn test_has_untracked_repo_with_untracked() -> TestResult {
+    fn test_has_staged_changes_empty_repo() -> TestResult {
+        let repo = TestRepo::builder().init(true).build();
+        let staged_changes = has_staged_changes(&repo.as_gix_repo())?;
+        assert!(!staged_changes, "An empty initialized repo has no staged changes");
+        Ok(())
+    }
+
+    #[test]
+    fn test_has_untracked_changes_repo_with_untracked() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         repo.create_file("test.txt", None);
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
@@ -141,7 +149,7 @@ mod tests {
     }
 
     #[test]
-    fn test_has_untracked_repo_with_staged() -> TestResult {
+    fn test_has_untracked_changes_repo_with_staged() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         repo.create_add_file("test.txt", None);
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
@@ -153,7 +161,7 @@ mod tests {
     }
 
     #[test]
-    fn test_has_untracked_repo_with_initial_commit() -> TestResult {
+    fn test_has_untracked_changes_repo_with_initial_commit() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         repo.create_add_commit_file("test.txt", None, "initial commit");
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
@@ -165,7 +173,7 @@ mod tests {
     }
 
     #[test]
-    fn test_has_untracked_repo_with_initial_commit_and_untracked_file() -> TestResult {
+    fn test_has_untracked_changes_repo_with_initial_commit_and_untracked_file() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         repo.create_add_commit_file("test.txt", None, "initial commit");
         repo.create_file("new_file.txt", None);
@@ -243,9 +251,7 @@ mod tests {
         // Arrange
         let repo = TestRepo::builder().init(true).build();
         repo.commit_empty("initial commit");
-        let rev_parse_output = repo.git(["rev-parse", "--short", "HEAD"])?.stdout;
-        let expected_head_hash = String::from_utf8(rev_parse_output)?;
-        let expected_hash_trimmed = expected_head_hash.trim();
+        let expected_hash = repo.head_short_sha();
 
         // Act
         let our_hash = get_commit_hash(repo.path()).expect("Failed to get commit hash");
@@ -253,7 +259,7 @@ mod tests {
         // Compare the hashes
         assert_str_eq!(
             our_hash,
-            expected_hash_trimmed,
+            expected_hash,
             "Our hash should match git's hash"
         );
         Ok(())

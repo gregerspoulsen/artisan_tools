@@ -59,10 +59,10 @@ impl fmt::Display for AtVersion {
 
 #[cfg(test)]
 mod tests {
-    use assert_fs::TempDir;
+    use test_log::test;
     use pretty_assertions::assert_str_eq;
     use semver::Version;
-    use test_utils;
+    use test_utils::{self, testrepo::TestRepo};
     use testresult::TestResult;
 
     use super::*;
@@ -72,13 +72,12 @@ mod tests {
     fn version_get_without_git_info() -> TestResult {
         // Arrange
         let version = Version::new(1, 2, 3);
-        let test_dir = TempDir::new()?;
-        test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
+        let repo = TestRepo::builder().init(true).build();
+        repo.init_at_version(&version);
 
         // Act
-        let result = AtVersion::new(test_dir.path())?;
+        let result = AtVersion::new(repo.path())?;
 
-        // Assert
         assert_str_eq!(result.to_string(), version.to_string());
         Ok(())
     }
@@ -86,28 +85,17 @@ mod tests {
     /// Test that version_mod::get returns version with git info when git_info is true
     #[test]
     fn version_get_with_git_info() -> TestResult {
+        let initial_branch_name = "master";
         let version = Version::new(1, 2, 3);
-        let test_dir = TempDir::new()?;
-        test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
+        let repo = TestRepo::builder().init(true).initial_branch_name(initial_branch_name).build();
+        repo.init_at_version(&version);
+        let head_short_sha = repo.head_short_sha();
+        let expected_version_str = format!("1.2.3+{initial_branch_name}-{head_short_sha}");
 
         // Act
-        let result = AtVersion::with_metadata(test_dir.path())?.to_string();
+        let get_version = AtVersion::with_metadata(repo.path())?.to_string();
 
-        // The result should be in format: version+branch-hash
-        // We know the version is "1.2.3" and branch should be "main" or "master"
-        assert!(
-            result.starts_with("1.2.3+"),
-            "Version should start with 1.2.3+"
-        );
-        assert!(
-            result.contains("main-") || result.contains("master-"),
-            "Should contain branch name"
-        );
-        assert!(
-            !result.ends_with("-dirty"),
-            "Should not be dirty as we committed all changes"
-        );
-
+        assert_str_eq!(get_version, expected_version_str);
         Ok(())
     }
 }
