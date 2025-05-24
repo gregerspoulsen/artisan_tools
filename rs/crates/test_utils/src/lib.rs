@@ -1,3 +1,5 @@
+pub mod testrepo;
+
 use semver::Version;
 use std::fs;
 use std::path::Path;
