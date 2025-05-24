@@ -192,9 +192,9 @@ mod tests {
 
     #[test]
     fn test_get_branch_uninitialized_repo() {
-        let test_repo = TestRepo::builder().init(false).build();
+        let repo = TestRepo::builder().init(false).build();
 
-        let err_str = get_branch(test_repo.path()).unwrap_err().to_string();
+        let err_str = get_branch(repo.path()).unwrap_err().to_string();
         assert!(err_str.starts_with("Could not find a git repository in"));
         assert!(err_str.ends_with("or in any of its parents"));
     }
@@ -203,13 +203,13 @@ mod tests {
     fn test_get_branch_repo_with_no_commits() {
         // Arrange
         let default_branch_name = "trunk";
-        let test_repo = TestRepo::builder()
+        let repo = TestRepo::builder()
             .init(true)
             .initial_branch_name(default_branch_name)
             .build();
 
         // Act
-        let branch = get_branch(test_repo.path()).expect("Failed to get branch");
+        let branch = get_branch(repo.path()).expect("Failed to get branch");
 
         // Assert
         assert_str_eq!(branch, default_branch_name);
@@ -219,14 +219,14 @@ mod tests {
     fn test_get_branch_repo_with_initial_commit() {
         // Arrange
         let default_branch_name = "master";
-        let test_repo = TestRepo::builder()
+        let repo = TestRepo::builder()
             .init(true)
             .initial_branch_name(default_branch_name)
             .build();
-        test_repo.create_add_commit_file("dummy.txt", Some("dummy contents"), "Initial commit");
+        repo.create_add_commit_file("dummy.txt", Some("dummy contents"), "Initial commit");
 
         // Act
-        let branch = get_branch(test_repo.path()).expect("Failed to get branch");
+        let branch = get_branch(repo.path()).expect("Failed to get branch");
 
         // Assert
         assert_str_eq!(branch, default_branch_name);

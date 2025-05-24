@@ -16,6 +16,7 @@ pub struct TestRepo {
 
 #[bon]
 impl TestRepo {
+    /// Initialize a [TestRepo]
     #[builder]
     pub fn new(
         #[builder(default = false)] init: bool,
@@ -110,14 +111,14 @@ impl TestRepo {
         self.resolve_path(p).display().to_string()
     }
 
-    /// Add a file
+    /// Stage a file in the test repo, errors if it doesn't already exist
     pub fn add_file(&self, file: impl AsRef<Path>) {
         let resolved = self.resolve_path_and_to_string(file);
         self.git(["add", &resolved])
             .expect("Failed to git add file");
     }
 
-    /// Create and add a file
+    /// Create a file in the test repo
     pub fn create_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
         let resolved = self.resolve_path(file);
         fs::write(&resolved, contents.unwrap_or("")).expect("Failed to write file");
@@ -129,7 +130,7 @@ impl TestRepo {
         self.add_file(file);
     }
 
-    /// Create a file and commit it
+    /// Create a file, stage, and commit it
     pub fn create_add_commit_file(
         &self,
         file: impl AsRef<Path>,
@@ -149,6 +150,7 @@ impl TestRepo {
         );
     }
 
+    /// Run `git` in the test repo
     pub fn git<I, S>(&self, args: I) -> io::Result<Output>
     where
         I: IntoIterator<Item = S>,
