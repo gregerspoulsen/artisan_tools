@@ -2,7 +2,7 @@ use anyhow::{Error, Result};
 use std::path::Path;
 
 /// Return name of the currently active git branch.
-pub fn get_branch<P: AsRef<Path>>(path: P) -> Result<String> {
+pub fn get_branch(path: impl AsRef<Path>) -> Result<String> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
 
@@ -16,7 +16,7 @@ pub fn get_branch<P: AsRef<Path>>(path: P) -> Result<String> {
 }
 
 /// Return the current commit hash in short format (first 7 characters).
-pub fn get_commit_hash<P: AsRef<Path>>(path: P) -> Result<String> {
+pub fn get_commit_hash(path: impl AsRef<Path>) -> Result<String> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
 
@@ -31,7 +31,7 @@ pub fn get_commit_hash<P: AsRef<Path>>(path: P) -> Result<String> {
 }
 
 /// Return whether the git repository has uncommitted changes.
-pub fn is_dirty<P: AsRef<Path>>(path: P) -> Result<bool> {
+pub fn is_dirty(path: impl AsRef<Path>) -> Result<bool> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
     Ok(repo.is_dirty()?)
