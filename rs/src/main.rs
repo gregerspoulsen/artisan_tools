@@ -1,6 +1,5 @@
-use artisan_tools::version;
-
 use anyhow::{Context, Result};
+use artisan_tools::{changeset, version};
 use clap::{
     builder::{
         styling::{AnsiColor, Effects},
@@ -30,8 +29,14 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     /// Manage version-related operations
-    #[command(subcommand)]
+    #[command(subcommand, visible_alias = "ver")]
     Version(VersionCommand),
+
+    /// Generate changeset file with the type of bump target
+    Changeset {
+        #[arg(value_enum, default_value_t = changeset::BumpTarget::Patch)]
+        target: changeset::BumpTarget,
+    },
 }
 
 /// Subcommands under `artisan-tools version`
@@ -69,6 +74,14 @@ fn main() -> Result<()> {
                 println!("VERSION updated to {}", version_contents);
             }
         },
+        Command::Changeset { target } => {
+            changeset::create_changeset_template("at-changeset", target)
+                .context("Failed to create changeset template")?;
+            println!(
+                "Created new changeset file with target: {}",
+                target.as_str()
+            );
+        }
     }
 
     Ok(())

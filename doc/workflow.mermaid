@@ -1,11 +1,11 @@
 graph TD
     A[.atversion<br>5.3.1]
-    B["$ at bump minor <br>"]
-    D[".at-bump file:<br>TARGET: minor<br><br>CHANGELOG:<br>### Added<br>* Add ability to update version files"]
-    E[User modifies .at-bump]
+    B["$ at changset minor <br>"]
+    D["at-changeset file:<br>TARGET: minor<br><br>CHANGELOG:<br>### Added<br>* Add ability to update version files"]
+    E[User modifies at-changeset]
     F[User clicks merge]
-    G[CI:<br>Update version + changelog<br>delete .at-bump file]
-    H[.atversion<br>5.4.0]
+    G[CI:<br>Update version + changelog<br>delete at-changeset file]
+    H[.at-version<br>5.4.0]
 
     A --> B
     B --> D
