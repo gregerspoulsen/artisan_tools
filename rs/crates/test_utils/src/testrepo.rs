@@ -2,7 +2,8 @@ use bon::bon;
 use semver::Version;
 use std::{
     ffi::OsStr,
-    fmt, fs, io,
+    fmt, fs,
+    io::{self, Write},
     path::{Path, PathBuf},
     process::{Command, Output},
 };
@@ -143,6 +144,26 @@ impl TestRepo {
         self.write_file_to_repo(resolved, contents);
     }
 
+    // Open a file in the test repo, takes a [ResolvedPath] for safety
+    #[builder]
+    fn open_repo_file(
+        &self,
+        #[builder(start_fn)] file: impl AsRef<Path>,
+        #[builder(default = true)] read: bool,
+        #[builder(default = false)] write: bool,
+        #[builder(default = false)] append: bool,
+        #[builder(default = false)] truncate: bool,
+    ) -> fs::File {
+        let resolved = self.resolver.resolve(file);
+        fs::OpenOptions::new()
+            .read(read)
+            .write(write)
+            .append(append)
+            .truncate(truncate)
+            .open(resolved.0)
+            .expect("Failed to open file")
+    }
+
     // Write a file to the test repo, takes a [ResolvedPath] for safety
     fn write_file_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
         fs::write(file.0, contents.unwrap_or("")).expect("Failed to write file");
@@ -162,6 +183,36 @@ impl TestRepo {
         commit_msg: &str,
     ) {
         self.create_add_file(file, contents);
+        self.commit(commit_msg);
+    }
+
+    /// Create, add, & commit a `.gitignore`
+    pub fn create_gitignore(&self) {
+        self.create_add_commit_file(".gitignore", None, "add .gitignore");
+    }
+
+    /// Add a line to the [TestRepo] .gitignore
+    pub fn add_to_gitignore(&self, line: impl AsRef<str>) {
+        // Ensure the line ends with a newline
+        let line = line.as_ref();
+        let line = if line.ends_with("\n") {
+            line.to_owned()
+        } else {
+            format!("{line}\n")
+        };
+        let mut gitignore = self
+            .open_repo_file(".gitignore")
+            .write(true)
+            .append(true)
+            .call();
+        gitignore
+            .write_all(line.as_bytes())
+            .expect("Failed writing to .gitinore");
+    }
+
+    /// Stage and commit .gitignore
+    pub fn add_commit_gitignore(&self, commit_msg: &str) {
+        self.add_file(".gitignore");
         self.commit(commit_msg);
     }
 

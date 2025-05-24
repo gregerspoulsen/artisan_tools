@@ -154,6 +154,23 @@ mod tests {
     }
 
     #[test]
+    fn test_has_untracked_changes_repo_with_untracked_ignored() -> TestResult {
+        let repo = TestRepo::builder().init(true).build();
+        let untracked_file = "test.txt";
+        repo.create_gitignore();
+        repo.add_to_gitignore(untracked_file);
+        repo.add_commit_gitignore("update .gitignore");
+        repo.create_file(untracked_file, None);
+
+        let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
+        assert!(
+            !has_untracked,
+            "A repo with an untracked but ignored file should NOT have untracked status"
+        );
+        Ok(())
+    }
+
+    #[test]
     fn test_has_untracked_changes_repo_with_staged() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         repo.create_add_file("test.txt", None);
