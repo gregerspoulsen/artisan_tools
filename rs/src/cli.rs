@@ -7,8 +7,10 @@ use clap::{
     Parser, Subcommand,
 };
 
+pub mod display;
+
 /// CLI for Artisan Tools.
-#[derive(Parser, Clone, Copy)]
+#[derive(Parser, Debug, Clone, Copy)]
 #[command(name = "artisan-tools")]
 #[command(about = "Artisan Tools CLI", version)]
 #[command(styles=STYLES)]
@@ -18,7 +20,7 @@ pub struct Cli {
 }
 
 /// Top-level commands for the CLI.
-#[derive(Subcommand, Clone, Copy)]
+#[derive(Subcommand, Debug, Clone, Copy)]
 pub enum Command {
     /// Manage version-related operations
     #[command(subcommand, visible_alias = "ver")]
@@ -32,7 +34,7 @@ pub enum Command {
 }
 
 /// Subcommands under `artisan-tools version`
-#[derive(Subcommand, Clone, Copy)]
+#[derive(Subcommand, Debug, Clone, Copy)]
 pub enum VersionCommand {
     /// Print current version to stdout
     Get {
