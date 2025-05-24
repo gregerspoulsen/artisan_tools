@@ -33,7 +33,6 @@ enum Command {
     Version(VersionCommand),
 
     /// Generate changeset file with the type of bump target
-    #[command(visible_alias = "bump")]
     Changeset {
         #[arg(value_enum, default_value_t = changeset::BumpTarget::Patch)]
         target: changeset::BumpTarget,
