@@ -2,16 +2,53 @@ use bon::bon;
 use semver::Version;
 use std::{
     ffi::OsStr,
-    fs, io,
+    fmt, fs, io,
     path::{Path, PathBuf},
     process::{Command, Output},
 };
 use tempfile::TempDir;
 
+// An absolute path relative to the test repo
+struct ResolvedPath(PathBuf);
+
+impl fmt::Display for ResolvedPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0.display())
+    }
+}
+
+/// Resolves paths to absolute paths relative to the repo
+#[derive(Debug)]
+struct PathResolver {
+    repo: PathBuf,
+}
+
+impl PathResolver {
+    // Create a new [PathResolver]
+    pub(crate) fn new(repo: &TempDir) -> Self {
+        Self {
+            repo: repo.path().canonicalize().unwrap(),
+        }
+    }
+
+    // Resolve a path to a [ResolvedPath] which is an absolute path relative to the test repo
+    //
+    // e.g. if you supply "dummy.txt" it will ensure that "dummy.txt" points to a path
+    // within the test repo
+    fn resolve(&self, p: impl AsRef<Path>) -> ResolvedPath {
+        if !p.as_ref().starts_with(&self.repo) {
+            ResolvedPath(self.repo.join(p))
+        } else {
+            ResolvedPath(p.as_ref().to_path_buf())
+        }
+    }
+}
+
 /// Utility for creating temporary git repositories during testing
 #[derive(Debug)]
 pub struct TestRepo {
     tempdir: TempDir,
+    resolver: PathResolver,
 }
 
 #[bon]
@@ -24,9 +61,9 @@ impl TestRepo {
         #[builder(default = "test@example.com")] git_user_mail: &str,
         #[builder(default = "master")] initial_branch_name: &str,
     ) -> Self {
-        let test_repo = Self {
-            tempdir: TempDir::new().expect("Failed to create temp directory"),
-        };
+        let tempdir = TempDir::new().expect("Failed to create temp directory");
+        let resolver = PathResolver::new(&tempdir);
+        let test_repo = Self { tempdir, resolver };
 
         if init {
             test_repo.init(initial_branch_name);
@@ -93,35 +130,22 @@ impl TestRepo {
         head_hash_output.trim().to_owned()
     }
 
-    // Resolve the path to an absolute path relative to the test repo
-    //
-    // e.g. if you supply "dummy.txt" it will ensure that "dummy.txt" points to a path
-    // within the test repo
-    fn resolve_path(&self, p: impl AsRef<Path>) -> PathBuf {
-        let abs_repo_p = self.path().canonicalize().unwrap();
-        if !p.as_ref().starts_with(&abs_repo_p) {
-            abs_repo_p.join(p)
-        } else {
-            p.as_ref().to_path_buf()
-        }
-    }
-
-    // Same as `resolve_path` but returns it as a String
-    fn resolve_path_and_to_string(&self, p: impl AsRef<Path>) -> String {
-        self.resolve_path(p).display().to_string()
-    }
-
     /// Stage a file in the test repo, errors if it doesn't already exist
     pub fn add_file(&self, file: impl AsRef<Path>) {
-        let resolved = self.resolve_path_and_to_string(file);
+        let resolved = self.resolver.resolve(file).to_string();
         self.git(["add", &resolved])
             .expect("Failed to git add file");
     }
 
     /// Create a file in the test repo
     pub fn create_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
-        let resolved = self.resolve_path(file);
-        fs::write(&resolved, contents.unwrap_or("")).expect("Failed to write file");
+        let resolved = self.resolver.resolve(file);
+        self.write_file_to_repo(resolved, contents);
+    }
+
+    // Write a file to the test repo, takes a [ResolvedPath] for safety
+    fn write_file_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
+        fs::write(file.0, contents.unwrap_or("")).expect("Failed to write file");
     }
 
     /// Create and add a file
