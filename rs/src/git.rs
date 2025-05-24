@@ -191,7 +191,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_branch_unitialized_repo() {
+    fn test_get_branch_uninitialized_repo() {
         let test_repo = TestRepo::builder().init(false).build();
 
         let err_str = get_branch(test_repo.path()).unwrap_err().to_string();
