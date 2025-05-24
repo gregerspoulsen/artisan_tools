@@ -8,6 +8,11 @@ rust-version.workspace = true
 
 [dependencies]
 semver.workspace = true
+bon.workspace = true
+gix.workspace = true
+tempfile.workspace = true
+testresult.workspace = true
+pretty_assertions.workspace = true
 
 [lints]
 workspace = true
