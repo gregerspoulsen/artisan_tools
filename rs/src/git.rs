@@ -73,7 +73,7 @@ pub fn is_dirty(path: impl AsRef<Path>) -> Result<bool> {
             let no_commits = matches!(head.kind, gix::head::Kind::Unborn(_));
             if no_commits {
                 log::debug!("Repo has no commits");
-                let staged_changes = has_staged_changes(&repo)?; 
+                let staged_changes = has_staged_changes(&repo)?;
                 if staged_changes {
                     log::debug!("Repo is dirty - staged changes");
                 } else {
@@ -123,7 +123,10 @@ mod tests {
     fn test_has_untracked_changes_empty_repo() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
-        assert!(!has_untracked, "An empty initialized repo has no untracked changes");
+        assert!(
+            !has_untracked,
+            "An empty initialized repo has no untracked changes"
+        );
         Ok(())
     }
 
@@ -131,7 +134,10 @@ mod tests {
     fn test_has_staged_changes_empty_repo() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         let staged_changes = has_staged_changes(&repo.as_gix_repo())?;
-        assert!(!staged_changes, "An empty initialized repo has no staged changes");
+        assert!(
+            !staged_changes,
+            "An empty initialized repo has no staged changes"
+        );
         Ok(())
     }
 
@@ -256,11 +262,7 @@ mod tests {
         let our_hash = get_commit_hash(repo.path()).expect("Failed to get commit hash");
 
         // Compare the hashes
-        assert_str_eq!(
-            our_hash,
-            expected_hash,
-            "Our hash should match git's hash"
-        );
+        assert_str_eq!(our_hash, expected_hash, "Our hash should match git's hash");
         Ok(())
     }
 

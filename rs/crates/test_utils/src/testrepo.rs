@@ -8,7 +8,7 @@ use std::{
 };
 use tempfile::TempDir;
 
-/// Utility for creating temporary git repositories during testing 
+/// Utility for creating temporary git repositories during testing
 #[derive(Debug)]
 pub struct TestRepo {
     tempdir: TempDir,
@@ -84,7 +84,10 @@ impl TestRepo {
 
     /// Returns the trimmed output of `git rev-parse --short HEAD`
     pub fn head_short_sha(&self) -> String {
-        let rev_parse_output = self.git(["rev-parse", "--short", "HEAD"]).expect("Git command failed").stdout;
+        let rev_parse_output = self
+            .git(["rev-parse", "--short", "HEAD"])
+            .expect("Git command failed")
+            .stdout;
         let head_hash_output = String::from_utf8(rev_parse_output).unwrap();
         head_hash_output.trim().to_owned()
     }

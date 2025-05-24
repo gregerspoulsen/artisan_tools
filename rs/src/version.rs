@@ -59,9 +59,9 @@ impl fmt::Display for AtVersion {
 
 #[cfg(test)]
 mod tests {
-    use test_log::test;
     use pretty_assertions::assert_str_eq;
     use semver::Version;
+    use test_log::test;
     use test_utils::{self, testrepo::TestRepo};
     use testresult::TestResult;
 
@@ -87,7 +87,10 @@ mod tests {
     fn version_get_with_git_info() -> TestResult {
         let initial_branch_name = "master";
         let version = Version::new(1, 2, 3);
-        let repo = TestRepo::builder().init(true).initial_branch_name(initial_branch_name).build();
+        let repo = TestRepo::builder()
+            .init(true)
+            .initial_branch_name(initial_branch_name)
+            .build();
         repo.init_at_version(&version);
         let head_short_sha = repo.head_short_sha();
         let expected_version_str = format!("1.2.3+{initial_branch_name}-{head_short_sha}");
