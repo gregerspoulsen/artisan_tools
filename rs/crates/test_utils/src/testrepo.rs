@@ -200,11 +200,7 @@ impl TestRepo {
         } else {
             format!("{line}\n")
         };
-        let mut gitignore = self
-            .open_file(".gitignore")
-            .write(true)
-            .append(true)
-            .call();
+        let mut gitignore = self.open_file(".gitignore").write(true).append(true).call();
         gitignore
             .write_all(line.as_bytes())
             .expect("Failed writing to .gitinore");

@@ -1,56 +1,11 @@
 use anyhow::{Context, Result};
-use artisan_tools::{changeset, version::AtVersion};
-use clap::{
-    builder::{
-        styling::{AnsiColor, Effects},
-        Styles,
-    },
-    Parser, Subcommand,
+use artisan_tools::{
+    changeset,
+    cli::{Cli, Command, VersionCommand},
+    version::AtVersion,
 };
+use clap::Parser;
 use std::fs;
-
-const STYLES: Styles = Styles::styled()
-    .header(AnsiColor::Green.on_default().effects(Effects::BOLD))
-    .usage(AnsiColor::Green.on_default().effects(Effects::BOLD))
-    .literal(AnsiColor::Cyan.on_default().effects(Effects::BOLD))
-    .placeholder(AnsiColor::Cyan.on_default());
-
-/// Simple CLI for Artisan Tools.
-#[derive(Parser)]
-#[command(name = "artisan-tools")]
-#[command(about = "Artisan Tools CLI", version)]
-#[command(styles=STYLES)]
-struct Cli {
-    #[command(subcommand)]
-    command: Command,
-}
-
-/// Top-level commands for the CLI.
-#[derive(Subcommand)]
-enum Command {
-    /// Manage version-related operations
-    #[command(subcommand, visible_alias = "ver")]
-    Version(VersionCommand),
-
-    /// Generate changeset file with the type of bump target
-    Changeset {
-        #[arg(value_enum, default_value_t = changeset::BumpTarget::Patch)]
-        target: changeset::BumpTarget,
-    },
-}
-
-/// Subcommands under `artisan-tools version`
-#[derive(Subcommand)]
-enum VersionCommand {
-    /// Print current version to stdout
-    Get {
-        /// Include git information in version string
-        #[arg(long)]
-        git_info: bool,
-    },
-    /// Update version in `VERSION` file
-    Update,
-}
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
