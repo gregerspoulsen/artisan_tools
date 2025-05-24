@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use artisan_tools::{changeset, version};
+use artisan_tools::{changeset, version::AtVersion};
 use clap::{
     builder::{
         styling::{AnsiColor, Effects},
@@ -60,17 +60,18 @@ fn main() -> Result<()> {
         Command::Version(subcmd) => match subcmd {
             VersionCommand::Get { git_info } => {
                 // Print current version to stdout
-                let vers =
-                    version::get(".", git_info).context("Failed to read the version file")?;
-                println!("{}", vers);
+                let vers = if git_info {
+                    AtVersion::with_metadata(".")?
+                } else {
+                    AtVersion::new(".")?
+                };
+                println!("{vers}");
             }
             VersionCommand::Update => {
                 // Update version in `VERSION` file
-                let version_contents =
-                    version::get(".", false).context("Failed to read the version file")?;
-                let version_contents = version_contents.trim_end();
+                let version_contents = AtVersion::new(".")?;
 
-                fs::write("VERSION", version_contents)
+                fs::write("VERSION", version_contents.to_string())
                     .context("Failed to write to the VERSION file")?;
                 println!("VERSION updated to {}", version_contents);
             }

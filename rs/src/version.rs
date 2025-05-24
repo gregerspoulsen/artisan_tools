@@ -1,9 +1,15 @@
 use crate::git;
 use anyhow::{Context, Result};
-use std::fs;
-use std::path::Path;
+use semver::BuildMetadata;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use std::{fmt, fs};
 
 const AT_VERSION_FILE: &str = ".at-version";
+// Returns the path to the version file relative to the repository root
+fn relative_version_file(path: impl AsRef<Path>) -> PathBuf {
+    path.as_ref().join(AT_VERSION_FILE)
+}
 
 /// Read content from the specified version file.
 fn read_at_version(path: &Path) -> Result<String> {
@@ -14,31 +20,41 @@ fn read_at_version(path: &Path) -> Result<String> {
     Ok(version.trim().to_string())
 }
 
-/// Get current version, optionally including git information
-///
-/// If git_info is true, appends branch, hash and dirty status in the format:
-/// version+branch-hash[-dirty]
-///
-/// # Arguments
-/// * `path` - Path to the directory containing the version file
-/// * `git_info` - Whether to include git information in the version string
-pub fn get(path: impl AsRef<Path>, git_info: bool) -> Result<String> {
-    let version_path = path.as_ref().join(AT_VERSION_FILE);
-    let mut version = read_at_version(&version_path).context("Failed to read the version file")?;
+#[derive(Debug)]
+pub struct AtVersion {
+    ver: semver::Version,
+}
 
-    if git_info {
-        let branch = git::get_branch(&path)?;
-        let branch = branch.replace('_', "-");
-
-        let hash = git::get_commit_hash(&path)?;
-
-        let is_dirty = git::is_dirty(&path)?;
-        let dirty = if is_dirty { "-dirty" } else { "" };
-
-        version = format!("{version}+{branch}-{hash}{dirty}");
+impl AtVersion {
+    /// Construct an [AtVersion] from a path to a repository
+    pub fn new(repo: impl AsRef<Path>) -> Result<Self> {
+        let ver = read_at_version(&relative_version_file(repo))
+            .context("Failed to read the version file")?;
+        let ver = semver::Version::from_str(&ver)?;
+        Ok(Self { ver })
     }
 
-    Ok(version)
+    /// Construct an [AtVersion] from a path to a repository including build metadata in the format `version+branch-hash[-dirty]`
+    pub fn with_metadata(repo: impl AsRef<Path>) -> Result<Self> {
+        let mut at_ver = Self::new(&repo)?;
+        let branch = git::get_branch(&repo)?;
+        let branch = branch.replace('_', "-");
+
+        let hash = git::get_commit_hash(&repo)?;
+
+        let is_dirty = git::is_dirty(&repo)?;
+        let dirty = if is_dirty { "-dirty" } else { "" };
+
+        let metadata = format!("{branch}-{hash}{dirty}");
+        at_ver.ver.build = BuildMetadata::new(&metadata)?;
+        Ok(at_ver)
+    }
+}
+
+impl fmt::Display for AtVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.ver)
+    }
 }
 
 #[cfg(test)]
@@ -60,10 +76,10 @@ mod tests {
         test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
         // Act
-        let result = get(test_dir.path(), false)?;
+        let result = AtVersion::new(test_dir.path())?;
 
         // Assert
-        assert_str_eq!(result, version.to_string());
+        assert_str_eq!(result.to_string(), version.to_string());
         Ok(())
     }
 
@@ -75,7 +91,7 @@ mod tests {
         test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
 
         // Act
-        let result = get(test_dir.path(), true)?;
+        let result = AtVersion::with_metadata(test_dir.path())?.to_string();
 
         // The result should be in format: version+branch-hash
         // We know the version is "1.2.3" and branch should be "main" or "master"
