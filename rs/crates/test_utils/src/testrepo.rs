@@ -132,21 +132,21 @@ impl TestRepo {
     }
 
     /// Stage a file in the test repo, errors if it doesn't already exist
-    pub fn add_file(&self, file: impl AsRef<Path>) {
+    pub fn stage(&self, file: impl AsRef<Path>) {
         let resolved = self.resolver.resolve(file).to_string();
         self.git(["add", &resolved])
             .expect("Failed to git add file");
     }
 
     /// Create a file in the test repo
-    pub fn create_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
+    pub fn create(&self, file: impl AsRef<Path>, contents: Option<&str>) {
         let resolved = self.resolver.resolve(file);
-        self.write_file_to_repo(resolved, contents);
+        self.write_to_repo(resolved, contents);
     }
 
     // Open a file in the test repo, takes a [ResolvedPath] for safety
     #[builder]
-    fn open_repo_file(
+    fn open_file(
         &self,
         #[builder(start_fn)] file: impl AsRef<Path>,
         #[builder(default = true)] read: bool,
@@ -165,30 +165,30 @@ impl TestRepo {
     }
 
     // Write a file to the test repo, takes a [ResolvedPath] for safety
-    fn write_file_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
+    fn write_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
         fs::write(file.0, contents.unwrap_or("")).expect("Failed to write file");
     }
 
     /// Create and add a file
-    pub fn create_add_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
-        self.create_file(&file, contents);
-        self.add_file(file);
+    pub fn create_and_stage(&self, file: impl AsRef<Path>, contents: Option<&str>) {
+        self.create(&file, contents);
+        self.stage(file);
     }
 
     /// Create a file, stage, and commit it
-    pub fn create_add_commit_file(
+    pub fn create_stage_commit(
         &self,
         file: impl AsRef<Path>,
         contents: Option<&str>,
         commit_msg: &str,
     ) {
-        self.create_add_file(file, contents);
+        self.create_and_stage(file, contents);
         self.commit(commit_msg);
     }
 
     /// Create, add, & commit a `.gitignore`
-    pub fn create_gitignore(&self) {
-        self.create_add_commit_file(".gitignore", None, "add .gitignore");
+    pub fn init_gitignore(&self) {
+        self.create_stage_commit(".gitignore", None, "add .gitignore");
     }
 
     /// Add a line to the [TestRepo] .gitignore
@@ -201,7 +201,7 @@ impl TestRepo {
             format!("{line}\n")
         };
         let mut gitignore = self
-            .open_repo_file(".gitignore")
+            .open_file(".gitignore")
             .write(true)
             .append(true)
             .call();
@@ -211,14 +211,14 @@ impl TestRepo {
     }
 
     /// Stage and commit .gitignore
-    pub fn add_commit_gitignore(&self, commit_msg: &str) {
-        self.add_file(".gitignore");
+    pub fn stage_commit_gitignore(&self, commit_msg: &str) {
+        self.stage(".gitignore");
         self.commit(commit_msg);
     }
 
     /// Create, add, & commit the '.at-version' file with the given [Version]
     pub fn init_at_version(&self, version: &Version) {
-        self.create_add_commit_file(
+        self.create_stage_commit(
             PathBuf::from(".at-version"),
             Some(&version.to_string()),
             "add at-version",

@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn test_has_untracked_changes_repo_with_untracked() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_file("test.txt", None);
+        repo.create("test.txt", None);
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
         assert!(
             has_untracked,
@@ -157,10 +157,10 @@ mod tests {
     fn test_has_untracked_changes_repo_with_untracked_ignored() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
         let untracked_file = "test.txt";
-        repo.create_gitignore();
+        repo.init_gitignore();
         repo.add_to_gitignore(untracked_file);
-        repo.add_commit_gitignore("update .gitignore");
-        repo.create_file(untracked_file, None);
+        repo.stage_commit_gitignore("update .gitignore");
+        repo.create(untracked_file, None);
 
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
         assert!(
@@ -173,7 +173,7 @@ mod tests {
     #[test]
     fn test_has_untracked_changes_repo_with_staged() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_file("test.txt", None);
+        repo.create_and_stage("test.txt", None);
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
         assert!(
             !has_untracked,
@@ -185,7 +185,7 @@ mod tests {
     #[test]
     fn test_has_untracked_changes_repo_with_initial_commit() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_commit_file("test.txt", None, "initial commit");
+        repo.create_stage_commit("test.txt", None, "initial commit");
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
         assert!(
             !has_untracked,
@@ -197,8 +197,8 @@ mod tests {
     #[test]
     fn test_has_untracked_changes_repo_with_initial_commit_and_untracked_file() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_commit_file("test.txt", None, "initial commit");
-        repo.create_file("new_file.txt", None);
+        repo.create_stage_commit("test.txt", None, "initial commit");
+        repo.create("new_file.txt", None);
         let has_untracked = has_untracked_changes(&repo.as_gix_repo())?;
         assert!(
             has_untracked,
@@ -240,7 +240,7 @@ mod tests {
             .init(true)
             .initial_branch_name(default_branch_name)
             .build();
-        repo.create_add_commit_file("dummy.txt", Some("dummy contents"), "Initial commit");
+        repo.create_stage_commit("dummy.txt", Some("dummy contents"), "Initial commit");
 
         // Act
         let branch = get_branch(repo.path()).expect("Failed to get branch");
@@ -305,7 +305,7 @@ mod tests {
     #[test]
     fn test_is_dirty_untracked_file() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_file("test.txt", None);
+        repo.create("test.txt", None);
 
         let dirty = is_dirty(repo.path())?;
         assert!(
@@ -318,7 +318,7 @@ mod tests {
     #[test]
     fn test_is_dirty_staged_file() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_file("test.txt", None);
+        repo.create_and_stage("test.txt", None);
 
         let dirty = is_dirty(repo.path())?;
         assert!(dirty, "Repository should be DIRTY after staging file");
@@ -328,7 +328,7 @@ mod tests {
     #[test]
     fn test_is_dirty_committed_file() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_commit_file("test.txt", None, "initial commit");
+        repo.create_stage_commit("test.txt", None, "initial commit");
 
         let dirty = is_dirty(repo.path())?;
         assert!(!dirty, "Repository should be CLEAN after staging file");
@@ -338,8 +338,8 @@ mod tests {
     #[test]
     fn test_is_dirty_committed_file_then_untracked() -> TestResult {
         let repo = TestRepo::builder().init(true).build();
-        repo.create_add_commit_file("test.txt", None, "initial commit");
-        repo.create_file("test2.txt", None);
+        repo.create_stage_commit("test.txt", None, "initial commit");
+        repo.create("test2.txt", None);
 
         let dirty = is_dirty(repo.path())?;
         assert!(
