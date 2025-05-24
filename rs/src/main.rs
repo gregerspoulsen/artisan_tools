@@ -29,12 +29,14 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     /// Manage version-related operations
-    #[command(subcommand)]
+    #[command(subcommand, visible_alias = "ver")]
     Version(VersionCommand),
 
-    /// Manage changeset operations
-    #[command(subcommand)]
-    Changeset(ChangesetCommand),
+    /// Generate changeset file with the type of bump target
+    Changeset {
+        #[arg(value_enum, default_value_t = changeset::BumpTarget::Patch)]
+        target: changeset::BumpTarget,
+    },
 }
 
 /// Subcommands under `artisan-tools version`
@@ -48,17 +50,6 @@ enum VersionCommand {
     },
     /// Update version in `VERSION` file
     Update,
-}
-
-/// Subcommands under `artisan-tools changeset`
-#[derive(Subcommand)]
-enum ChangesetCommand {
-    /// Initialize a new changeset file
-    Init {
-        /// The type of version bump
-        #[arg(value_enum)]
-        target: changeset::BumpTarget,
-    },
 }
 
 fn main() -> Result<()> {
@@ -83,16 +74,14 @@ fn main() -> Result<()> {
                 println!("VERSION updated to {}", version_contents);
             }
         },
-        Command::Changeset(subcmd) => match subcmd {
-            ChangesetCommand::Init { target } => {
-                changeset::create_changeset_template("at-changeset", target)
-                    .context("Failed to create changeset template")?;
-                println!(
-                    "Created new changeset file with target: {}",
-                    target.as_str()
-                );
-            }
-        },
+        Command::Changeset { target } => {
+            changeset::create_changeset_template("at-changeset", target)
+                .context("Failed to create changeset template")?;
+            println!(
+                "Created new changeset file with target: {}",
+                target.as_str()
+            );
+        }
     }
 
     Ok(())
