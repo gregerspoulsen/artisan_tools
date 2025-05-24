@@ -10,7 +10,7 @@ fn test_changeset_init_creates_file() -> TestResult {
     // Arrange
     let test_dir = TempDir::new()?;
     let mut cmd = Command::cargo_bin("at")?;
-    cmd.args(["changeset", "init", "major"]);
+    cmd.args(["changeset", "major"]);
     cmd.current_dir(&test_dir);
 
     // Act & Assert
@@ -32,7 +32,7 @@ fn test_changeset_init_invalid_target() -> TestResult {
     // Arrange
     let test_dir = TempDir::new()?;
     let mut cmd = Command::cargo_bin("at")?;
-    cmd.args(["changeset", "init", "invalid"]);
+    cmd.args(["changeset", "invalid"]);
     cmd.current_dir(&test_dir);
 
     // Act & Assert
@@ -52,7 +52,7 @@ fn test_changeset_init_all_targets() -> TestResult {
     for target in targets {
         // Arrange
         let mut cmd = Command::cargo_bin("at")?;
-        cmd.args(["changeset", "init", target]);
+        cmd.args(["changeset", target]);
         cmd.current_dir(&test_dir);
 
         // Act & Assert
