@@ -13,7 +13,6 @@ pub struct TestRepo {
     tempdir: TempDir,
     version: Version,
     init: bool,
-    commit_file: Option<(PathBuf, String)>,
     git_user_name: String,
     git_user_mail: String,
 }
@@ -27,7 +26,6 @@ impl TestRepo {
     pub fn new(
         #[builder(default = TestRepo::DEFAULT_VERSION)] version: Version,
         #[builder(default = false)] init: bool,
-        commit_file: Option<(PathBuf, String)>,
         #[builder(default = "test user")] git_user_name: &str,
         #[builder(default = "test@example.com")] git_user_mail: &str,
         #[builder(default = "master")] initial_branch_name: &str,
@@ -36,7 +34,6 @@ impl TestRepo {
             tempdir: TempDir::new().expect("Failed to create temp directory"),
             version,
             init,
-            commit_file,
             git_user_name: git_user_name.to_owned(),
             git_user_mail: git_user_mail.to_owned(),
         };
@@ -47,16 +44,19 @@ impl TestRepo {
 
         test_repo.config_git_user(git_user_name, git_user_mail);
 
-        if let Some((file, contents)) = &test_repo.commit_file {
-            test_repo.create_add_commit_file(file, contents, "Initial commit");
-        }
-
         test_repo
     }
 
     /// Path to the test repo
     pub fn path(&self) -> &Path {
         self.tempdir.path()
+    }
+
+    /// Return the test repo as a [gix::Repository]
+    ///
+    /// Requires the test repo to be initialized
+    pub fn as_gix_repo(&self) -> gix::Repository {
+        gix::discover(self.path()).expect("Could not get test repo as a gix repository")
     }
 
     // Initialize git repository
@@ -73,8 +73,24 @@ impl TestRepo {
             .expect("Failed to configure git user email");
     }
 
+    /// Create a commit
     pub fn commit(&self, msg: &str) {
         self.git(["commit", "-m", msg]).expect("Failed to commit");
+    }
+
+    /// Create a commit and allow it to be empty
+    pub fn commit_empty(&self, msg: &str) {
+        self.git(["commit", "--allow-empty", "-m", msg])
+            .expect("Failed to commit");
+    }
+
+    /// Checks out the parent commit, fails if the HEAD commit has no parent
+    ///
+    /// This will bring the head in DETACHED state. The same thing can be achieved with
+    /// e.g. `git checkout <SHA>`
+    pub fn checkout_parent(&self) {
+        self.git(["checkout", "HEAD~1"])
+            .expect("Failed checking out parent commit");
     }
 
     // Resolve the path to an absolute path relative to the test repo
@@ -96,20 +112,31 @@ impl TestRepo {
     }
 
     /// Add a file
-    pub fn add_file(&self, file: &Path) {
+    pub fn add_file(&self, file: impl AsRef<Path>) {
         let resolved = self.resolve_path_and_to_string(file);
-        self.git(["add", &resolved]);
+        self.git(["add", &resolved])
+            .expect("Failed to git add file");
     }
 
     /// Create and add a file
-    pub fn create_add_file(&self, file: &Path, contents: &str) {
+    pub fn create_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
         let resolved = self.resolve_path(file);
-        fs::write(&resolved, contents).expect("Failed to write file");
-        self.add_file(&resolved);
+        fs::write(&resolved, contents.unwrap_or("")).expect("Failed to write file");
+    }
+
+    /// Create and add a file
+    pub fn create_add_file(&self, file: impl AsRef<Path>, contents: Option<&str>) {
+        self.create_file(&file, contents);
+        self.add_file(file);
     }
 
     /// Create a file and commit it
-    pub fn create_add_commit_file(&self, file: &Path, contents: &str, commit_msg: &str) {
+    pub fn create_add_commit_file(
+        &self,
+        file: impl AsRef<Path>,
+        contents: Option<&str>,
+        commit_msg: &str,
+    ) {
         self.create_add_file(file, contents);
         self.commit(commit_msg);
     }
@@ -117,7 +144,7 @@ impl TestRepo {
     pub fn init_version(&self, version: Option<Version>) {
         self.create_add_commit_file(
             &PathBuf::from(".at-version"),
-            &version.unwrap_or(Self::DEFAULT_VERSION).to_string(),
+            Some(&version.unwrap_or(Self::DEFAULT_VERSION).to_string()),
             "add at-version",
         );
     }
@@ -136,17 +163,21 @@ impl TestRepo {
 
 #[cfg(test)]
 mod tests {
+    use testresult::TestResult;
+
     use super::*;
 
     #[test]
-    fn test_build_test_repo() {
+    fn test_build_test_repo() -> TestResult {
         let testrepo = TestRepo::builder().build();
         testrepo.init("custom-branch-name");
         assert_eq!(testrepo.git_user_name, "test user");
-        let stdout = testrepo.git(["status"]).unwrap().stdout;
-        let stdout = String::from_utf8(stdout).unwrap();
+
+        let stdout = testrepo.git(["status"])?.stdout;
+        let stdout = String::from_utf8(stdout)?;
         eprintln!("---\n{stdout}\n---",);
 
         assert!(stdout.contains("custom-branch-name"));
+        Ok(())
     }
 }
