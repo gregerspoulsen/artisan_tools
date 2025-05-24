@@ -22,7 +22,7 @@ fn read_at_version(path: &Path) -> Result<String> {
 /// # Arguments
 /// * `path` - Path to the directory containing the version file
 /// * `git_info` - Whether to include git information in the version string
-pub fn get<P: AsRef<Path>>(path: P, git_info: bool) -> Result<String> {
+pub fn get(path: impl AsRef<Path>, git_info: bool) -> Result<String> {
     let version_path = path.as_ref().join(AT_VERSION_FILE);
     let mut version = read_at_version(&version_path).context("Failed to read the version file")?;
 

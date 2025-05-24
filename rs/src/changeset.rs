@@ -21,8 +21,8 @@ impl BumpTarget {
     }
 }
 
-pub fn create_changeset_template<P: AsRef<Path>>(
-    path: P,
+pub fn create_changeset_template(
+    path: impl AsRef<Path>,
     target: BumpTarget,
 ) -> std::io::Result<()> {
     let template = include_str!("../templates/at-changeset-template.txt");
