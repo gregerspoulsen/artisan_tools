@@ -2,10 +2,11 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
-#[derive(Debug, Clone, Copy, PartialEq, clap::ValueEnum)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, clap::ValueEnum)]
 pub enum BumpTarget {
     Major,
     Minor,
+    #[default]
     Patch,
     Unreleased,
 }
