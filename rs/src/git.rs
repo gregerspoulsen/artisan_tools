@@ -6,13 +6,14 @@ pub fn get_branch(path: impl AsRef<Path>) -> Result<String> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
 
-    let head = repo
-        .head_ref()?
-        .ok_or_else(|| Error::msg("Failed to get HEAD reference"))?;
+    let head = repo.head()?;
 
-    let name = head.name().shorten();
-
-    Ok(name.to_string())
+    let name = match head.kind {
+        gix::head::Kind::Symbolic(reference) => reference.name.shorten().to_string(),
+        gix::head::Kind::Detached { target, peeled } => todo!("Handle detached HEAD state"),
+        gix::head::Kind::Unborn(full_name) => full_name.shorten().to_string(),
+    };
+    Ok(name)
 }
 
 /// Return the current commit hash in short format.
@@ -43,22 +44,54 @@ pub fn is_dirty(path: impl AsRef<Path>) -> Result<bool> {
 mod tests {
     use std::fs;
     use std::process::Command;
+    use pretty_assertions::assert_str_eq;
     use tempfile::TempDir;
     use test_utils;
+    use test_utils::testrepo::TestRepo;
 
     use super::*;
 
     #[test]
-    fn test_get_branch() {
-        // Create a temporary directory for our test git repository
-        let temp_dir = TempDir::new().expect("Failed to create temp directory");
-        let temp_path = temp_dir.path();
-
-        test_utils::setup_git_repo(temp_path, None);
+    fn test_get_branch_unitialized_repo() {
+        let test_repo = TestRepo::builder()
+            .init(false)
+            .build();
 
         // Test the get_branch function
-        let branch = get_branch(temp_path).expect("Failed to get branch");
-        assert_eq!(branch, "master");
+        let err_str = get_branch(test_repo.path()).unwrap_err().to_string();
+        assert!(err_str.starts_with("Could not find a git repository in"));
+        assert!(err_str.ends_with("or in any of its parents"));
+    }
+
+    #[test]
+    fn test_get_branch_repo_with_no_commits() {
+        let default_branch_name = "trunk";
+        let test_repo = TestRepo::builder()
+            .init(true)
+            .initial_branch_name(default_branch_name)
+            .build();
+
+        // Test the get_branch function
+        let branch = get_branch(test_repo.path()).expect("Failed to get branch");
+        assert_str_eq!(branch, default_branch_name);
+    }
+
+    #[test]
+    fn test_get_branch_repo_with_initial_commit() {
+        let default_branch_name = "master";
+        let test_repo = TestRepo::builder()
+            .init(true)
+            .initial_branch_name(default_branch_name)
+            .build();
+        test_repo.create_add_commit_file(
+            Path::new("dummy.txt"),
+            "dummy contents",
+            "Initial commit",
+        );
+
+        // Test the get_branch function
+        let branch = get_branch(test_repo.path()).expect("Failed to get branch");
+        assert_str_eq!(branch, default_branch_name);
     }
 
     #[test]
