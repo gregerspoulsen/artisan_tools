@@ -39,11 +39,11 @@ pub fn get_commit_hash(path: impl AsRef<Path>) -> Result<String> {
 
 /// Return whether the git repository has uncommitted changes.
 ///
-/// We define a dirty as a repo has:
+/// We define a dirty as a repo that has:
 /// - Staged changes
 /// - Untracked and unignored files
 ///
-/// Additionally we don't consider a repo dirt if it fulfills the above and the repo:
+/// Additionally we don't consider a repo dirty if it has none of the properties described above and the repo:
 /// - Has no commits
 /// - Has untracked but ignored file(s)
 /// - Has changes to ignored file(s)
