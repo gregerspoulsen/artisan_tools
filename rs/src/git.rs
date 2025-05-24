@@ -15,7 +15,9 @@ pub fn get_branch(path: impl AsRef<Path>) -> Result<String> {
     Ok(name.to_string())
 }
 
-/// Return the current commit hash in short format (first 7 characters).
+/// Return the current commit hash in short format.
+///
+/// The minimum length is 4, the default is the effective value of the `core.abbrev` configuration variable (see <https://git-scm.com/docs/git-config>)
 pub fn get_commit_hash(path: impl AsRef<Path>) -> Result<String> {
     // Find the repository by searching up through parent directories
     let repo = gix::discover(path)?;
@@ -24,8 +26,8 @@ pub fn get_commit_hash(path: impl AsRef<Path>) -> Result<String> {
     let mut head = repo.head()?;
     let head_commit = head.peel_to_commit_in_place()?;
 
-    // Get the short hash (7 characters)
-    let short_hash = head_commit.id().to_string()[..7].to_string();
+    // Shorten the hash as defined by `core.abbrev`
+    let short_hash = head_commit.id().shorten()?.to_string();
 
     Ok(short_hash)
 }
