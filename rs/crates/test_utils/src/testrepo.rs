@@ -117,8 +117,7 @@ pub trait LocalRepo: GitRepo {
 
     /// Create a file in the test repo
     fn create(&self, file: impl AsRef<Path>, contents: Option<&str>) {
-        let resolved = self.resolve_path(file);
-        self.write_to_repo(resolved, contents);
+        self.write_to_repo(file, contents);
     }
 
     /// Create and add a file
@@ -229,7 +228,6 @@ pub trait WithRemote: LocalRepo {
 
 #[cfg(test)]
 mod tests {
-    use pretty_assertions::assert_str_eq;
     use testresult::TestResult;
 
     use crate::prelude::RemoteRepoSetup;
@@ -254,14 +252,15 @@ mod tests {
         let testrepo = TestRepo::builder().with_remote(true).init(true).build();
 
         testrepo.remote().create_initial_commit();
-        testrepo.remote().add_tags(&[("v0.1.0", "first release")]);
+        let tag = "v0.1.0";
+        testrepo.remote().add_tag(tag, None);
 
         let tags = testrepo.list_tags();
         assert!(tags.is_empty());
 
         testrepo.fetch();
         let tags = testrepo.list_tags();
-        assert_str_eq!(tags[0], "v0.1.0");
+        assert_eq!(tags, vec![tag]);
 
         Ok(())
     }

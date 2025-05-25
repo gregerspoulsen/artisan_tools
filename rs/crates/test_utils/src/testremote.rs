@@ -59,21 +59,18 @@ pub trait RemoteRepoSetup: RemoteRepo {
         work_repo.push("origin", self.default_branch());
     }
 
-    /// Add tags to the repo
-    fn add_tags(&self, tags: &[(&str, &str)]) {
-        if tags.is_empty() {
-            return;
-        }
-
+    /// Add a tag to the repo, if a message is supplied it will be an annotated tag instead of a lightweight tag
+    fn add_tag(&self, name: &str, msg: Option<&str>) {
         let work_repo = TestRepo::builder().init(false).build();
-
         work_repo.clone(&self.path().to_string_lossy(), ".");
         work_repo.config_git_user("remote tag setup", "remote_tags@example.com");
 
-        // Create tags
-        for (tag_name, tag_message) in tags {
-            work_repo.create_annotated_tag(tag_name, tag_message);
+        if let Some(msg) = msg {
+            work_repo.create_annotated_tag(name, msg);
+        } else {
+            work_repo.create_tag(name);
         }
+
         work_repo.push_tags();
     }
 }
@@ -85,24 +82,20 @@ mod tests {
 
     #[test]
     fn test_build_remote_test_repo() -> TestResult {
-        let expected_tags = &[
-            ("v0.1.0", "initial release"),
-            ("v1.0.0", "perfect release!"),
-        ];
-
+        let first_tag = "v0.1.0";
+        let second_tag = "v1.0.0";
         let mut remote = TestRemote::new();
         remote.init("master");
         assert!(remote.list_tags().is_empty());
 
         remote.create_initial_commit();
-        remote.add_tags(expected_tags);
+        remote.add_tag(first_tag, None);
+        remote.add_tag(second_tag, Some("perfect release!"));
 
         let tags = remote.list_tags();
         eprintln!("{tags:?}");
 
-        assert_eq!(&tags[0], expected_tags[0].0);
-        assert_eq!(&tags[1], expected_tags[1].0);
-        assert_eq!(tags.len(), 2);
+        assert_eq!(tags, vec![first_tag, second_tag]);
 
         Ok(())
     }

@@ -18,38 +18,14 @@ pub(crate) trait Internals {
     /// Resolve a path to a path relative to the repo
     fn resolve_path(&self, p: impl AsRef<Path>) -> ResolvedPath;
 
-    /// Write a file to the test repo, takes a [ResolvedPath] for safety
-    fn write_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
-        fs::write(file.0, contents.unwrap_or("")).expect("Failed to write file");
-    }
-
-    // Open a file in the repo for reading, takes a [ResolvedPath] for safety
-    #[expect(dead_code, reason = "It's not used yet")]
-    fn open_file_read(&self, file: impl AsRef<Path>) -> fs::File {
+    /// Write a file to the test repo
+    fn write_to_repo(&self, file: impl AsRef<Path>, contents: Option<&str>) {
         let resolved = self.resolve_path(file);
-        fs::OpenOptions::new()
-            .read(true)
-            .write(false)
-            .append(false)
-            .truncate(false)
-            .open(resolved.0)
-            .expect("Failed to open file")
+        fs::write(resolved.0, contents.unwrap_or("")).expect("Failed to write file");
     }
 
-    // Open a file in the repo for appending, takes a [ResolvedPath] for safety
+    // Open a file in the repo for appending
     fn open_file_append(&self, file: impl AsRef<Path>) -> fs::File {
-        let resolved = self.resolve_path(file);
-        fs::OpenOptions::new()
-            .read(true)
-            .append(true)
-            .truncate(false)
-            .open(resolved.0)
-            .expect("Failed to open file")
-    }
-
-    // Open a file in the repo for writing truncated, takes a [ResolvedPath] for safety
-    #[expect(dead_code, reason = "It's not used yet")]
-    fn open_file_truncate(&self, file: impl AsRef<Path>) -> fs::File {
         let resolved = self.resolve_path(file);
         fs::OpenOptions::new()
             .read(true)
