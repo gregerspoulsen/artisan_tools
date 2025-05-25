@@ -1,49 +1,16 @@
 use bon::bon;
+use path::{PathResolver, ResolvedPath};
 use semver::Version;
 use std::{
     ffi::OsStr,
-    fmt, fs,
+    fs,
     io::{self, Write},
     path::{Path, PathBuf},
     process::{Command, Output},
 };
 use tempfile::TempDir;
 
-// An absolute path relative to the test repo
-struct ResolvedPath(PathBuf);
-
-impl fmt::Display for ResolvedPath {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0.display())
-    }
-}
-
-/// Resolves paths to absolute paths relative to the repo
-#[derive(Debug)]
-struct PathResolver {
-    repo: PathBuf,
-}
-
-impl PathResolver {
-    // Create a new [PathResolver]
-    pub(crate) fn new(repo: &TempDir) -> Self {
-        Self {
-            repo: repo.path().canonicalize().unwrap(),
-        }
-    }
-
-    // Resolve a path to a [ResolvedPath] which is an absolute path relative to the test repo
-    //
-    // e.g. if you supply "dummy.txt" it will ensure that "dummy.txt" points to a path
-    // within the test repo
-    fn resolve(&self, p: impl AsRef<Path>) -> ResolvedPath {
-        if !p.as_ref().starts_with(&self.repo) {
-            ResolvedPath(self.repo.join(p))
-        } else {
-            ResolvedPath(p.as_ref().to_path_buf())
-        }
-    }
-}
+mod path;
 
 /// Utility for creating temporary git repositories during testing
 #[derive(Debug)]
