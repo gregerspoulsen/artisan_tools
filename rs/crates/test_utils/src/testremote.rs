@@ -65,13 +65,10 @@ pub trait RemoteRepoSetup: RemoteRepo {
             return;
         }
 
-        let work_repo = TestRepo::builder()
-            .init(false)
-            .git_user_name("remote tag setup")
-            .git_user_mail("remote_tags@example.com")
-            .build();
+        let work_repo = TestRepo::builder().init(false).build();
 
         work_repo.clone(&self.path().to_string_lossy(), ".");
+        work_repo.config_git_user("remote tag setup", "remote_tags@example.com");
 
         // Create tags
         for (tag_name, tag_message) in tags {
