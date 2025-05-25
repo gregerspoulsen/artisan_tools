@@ -62,7 +62,7 @@ mod tests {
     use pretty_assertions::assert_str_eq;
     use semver::Version;
     use test_log::test;
-    use test_utils::{self, testrepo::TestRepo};
+    use test_utils::prelude::*;
     use testresult::TestResult;
 
     use super::*;

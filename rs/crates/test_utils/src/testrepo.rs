@@ -1,22 +1,26 @@
-use bon::bon;
-use path::{PathResolver, ResolvedPath};
-use semver::Version;
 use std::{
-    ffi::OsStr,
-    fs,
-    io::{self, Write},
+    io::Write as _,
     path::{Path, PathBuf},
-    process::{Command, Output},
 };
+
+use bon::bon;
+use path::PathResolver;
+use semver::Version;
 use tempfile::TempDir;
 
-mod path;
+use crate::{
+    testremote::{RemoteRepo as _, TestRemote},
+    GitRepo,
+};
+
+pub(crate) mod path;
 
 /// Utility for creating temporary git repositories during testing
 #[derive(Debug)]
 pub struct TestRepo {
-    tempdir: TempDir,
-    resolver: PathResolver,
+    pub(crate) tempdir: TempDir,
+    pub(crate) resolver: PathResolver,
+    pub(crate) remote: Option<TestRemote>,
 }
 
 #[bon]
@@ -28,122 +32,103 @@ impl TestRepo {
         #[builder(default = "test user")] git_user_name: &str,
         #[builder(default = "test@example.com")] git_user_mail: &str,
         #[builder(default = "master")] initial_branch_name: &str,
+        #[builder(default = false)] with_remote: bool,
     ) -> Self {
         let tempdir = TempDir::new().expect("Failed to create temp directory");
         let resolver = PathResolver::new(&tempdir);
-        let test_repo = Self { tempdir, resolver };
+        let mut remote = None;
+        if with_remote {
+            let mut r = TestRemote::new();
+            r.init(initial_branch_name);
+            remote = Some(r);
+        }
+        let test_repo = Self {
+            tempdir,
+            resolver,
+            remote,
+        };
 
         if init {
             test_repo.init(initial_branch_name);
+            test_repo.config_git_user(git_user_name, git_user_mail);
         }
 
-        test_repo.config_git_user(git_user_name, git_user_mail);
+        // Set up remote if it exists
+        if let Some(ref remote) = test_repo.remote {
+            test_repo.add_remote("origin", remote.path().to_str().unwrap());
+        }
 
         test_repo
     }
+}
 
-    /// Path to the test repo
-    pub fn path(&self) -> &Path {
-        self.tempdir.path()
-    }
-
+/// A local repo is what a developer usually works directly on, i.e. a non-bare repository
+pub trait LocalRepo: GitRepo {
     /// Return the test repo as a [gix::Repository]
     ///
     /// Requires the test repo to be initialized
-    pub fn as_gix_repo(&self) -> gix::Repository {
+    fn as_gix_repo(&self) -> gix::Repository {
         gix::discover(self.path()).expect("Could not get test repo as a gix repository")
     }
 
     // Initialize git repository
-    pub fn init(&self, default_branch: &str) {
-        self.git(["init", &format!("--initial-branch={default_branch}")])
-            .expect("Failed to initialize git repository");
+    fn init(&self, default_branch: &str) {
+        self.git_assert_success(["init", &format!("--initial-branch={default_branch}")]);
     }
 
     // Configure git user for the test
-    pub fn config_git_user(&self, name: &str, mail: &str) {
-        self.git(["config", "user.name", name])
-            .expect("Failed to configure git user name");
-        self.git(["config", "user.email", mail])
-            .expect("Failed to configure git user email");
+    fn config_git_user(&self, name: &str, mail: &str) {
+        self.git_assert_success(["config", "user.name", name]);
+        self.git_assert_success(["config", "user.email", mail]);
     }
 
     /// Create a commit
-    pub fn commit(&self, msg: &str) {
-        self.git(["commit", "-m", msg]).expect("Failed to commit");
+    fn commit(&self, msg: &str) {
+        self.git_assert_success(["commit", "-m", msg]);
     }
 
     /// Create a commit and allow it to be empty
-    pub fn commit_empty(&self, msg: &str) {
-        self.git(["commit", "--allow-empty", "-m", msg])
-            .expect("Failed to commit");
+    fn commit_empty(&self, msg: &str) {
+        self.git_assert_success(["commit", "--allow-empty", "-m", msg]);
     }
 
     /// Checks out the parent commit, fails if the HEAD commit has no parent
     ///
     /// This will bring the head in DETACHED state. The same thing can be achieved with
     /// e.g. `git checkout <SHA>`
-    pub fn checkout_parent(&self) {
-        self.git(["checkout", "HEAD~1"])
-            .expect("Failed checking out parent commit");
+    fn checkout_parent(&self) {
+        self.git_assert_success(["checkout", "HEAD~1"]);
     }
 
     /// Returns the trimmed output of `git rev-parse --short HEAD`
-    pub fn head_short_sha(&self) -> String {
+    fn head_short_sha(&self) -> String {
         let rev_parse_output = self
-            .git(["rev-parse", "--short", "HEAD"])
-            .expect("Git command failed")
+            .git_assert_success(["rev-parse", "--short", "HEAD"])
             .stdout;
         let head_hash_output = String::from_utf8(rev_parse_output).unwrap();
         head_hash_output.trim().to_owned()
     }
 
     /// Stage a file in the test repo, errors if it doesn't already exist
-    pub fn stage(&self, file: impl AsRef<Path>) {
-        let resolved = self.resolver.resolve(file).to_string();
-        self.git(["add", &resolved])
-            .expect("Failed to git add file");
+    fn stage(&self, file: impl AsRef<Path>) {
+        let resolved = self.resolve_path(file).to_string();
+        self.git_assert_success(["add", &resolved]);
     }
 
     /// Create a file in the test repo
-    pub fn create(&self, file: impl AsRef<Path>, contents: Option<&str>) {
-        let resolved = self.resolver.resolve(file);
+    fn create(&self, file: impl AsRef<Path>, contents: Option<&str>) {
+        let resolved = self.resolve_path(file);
         self.write_to_repo(resolved, contents);
     }
 
-    // Open a file in the test repo, takes a [ResolvedPath] for safety
-    #[builder]
-    fn open_file(
-        &self,
-        #[builder(start_fn)] file: impl AsRef<Path>,
-        #[builder(default = true)] read: bool,
-        #[builder(default = false)] write: bool,
-        #[builder(default = false)] append: bool,
-        #[builder(default = false)] truncate: bool,
-    ) -> fs::File {
-        let resolved = self.resolver.resolve(file);
-        fs::OpenOptions::new()
-            .read(read)
-            .write(write)
-            .append(append)
-            .truncate(truncate)
-            .open(resolved.0)
-            .expect("Failed to open file")
-    }
-
-    // Write a file to the test repo, takes a [ResolvedPath] for safety
-    fn write_to_repo(&self, file: ResolvedPath, contents: Option<&str>) {
-        fs::write(file.0, contents.unwrap_or("")).expect("Failed to write file");
-    }
-
     /// Create and add a file
-    pub fn create_and_stage(&self, file: impl AsRef<Path>, contents: Option<&str>) {
+    fn create_and_stage(&self, file: impl AsRef<Path>, contents: Option<&str>) {
         self.create(&file, contents);
         self.stage(file);
     }
 
     /// Create a file, stage, and commit it
-    pub fn create_stage_commit(
+    fn create_stage_commit(
         &self,
         file: impl AsRef<Path>,
         contents: Option<&str>,
@@ -154,12 +139,12 @@ impl TestRepo {
     }
 
     /// Create, add, & commit a `.gitignore`
-    pub fn init_gitignore(&self) {
+    fn init_gitignore(&self) {
         self.create_stage_commit(".gitignore", None, "add .gitignore");
     }
 
     /// Add a line to the [TestRepo] .gitignore
-    pub fn add_to_gitignore(&self, line: impl AsRef<str>) {
+    fn add_to_gitignore(&self, line: impl AsRef<str>) {
         // Ensure the line ends with a newline
         let line = line.as_ref();
         let line = if line.ends_with("\n") {
@@ -167,20 +152,20 @@ impl TestRepo {
         } else {
             format!("{line}\n")
         };
-        let mut gitignore = self.open_file(".gitignore").write(true).append(true).call();
+        let mut gitignore = self.open_file_append(".gitignore");
         gitignore
             .write_all(line.as_bytes())
             .expect("Failed writing to .gitinore");
     }
 
     /// Stage and commit .gitignore
-    pub fn stage_commit_gitignore(&self, commit_msg: &str) {
+    fn stage_commit_gitignore(&self, commit_msg: &str) {
         self.stage(".gitignore");
         self.commit(commit_msg);
     }
 
     /// Create, add, & commit the '.at-version' file with the given [Version]
-    pub fn init_at_version(&self, version: &Version) {
+    fn init_at_version(&self, version: &Version) {
         self.create_stage_commit(
             PathBuf::from(".at-version"),
             Some(&version.to_string()),
@@ -188,22 +173,66 @@ impl TestRepo {
         );
     }
 
-    /// Run `git` in the test repo
-    pub fn git<I, S>(&self, args: I) -> io::Result<Output>
-    where
-        I: IntoIterator<Item = S>,
-        S: AsRef<OsStr>,
-    {
-        Command::new("git")
-            .args(args)
-            .current_dir(self.path())
-            .output()
+    /// Create a lightweight tag
+    fn create_tag(&self, name: &str) {
+        self.git_assert_success(["tag", name]);
+    }
+
+    /// Create an annotated tag
+    fn create_annotated_tag(&self, name: &str, msg: &str) {
+        self.git_assert_success(["tag", "-a", name, "-m", msg]);
+    }
+}
+
+/// Operations on a remote repository
+pub trait WithRemote: LocalRepo {
+    /// Get a reference to the remote repository (panics if no remote is set up)
+    ///
+    /// NOTE: Typically you want to add a utility function instead of accessing the remote directly
+    fn remote(&self) -> &TestRemote;
+
+    /// Add a remote repository
+    fn add_remote(&self, name: &str, url: &str) {
+        self.git_assert_success(["remote", "add", name, url]);
+    }
+
+    /// Clone a repo to a path
+    fn clone(&self, url: &str, path: impl AsRef<Path>) {
+        self.git_assert_success(["clone", url, &path.as_ref().to_string_lossy()]);
+    }
+
+    /// Push to remote
+    fn push(&self, remote: &str, branch: &str) {
+        self.git_assert_success(["push", remote, branch]);
+    }
+
+    /// Push tags to remote origin
+    fn push_tags(&self) {
+        self.git_assert_success(["push", "--tags"]);
+    }
+
+    /// Push with upstream tracking
+    fn push_set_upstream(&self, remote: &str, branch: &str) {
+        self.git_assert_success(["push", "-u", remote, branch]);
+    }
+
+    /// Fetch
+    fn fetch(&self) {
+        self.git_assert_success(["fetch"]);
+    }
+
+    /// Pull from remote
+    fn pull(&self, remote: &str, branch: &str) {
+        self.git_assert_success(["pull", remote, branch]);
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_str_eq;
     use testresult::TestResult;
+
+    use crate::prelude::RemoteRepoSetup;
 
     use super::*;
 
@@ -217,6 +246,23 @@ mod tests {
         eprintln!("---\n{stdout}\n---",);
 
         assert!(stdout.contains("custom-branch-name"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_build_test_repo_with_remote() -> TestResult {
+        let testrepo = TestRepo::builder().with_remote(true).init(true).build();
+
+        testrepo.remote().create_initial_commit();
+        testrepo.remote().add_tags(&[("v0.1.0", "first release")]);
+
+        let tags = testrepo.list_tags();
+        assert!(tags.is_empty());
+
+        testrepo.fetch();
+        let tags = testrepo.list_tags();
+        assert_str_eq!(tags[0], "v0.1.0");
+
         Ok(())
     }
 }
