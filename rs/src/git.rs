@@ -111,8 +111,7 @@ fn has_staged_changes(repo: &Repository) -> Result<bool> {
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_str_eq;
-    use test_utils;
-    use test_utils::testrepo::TestRepo;
+    use test_utils::prelude::*;
     use testresult::TestResult;
     // Enables logging for all tests
     use test_log::test;
