@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.8] - 2025-05-21
+- Add template generation code
+- Split main.rs to run.rs and cli.rs
+- Refactor test crate for modularity
+
 ## [1.1.7] - 2025-05-21
 - Add colored CLI style
 

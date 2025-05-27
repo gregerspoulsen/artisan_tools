@@ -38,7 +38,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Test ${{ matrix.os }}
         working-directory: rs
-        run: cargo nextest run
+        run: cargo nextest run --workspace
 
   lint:
     runs-on: ubuntu-latest
