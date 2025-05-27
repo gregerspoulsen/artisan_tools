@@ -4,6 +4,7 @@ use predicates::prelude::*; // Used for writing assertions
 use pretty_assertions::assert_str_eq;
 use semver::Version;
 use std::{fs, process::Command};
+use test_utils::testrepo::TestRepo;
 use testresult::TestResult;
 
 /// Test that when cwd has no .at-version file, we error with an informative error message
@@ -37,11 +38,11 @@ fn at_version_update_no_at_version_file_errors() -> TestResult {
 fn at_version_update_at_version_file_exists_ok() -> TestResult {
     // Arrange
     let version = Version::new(0, 1, 0);
-    let test_dir = TempDir::new()?;
-    test_utils::setup_git_repo(test_dir.path(), Some(version.clone()));
+    let repo = TestRepo::builder().init(true).build();
+    repo.init_at_version(&version);
 
     let mut cmd = Command::cargo_bin("at")?;
-    cmd.args(["version", "update"]).current_dir(&test_dir);
+    cmd.args(["version", "update"]).current_dir(repo.path());
 
     // Act + Assert
     cmd.assert()
@@ -49,7 +50,7 @@ fn at_version_update_at_version_file_exists_ok() -> TestResult {
         .stdout(predicate::str::contains(format!(
             "VERSION updated to {version}"
         )));
-    let version_file_contents = fs::read_to_string(test_dir.join("VERSION"))?;
+    let version_file_contents = fs::read_to_string(repo.path().join("VERSION"))?;
     assert_str_eq!(version_file_contents, version.to_string());
 
     Ok(())
