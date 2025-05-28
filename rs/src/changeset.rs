@@ -47,6 +47,31 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
+    fn test_get_template_content() {
+        // Get the raw template content
+        let raw_template = TEMPLATE;
+
+        // Test all BumpTarget variants
+        let targets = [
+            BumpTarget::Major,
+            BumpTarget::Minor,
+            BumpTarget::Patch,
+            BumpTarget::Unreleased,
+        ];
+
+        for target in targets {
+            // Generate content with the function under test
+            let content = get_template_content(target);
+
+            // Manually create the expected content for comparison
+            let expected =
+                raw_template.replace("target: patch", &format!("target: {}", target.as_str()));
+
+            assert_eq!(content, expected);
+        }
+    }
+
+    #[test]
     fn test_create_changeset_template() {
         let dir = tempdir().unwrap();
         let file_path = dir.path().join("at-changeset");
