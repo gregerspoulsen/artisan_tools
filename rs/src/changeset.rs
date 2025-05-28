@@ -56,7 +56,7 @@ mod tests {
         assert!(file_path.exists());
         let content = fs::read_to_string(file_path).unwrap();
         let expected = get_template_content(BumpTarget::Minor);
-        
+
         assert_eq!(content, expected);
     }
 }
