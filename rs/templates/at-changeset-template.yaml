@@ -1,0 +1,7 @@
+target: patch
+
+changes:
+  header: Added # Can be omitted
+  text: |
+    * fix that bug
+    * add documentation

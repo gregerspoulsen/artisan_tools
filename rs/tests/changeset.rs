@@ -4,6 +4,8 @@ use predicates::prelude::*;
 use std::{fs, process::Command};
 use testresult::TestResult;
 
+use artisan_tools::changeset::{BumpTarget, get_template_content};
+
 /// Test that init creates an at-changeset file with the specified target
 #[test]
 fn test_changeset_init_creates_file() -> TestResult {
@@ -19,9 +21,9 @@ fn test_changeset_init_creates_file() -> TestResult {
     ));
 
     let changeset_content = fs::read_to_string(test_dir.join("at-changeset"))?;
-    assert!(changeset_content.contains("TARGET: MAJOR"));
-    assert!(changeset_content.contains("CHANGELOG:"));
-    assert!(changeset_content.contains("### Added"));
+    let expected = get_template_content(BumpTarget::Major);
+    
+    assert_eq!(changeset_content, expected);
 
     Ok(())
 }
@@ -64,7 +66,18 @@ fn test_changeset_init_all_targets() -> TestResult {
             )));
 
         let changeset_content = fs::read_to_string(test_dir.join("at-changeset"))?;
-        assert!(changeset_content.contains(&format!("TARGET: {}", target.to_uppercase())));
+        
+        // Convert string target to BumpTarget enum
+        let bump_target = match target {
+            "major" => BumpTarget::Major,
+            "minor" => BumpTarget::Minor,
+            "patch" => BumpTarget::Patch,
+            "unreleased" => BumpTarget::Unreleased,
+            _ => unreachable!("Invalid target should have been caught by CLI validation"),
+        };
+        
+        let expected = get_template_content(bump_target);
+        assert_eq!(changeset_content, expected);
     }
 
     Ok(())

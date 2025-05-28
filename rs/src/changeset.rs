@@ -2,6 +2,9 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+// Default TEMPLATE content
+const TEMPLATE: &str = include_str!("../templates/at-changeset-template.yaml");
+
 #[derive(Debug, Clone, Copy, Default, PartialEq, clap::ValueEnum)]
 pub enum BumpTarget {
     Major,
@@ -22,13 +25,16 @@ impl BumpTarget {
     }
 }
 
+/// Get the content of the changeset template with the target replaced.
+pub fn get_template_content(target: BumpTarget) -> String {
+    TEMPLATE.replace("target: patch", &format!("target: {}", target.as_str()))
+}
+
 pub fn create_changeset_template(
     path: impl AsRef<Path>,
     target: BumpTarget,
 ) -> std::io::Result<()> {
-    let template = include_str!("../templates/at-changeset-template.txt");
-    let content = template.replace("TARGET: patch", &format!("TARGET: {}", target.as_str()));
-
+    let content = get_template_content(target);
     let mut file = fs::File::create(path)?;
     file.write_all(content.as_bytes())?;
     Ok(())
@@ -49,8 +55,8 @@ mod tests {
 
         assert!(file_path.exists());
         let content = fs::read_to_string(file_path).unwrap();
-        assert!(content.contains("TARGET: MINOR"));
-        assert!(content.contains("CHANGELOG:"));
-        assert!(content.contains("### Added"));
+        let expected = get_template_content(BumpTarget::Minor);
+        
+        assert_eq!(content, expected);
     }
 }
