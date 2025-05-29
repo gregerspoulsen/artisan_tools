@@ -77,7 +77,7 @@ fn try_add_raw_version_file_to_gitignore(
     } else {
         let prefix_emoji = Emoji("⚠️", "!");
         println!(
-            "{prefix_emoji} No {styled_gitignore}, consider adding one and adding {styled_raw_version_file} to it"
+            "{prefix_emoji}  No {styled_gitignore}, consider adding one and adding {styled_raw_version_file} to it"
         );
     }
     Ok(())
@@ -89,11 +89,11 @@ pub fn prompt_hint_styled(txt: &str) -> StyledObject<&str> {
 
 fn user_confirmed_project_type(project_type: Option<ProjectType>) -> Result<ProjectType> {
     if let Some(project_type) = project_type {
-        let project_type_styled = Style::new().bold().apply_to(project_type.to_string());
+        let project_type_styled = project_type.styled_label();
         let prefix_emoji = Emoji("📦", "");
         let project_type_pre = Style::new()
             .bold()
-            .underlined()
+            .cyan()
             .apply_to("Detected project type:");
 
         let hint = prompt_hint_styled("('no' to select the project type manually)");
@@ -153,11 +153,10 @@ impl ProjectType {
         let (emoji, style) = match self {
             ProjectType::Go => (Emoji("🔵", ""), style.cyan()),
             ProjectType::JavaScriptOrTypeScript => (Emoji("🌐", ""), style.yellow()),
-            ProjectType::Rust => (Emoji("🦀", ""), style.red()),
+            ProjectType::Rust => (Emoji("🦀", ""), style.color256(208)),
             ProjectType::Python => (Emoji("🐍", ""), style.green()),
             ProjectType::ManualSetup => (Emoji("⚙️", ""), style.blue()),
         };
-
         format!("{emoji} {}", style.bold().apply_to(self.to_string()))
     }
 }
