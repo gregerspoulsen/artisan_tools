@@ -71,7 +71,7 @@ mod tests {
 
             assert!(
                 !root["changes"].is_badvalue(),
-                "YAML is missing the top-level `content` section"
+                "YAML is missing the top-level `changes` section"
             );
         }
     }
