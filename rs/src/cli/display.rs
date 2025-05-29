@@ -24,7 +24,7 @@ impl fmt::Display for Command {
                     f,
                     "init {if_dry_run} {if_yes}",
                     if_dry_run = if *dry_run { "--dry-run" } else { "" },
-                    if_yes = if *yes { "--dry-run" } else { "" }
+                    if_yes = if *yes { "--yes" } else { "" }
                 )
             }
         }
