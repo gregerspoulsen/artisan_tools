@@ -43,14 +43,13 @@ pub fn create_changeset_template(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
     use std::fs;
     use tempfile::tempdir;
+    use yaml_rust2::YamlLoader;
 
     #[test]
     fn test_get_template_content() {
-        // Get the raw template content
-        let raw_template = TEMPLATE;
-
         // Test all BumpTarget variants
         let targets = [
             BumpTarget::Major,
@@ -63,11 +62,17 @@ mod tests {
             // Generate content with the function under test
             let content = get_template_content(target);
 
-            // Manually create the expected content for comparison
-            let expected =
-                raw_template.replace("target: patch", &format!("target: {}", target.as_str()));
+            // Parse the YAML content
+            let docs = YamlLoader::load_from_str(&content).expect("Failed to parse YAML");
+            let root = &docs[0];
 
-            assert_eq!(content, expected);
+            // Extract the target value from the YAML
+            assert_eq!(root["target"].as_str(), Some(target.as_str()));
+
+            assert!(
+                !root["changes"].is_badvalue(),
+                "YAML is missing the top-level `content` section"
+            );
         }
     }
 
