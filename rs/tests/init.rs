@@ -1,9 +1,5 @@
 use assert_cmd::prelude::*; // Add methods on commands
-use assert_fs::TempDir;
-use predicates::prelude::*; // Used for writing assertions
-use pretty_assertions::assert_str_eq;
-use semver::Version;
-use std::{fs, process::Command};
+use std::process::Command;
 use test_utils::prelude::*;
 use testresult::TestResult;
 
