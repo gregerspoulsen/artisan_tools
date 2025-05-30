@@ -60,6 +60,7 @@ testresult.workspace = true
 pretty_assertions.workspace = true
 tempfile.workspace = true
 test-log.workspace = true
+yaml-rust2 = "0.10"
 
 # Relatively fast-compiling release build
 [profile.release]

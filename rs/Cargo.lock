@@ -133,6 +133,7 @@ dependencies = [
  "testresult",
  "toml",
  "toml_edit",
+ "yaml-rust2",
 ]
 
 [[package]]

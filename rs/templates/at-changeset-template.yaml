@@ -1,0 +1,15 @@
+target: patch
+
+changes:
+  header: Added # Can be omitted
+  text: |
+      * 
+#  Describe your changes above.
+#  You can write changes under multiple headers e.g.
+#  changes:
+#    header: Added
+#    text: add desired feature
+#    header: Changes
+#    text: |
+#      * fix that bug
+#      * add documentation
