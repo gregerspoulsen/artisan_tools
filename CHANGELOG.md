@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.9] - 2025-05-28
+- Change changelog template to yaml format
+
 ## [1.1.8] - 2025-05-21
 - Add template generation code
 - Split main.rs to run.rs and cli.rs
