@@ -7,8 +7,6 @@ use clap::{
     Parser, Subcommand,
 };
 
-pub mod display;
-
 /// CLI for Artisan Tools.
 #[derive(Parser, Debug, Clone, Copy)]
 #[command(name = "artisan-tools")]
