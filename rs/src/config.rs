@@ -24,12 +24,11 @@ pub struct VersionConfig {
 
     /// This table concerns the version with build metadata in the format:
     /// <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
-    #[serde(rename = "with-metadata")]
-    pub with_metadata: WithMetadataConfig,
+    pub extended: VersionExtendedConfig,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct WithMetadataConfig {
+pub struct VersionExtendedConfig {
     /// Files where the version with the build metadata is written to as is
     /// (will truncate the file)
     pub raw: Vec<String>,
@@ -40,7 +39,7 @@ impl Default for AtConfig {
         Self {
             version: VersionConfig {
                 link: vec![],
-                with_metadata: WithMetadataConfig { raw: vec![] },
+                extended: VersionExtendedConfig { raw: vec![] },
             },
         }
     }
@@ -106,7 +105,7 @@ impl AtConfig {
 
         // Start with defaults
         builder = builder.set_default("version.link", Vec::<String>::new())?;
-        builder = builder.set_default("version.with-metadata.raw", Vec::<String>::new())?;
+        builder = builder.set_default("version.extended.raw", Vec::<String>::new())?;
 
         // Overlay with file if provided and exists
         if let Some(path) = config_path {
@@ -140,13 +139,13 @@ mod tests {
 [version]
 link = ["Cargo.toml", "RELEASE"]
 
-[version.with-metadata]
+[version.extended]
 raw = ["VERSION"]
 "#;
 
         let config = AtConfig::from_toml_str(toml_str).unwrap();
         assert_eq!(config.version.link, vec!["Cargo.toml", "RELEASE"]);
-        assert_eq!(config.version.with_metadata.raw, vec!["VERSION"]);
+        assert_eq!(config.version.extended.raw, vec!["VERSION"]);
     }
 
     #[test]
@@ -159,7 +158,7 @@ link = ["Cargo.toml", "RELEASE"]
         let config = AtConfig::from_toml_str(toml_str).unwrap_err();
         assert_str_eq!(
             config.to_string(),
-            "missing field `with-metadata` for key `version`"
+            "missing field `extended` for key `version`"
         );
     }
 
@@ -188,7 +187,7 @@ link = ["Cargo.toml", "RELEASE"]
     fn test_load_with_defaults() -> TestResult {
         let config = AtConfig::load_with_defaults(None)?;
         assert!(config.version.link.is_empty());
-        assert!(config.version.with_metadata.raw.is_empty());
+        assert!(config.version.extended.raw.is_empty());
         Ok(())
     }
 }

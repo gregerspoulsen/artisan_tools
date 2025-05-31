@@ -216,7 +216,7 @@ link = ["Cargo.toml"]
 
 # This table concerns the version with build metadata in the format:
 # <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
-[version.with-metadata]
+[version.extended]
 # Files where the version with the build metadata is written to as is
 # (will truncate the file)
 #raw = [<FILE>, .. ]
@@ -244,7 +244,7 @@ link = ["pyproject.toml"]
 
 # This table concerns the version with build metadata in the format:
 # <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
-[version.with-metadata]
+[version.extended]
 # Files where the version with the build metadata is written to as is
 # (will truncate the file)
 #raw = [<FILE>, .. ]
