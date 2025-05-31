@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0] - 2025-05-29
+## [1.1.9] - 2025-05-29
 - Add initial Artisan Tools 2.0 config
 - Implement interactive `at init`
 
