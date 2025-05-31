@@ -44,6 +44,13 @@ semver.workspace = true
 test_utils.path = "crates/test_utils"
 log.workspace = true
 env_logger.workspace = true
+console = "0.15.11"
+dialoguer = "0.11.0"
+strum = { version = "0.27.1", features = ["derive", "strum_macros"] }
+toml_edit = { version = "0.22.26", features = ["serde"] }
+serde = { version = "1.0.219", features = ["derive"] }
+config = { version = "0.15.11", features = ["toml"] }
+toml = "0.8.22"
 
 [dev-dependencies]
 assert_cmd = "2.0.14"

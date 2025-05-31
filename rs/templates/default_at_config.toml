@@ -1,0 +1,18 @@
+[version]
+# Files with the current project version (semantic version), updated when an `at merge` is performed.
+# Example: link = ["pyproject.toml", "rs/Cargo.toml", "RELEASE"]
+#   This configuration would keep the version updated in 3 places:
+#    - The pyproject.toml at the project root
+#    - The Cargo.toml in the 'rs' subdirectory
+#    - the custom file named RELEASE, which would simply contain the version and nothing more
+#
+#link = "[ <STANDARDIZED_PROJECT_FILE> | <FILE>, .. ]"
+link = []
+
+# This table concerns the version with build metadata in the format:
+# <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
+[version.extended]
+# Files where the version with the build metadata is written to as is
+# (will truncate the file)
+#raw = [<FILE>, .. ]
+raw = ["VERSION"]
