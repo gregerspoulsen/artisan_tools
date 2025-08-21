@@ -11,10 +11,10 @@ pub struct DryRun(pub bool);
 #[derive(Debug, Clone, Copy)]
 pub struct Yes(pub bool);
 
-pub fn handle_artisan_init(dry_run: DryRun, yes: Yes) -> Result<()> {
+pub fn handle_artisan_init(dry_run: DryRun, Yes(yes): Yes) -> Result<()> {
     let project_root: ProjectRootDir = std::env::current_dir()?.try_into()?;
     let (detected_project_type, project_file) = detect_project_type(&project_root);
-    let project_type_final = if yes.0 {
+    let project_type_final = if yes {
         detected_project_type.unwrap_or(ProjectType::ManualSetup)
     } else {
         user_confirmed_project_type(detected_project_type)?
@@ -32,21 +32,21 @@ fn init_project(
     project_root: &ProjectRootDir,
     project_type: &ProjectType,
     project_file: Option<&str>,
-    dry_run: DryRun,
+    DryRun(dry_run): DryRun,
 ) -> Result<()> {
     let default_config = AtConfig::customize_for(project_type, project_file)?;
 
     let styled_config_name = Style::new().bold().cyan().apply_to(AtConfig::NAME);
     let config_loc = project_root.0.join(AtConfig::NAME);
     let styled_config_loc = Style::new().underlined().apply_to(config_loc.display());
-    if dry_run.0 {
+    if dry_run {
         println!("Would write {styled_config_name} to {styled_config_loc}");
     } else {
         fs::write(config_loc, default_config.to_string())?;
         println!("Created {styled_config_name}");
     }
 
-    try_add_raw_version_file_to_gitignore(project_root, dry_run)?;
+    try_add_raw_version_file_to_gitignore(project_root, DryRun(dry_run))?;
 
     let start_cmd = Style::new().bold().yellow().apply_to("at sync");
     let prefix_emoji = Emoji("✅", "=>");
@@ -56,7 +56,7 @@ fn init_project(
 
 fn try_add_raw_version_file_to_gitignore(
     project_root: &ProjectRootDir,
-    dry_run: DryRun,
+    DryRun(dry_run): DryRun,
 ) -> Result<()> {
     let raw_version_file = AtConfig::DEFAULT_RAW_VERSION_FILE;
     let styled_raw_version_file = Style::new().bold().apply_to(raw_version_file);
@@ -65,7 +65,7 @@ fn try_add_raw_version_file_to_gitignore(
     let styled_gitignore = Style::new().underlined().apply_to(gitignore);
 
     if project_root.contains_file(gitignore) {
-        if dry_run.0 {
+        if dry_run {
             println!("Would add {styled_raw_version_file} to {styled_gitignore}");
         } else {
             let mut gitignore = fs::OpenOptions::new()
