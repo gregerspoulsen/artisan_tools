@@ -195,64 +195,99 @@ fn detect_project_type(root: &ProjectRootDir) -> (Option<ProjectType>, Option<St
 
 #[cfg(test)]
 mod tests {
-    use pretty_assertions::assert_str_eq;
     use test_log::test;
     use testresult::TestResult;
+    use toml::Value;
 
     use super::*;
 
     #[test]
     fn test_customize_config_for_rust() -> TestResult {
-        let expected_cfg = r###"[version]
-# Files with the current project version (semantic version), updated when an `at merge` is performed.
-# Example: link = ["pyproject.toml", "rs/Cargo.toml", "RELEASE"]
-#   This configuration would keep the version updated in 3 places:
-#    - The pyproject.toml at the project root
-#    - The Cargo.toml in the 'rs' subdirectory
-#    - the custom file named RELEASE, which would simply contain the version and nothing more
-#
-#link = "[ <STANDARDIZED_PROJECT_FILE> | <FILE>, .. ]"
-link = ["Cargo.toml"]
-
-# This table concerns the version with build metadata in the format:
-# <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
-[version.extended]
-# Files where the version with the build metadata is written to as is
-# (will truncate the file)
-#raw = [<FILE>, .. ]
-raw = ["VERSION"]
-"###;
         let customized_cfg = AtConfig::customize_for(&ProjectType::Rust, None)?;
+        let customized_cfg_str = customized_cfg.to_string();
 
-        assert_str_eq!(expected_cfg, customized_cfg.to_string());
+        let parsed: Value = toml::from_str(&customized_cfg_str)?;
+
+        // Assert version.link contains "Cargo.toml"
+        let version_link = parsed
+            .get("version")
+            .and_then(|v| v.get("link"))
+            .and_then(|l| l.as_array())
+            .expect("version.link should be an array");
+
+        assert_eq!(version_link.len(), 1);
+        assert_eq!(version_link[0].as_str(), Some("Cargo.toml"));
+
+        // Assert version.extended.raw contains "VERSION"
+        let extended_raw = parsed
+            .get("version")
+            .and_then(|v| v.get("extended"))
+            .and_then(|e| e.get("raw"))
+            .and_then(|r| r.as_array())
+            .expect("version.extended.raw should be an array");
+
+        assert_eq!(extended_raw.len(), 1);
+        assert_eq!(extended_raw[0].as_str(), Some("VERSION"));
+
+        insta::assert_snapshot!("Default config customized for Rust", customized_cfg_str);
 
         Ok(())
     }
 
     #[test]
     fn test_customize_config_for_python() -> TestResult {
-        let expected_cfg = r###"[version]
-# Files with the current project version (semantic version), updated when an `at merge` is performed.
-# Example: link = ["pyproject.toml", "rs/Cargo.toml", "RELEASE"]
-#   This configuration would keep the version updated in 3 places:
-#    - The pyproject.toml at the project root
-#    - The Cargo.toml in the 'rs' subdirectory
-#    - the custom file named RELEASE, which would simply contain the version and nothing more
-#
-#link = "[ <STANDARDIZED_PROJECT_FILE> | <FILE>, .. ]"
-link = ["pyproject.toml"]
-
-# This table concerns the version with build metadata in the format:
-# <SEMVER>+<BRANCH>-<GIT_SHORT_SHA>[-dirty]
-[version.extended]
-# Files where the version with the build metadata is written to as is
-# (will truncate the file)
-#raw = [<FILE>, .. ]
-raw = ["VERSION"]
-"###;
         let customized_cfg = AtConfig::customize_for(&ProjectType::Python, Some("pyproject.toml"))?;
+        let customized_cfg_str = customized_cfg.to_string();
 
-        assert_str_eq!(expected_cfg, customized_cfg.to_string());
+        let parsed: Value = toml::from_str(&customized_cfg_str)?;
+
+        // Assert version.link contains "pyproject.toml"
+        let version_link = parsed
+            .get("version")
+            .and_then(|v| v.get("link"))
+            .and_then(|l| l.as_array())
+            .expect("version.link should be an array");
+
+        assert_eq!(version_link.len(), 1);
+        assert_eq!(version_link[0].as_str(), Some("pyproject.toml"));
+
+        // Assert version.extended.raw contains "VERSION"
+        let extended_raw = parsed
+            .get("version")
+            .and_then(|v| v.get("extended"))
+            .and_then(|e| e.get("raw"))
+            .and_then(|r| r.as_array())
+            .expect("version.extended.raw should be an array");
+
+        assert_eq!(extended_raw.len(), 1);
+        assert_eq!(extended_raw[0].as_str(), Some("VERSION"));
+
+        insta::assert_snapshot!("Default config customized for Python", customized_cfg_str);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_customize_config_for_go() -> TestResult {
+        let customized_cfg = AtConfig::customize_for(&ProjectType::Go, None)?;
+        let customized_cfg_str = customized_cfg.to_string();
+
+        // Parse the TOML and assert on specific values
+        let parsed: Value = toml::from_str(&customized_cfg_str)?;
+
+        // Go projects might have different configuration, adjust assertions as needed
+        // For now, just assert that extended.raw contains "VERSION"
+        let extended_raw = parsed
+            .get("version")
+            .and_then(|v| v.get("extended"))
+            .and_then(|e| e.get("raw"))
+            .and_then(|r| r.as_array())
+            .expect("version.extended.raw should be an array");
+
+        assert_eq!(extended_raw.len(), 1);
+        assert_eq!(extended_raw[0].as_str(), Some("VERSION"));
+
+        insta::assert_snapshot!("Default config customized for Go", customized_cfg_str);
 
         Ok(())
     }

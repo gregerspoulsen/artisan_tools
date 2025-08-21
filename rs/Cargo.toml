@@ -61,6 +61,7 @@ pretty_assertions.workspace = true
 tempfile.workspace = true
 test-log.workspace = true
 yaml-rust2 = "0.10"
+insta = { version = "1.43.1", features = ["toml"] }
 
 # Relatively fast-compiling release build
 [profile.release]
