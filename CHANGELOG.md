@@ -1,7 +1,8 @@
 # Changelog
 
-## [1.1.9] - 2025-05-28
-- Change changelog template to yaml format
+## [1.1.10] - 2025-05-29
+- Add initial Artisan Tools 2.0 config
+- Implement interactive `at init`
 
 ## [1.1.8] - 2025-05-21
 - Add template generation code

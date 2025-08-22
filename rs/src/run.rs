@@ -3,6 +3,7 @@ use std::fs;
 use crate::{
     changeset,
     cli::{Command, VersionCommand},
+    init::{self, DryRun, Yes},
     version::AtVersion,
 };
 use anyhow::{Context, Result};
@@ -36,6 +37,9 @@ pub fn command(cmd: Command) -> Result<()> {
                 "Created new changeset file with target: {}",
                 target.as_str()
             );
+        }
+        Command::Init { dry_run, yes } => {
+            init::handle_artisan_init(DryRun(dry_run), Yes(yes))?;
         }
     }
     Ok(())

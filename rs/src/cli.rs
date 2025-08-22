@@ -7,8 +7,6 @@ use clap::{
     Parser, Subcommand,
 };
 
-pub mod display;
-
 /// CLI for Artisan Tools.
 #[derive(Parser, Debug, Clone, Copy)]
 #[command(name = "artisan-tools")]
@@ -30,6 +28,15 @@ pub enum Command {
     Changeset {
         #[arg(value_enum, default_value_t = BumpTarget::Patch)]
         target: BumpTarget,
+    },
+    /// Setup Artisan Tools for an existing project
+    Init {
+        /// Print what Artisan Tools would do without doing it
+        #[arg(long)]
+        dry_run: bool,
+        /// Automatically accept all recommended/default values
+        #[arg(short('y'), long("yes"))]
+        yes: bool,
     },
 }
 
