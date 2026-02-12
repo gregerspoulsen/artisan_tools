@@ -4,7 +4,6 @@ from artisan_tools.version.cli import (
     factory,
 )
 
-
 runner = CliRunner()
 
 

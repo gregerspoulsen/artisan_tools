@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     dev:
         build:
@@ -11,3 +9,4 @@ services:
             - ../:/app
             - ${SSH_AUTH_SOCK}:/ssh-agent
         privileged: true # Required to run podman inside container
+        cgroup: host # Required for cgroup v2 delegation to nested containers

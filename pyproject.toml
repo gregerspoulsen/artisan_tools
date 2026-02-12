@@ -1,23 +1,22 @@
 [project]
 name = "artisan-tools"
-version = "1.1.9"
+version = "1.1.10"
 dependencies = [
   "semver",
   "typer",
-  "click<8.2", # causes error in type==0.15.3
-  "rich", # pretty output for typer
+  "click<8.2",         # causes error in type==0.15.3
+  "rich",              # pretty output for typer
   "pyyaml",
   "structlog",
+  "typing_extensions",
 ]
 requires-python = ">=3.7"
-authors = [
-  {name = "Gregers Poulsen", email = "gp@skytem.com"},
-]
+authors = [{ name = "Gregers Poulsen", email = "gp@skytem.com" }]
 description = "Tools to make software artisanship a breeze"
 readme = "README.rst"
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python"
+  "Programming Language :: Python",
 ]
 
 
